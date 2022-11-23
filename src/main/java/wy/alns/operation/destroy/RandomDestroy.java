@@ -1,4 +1,4 @@
-package wy.alns.destroy;
+package wy.alns.operation.destroy;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,7 +6,7 @@ import java.util.Random;
 
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.operation.ALNSAbstractOperation;
-import wy.alns.instance.Route;
+import wy.alns.vo.Route;
 
 /**  
 * <p>Title: RandomDestroy</p>  

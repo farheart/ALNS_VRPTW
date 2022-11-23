@@ -3,7 +3,7 @@ package wy.alns.algrithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import wy.alns.instance.Route;
+import wy.alns.vo.Route;
 
 /**
  * @author zll_hust

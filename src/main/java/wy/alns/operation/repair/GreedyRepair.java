@@ -1,8 +1,8 @@
-package wy.alns.repair;
+package wy.alns.operation.repair;
 
-import wy.alns.algrithm.Cost;
+import wy.alns.vo.Cost;
 import wy.alns.algrithm.MyALNSSolution;
-import wy.alns.instance.Node;
+import wy.alns.vo.Node;
 
 /**  
 * <p>Title: GreedyRepair</p>  

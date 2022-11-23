@@ -1,12 +1,13 @@
-package wy.alns.algrithm;
+package wy.alns.algrithm.solver;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import wy.alns.instance.Node;
-import wy.alns.instance.Route;
-import wy.alns.instance.Instance;
+import wy.alns.algrithm.Solution;
+import wy.alns.vo.Node;
+import wy.alns.vo.Route;
+import wy.alns.vo.Instance;
 
 /**
  * This class contains all the necessary functionality in order to solve the VRP problem using a greedy approach.

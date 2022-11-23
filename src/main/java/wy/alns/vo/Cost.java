@@ -1,4 +1,4 @@
-package wy.alns.algrithm;
+package wy.alns.vo;
 
 public class Cost {
 	public double total;

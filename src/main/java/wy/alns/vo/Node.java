@@ -1,4 +1,4 @@
-package wy.alns.instance;
+package wy.alns.vo;
 
 /**
  * @author zll_hust

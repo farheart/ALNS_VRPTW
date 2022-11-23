@@ -1,7 +1,7 @@
 package wy.alns.algrithm;
 
-import wy.alns.instance.Route;
-import wy.alns.instance.Instance;
+import wy.alns.vo.Route;
+import wy.alns.vo.Instance;
 
 
 

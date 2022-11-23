@@ -6,10 +6,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import wy.alns.algrithm.Solution;
 import wy.alns.algrithm.SolutionValidator;
-import wy.alns.algrithm.Solver;
-import wy.alns.config.ALNSConfiguration;
-import wy.alns.config.IALNSConfig;
-import wy.alns.instance.Instance;
+import wy.alns.algrithm.solver.Solver;
+import wy.alns.algrithm.ALNSConfiguration;
+import wy.alns.vo.Instance;
 
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -58,8 +57,8 @@ public class Test {
         log.info(">> ALL DONE");
     }
 
-    // solve函数，输出解 输入变量：算例名，客户数，
-    private static String[] solve(String name, String instanceType, int size, IALNSConfig c) throws Exception {
+
+    private static String[] solve(String name, String instanceType, int size, ALNSConfiguration c) throws Exception {
         Instance instance = new Instance(size, name, instanceType);
         SolutionValidator solutionValidator = new SolutionValidator(instance);
         Solver solver = new Solver();

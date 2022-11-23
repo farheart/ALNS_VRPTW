@@ -1,7 +1,9 @@
-package wy.alns.config;
+package wy.alns.algrithm;
 
+import lombok.Getter;
 
-public enum ALNSConfiguration implements IALNSConfig {
+@Getter
+public enum ALNSConfiguration  {
     DEFAULT(5000, 500, 0.1, 20, 5, 1, 0.99937, 0.05, 0.5);
     private final int omega;//迭代次数
     private final int tau;//更新算子选择概率的间隔迭代次数
@@ -25,48 +27,5 @@ public enum ALNSConfiguration implements IALNSConfig {
         this.big_omega = big_omega;
     }
 
-    @Override
-    public int getOmega() {
-        return omega;
-    }
 
-    @Override
-    public int getTau() {
-        return tau;
-    }
-
-    @Override
-    public double getR_p() {
-        return r_p;
-    }
-
-    @Override
-    public int getSigma_1() {
-        return sigma_1;
-    }
-
-    @Override
-    public int getSigma_2() {
-        return sigma_2;
-    }
-
-    @Override
-    public int getSigma_3() {
-        return sigma_3;
-    }
-
-    @Override
-    public double getC() {
-        return c;
-    }
-
-    @Override
-    public double getDelta() {
-        return delta;
-    }
-
-    @Override
-    public double getBig_omega() {
-        return big_omega;
-    }
 }

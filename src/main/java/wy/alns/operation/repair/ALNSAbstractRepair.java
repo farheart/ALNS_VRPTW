@@ -1,4 +1,4 @@
-package wy.alns.repair;
+package wy.alns.operation.repair;
 
 import wy.alns.operation.ALNSAbstractOperation;
 

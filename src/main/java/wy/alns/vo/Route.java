@@ -1,16 +1,9 @@
-package wy.alns.instance;
+package wy.alns.vo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import wy.alns.algrithm.Cost;
 
-
-/**
- * @author zll_hust
- *
- * Every instance of this class represents a Route (Vehicle) that will be used in order to serve a set of customers
- */
 public class Route {
 	
 	private int id;

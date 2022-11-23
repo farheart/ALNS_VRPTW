@@ -3,9 +3,10 @@ package wy.alns.algrithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import wy.alns.instance.Node;
-import wy.alns.instance.Route;
-import wy.alns.instance.Instance;
+import wy.alns.vo.Cost;
+import wy.alns.vo.Node;
+import wy.alns.vo.Route;
+import wy.alns.vo.Instance;
 
 /**  
 * <p>Title: ALNSSolution</p>  

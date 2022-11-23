@@ -1,7 +1,10 @@
-package wy.alns.algrithm;
+package wy.alns.algrithm.solver;
 
-import wy.alns.instance.Instance;
-import wy.alns.config.IALNSConfig;
+import wy.alns.algrithm.ALNSConfiguration;
+import wy.alns.algrithm.MyALNSProcess;
+import wy.alns.algrithm.Solution;
+import wy.alns.algrithm.solver.GreedyVRP;
+import wy.alns.vo.Instance;
 
 
 public class Solver {
@@ -14,7 +17,7 @@ public class Solver {
     	return greedyVRP.getInitialSolution();
     }
 
-    public Solution improveSolution(Solution s, IALNSConfig ac, Instance is) throws Exception {
+    public Solution improveSolution(Solution s, ALNSConfiguration ac, Instance is) throws Exception {
         MyALNSProcess ALNS = new MyALNSProcess(s, is, ac);
     	return ALNS.improveSolution();
     }

@@ -3,20 +3,19 @@ package wy.alns.algrithm;
 import java.io.IOException;
 import java.util.Random;
 
-import wy.alns.config.IALNSConfig;
-import wy.alns.destroy.IALNSDestroy;
-import wy.alns.destroy.RandomDestroy;
-import wy.alns.destroy.ShawDestroy;
-import wy.alns.destroy.WorstCostDestroy;
-import wy.alns.repair.GreedyRepair;
-import wy.alns.repair.IALNSRepair;
-import wy.alns.repair.RandomRepair;
-import wy.alns.repair.RegretRepair;
-import wy.alns.instance.Instance;
+import wy.alns.operation.destroy.IALNSDestroy;
+import wy.alns.operation.destroy.RandomDestroy;
+import wy.alns.operation.destroy.ShawDestroy;
+import wy.alns.operation.destroy.WorstCostDestroy;
+import wy.alns.operation.repair.GreedyRepair;
+import wy.alns.operation.repair.IALNSRepair;
+import wy.alns.operation.repair.RandomRepair;
+import wy.alns.operation.repair.RegretRepair;
+import wy.alns.vo.Instance;
 
 public class MyALNSProcess {
     // ²ÎÊý
-    private final IALNSConfig config;
+    private final ALNSConfiguration config;
     private final IALNSDestroy[] destroy_ops = new IALNSDestroy[]{
             //new ProximityZoneDestroy(),
             //new ZoneDestroy(),
@@ -47,7 +46,7 @@ public class MyALNSProcess {
     private double T_end;
     
 
-    public MyALNSProcess(Solution s_, Instance instance, IALNSConfig c) throws InterruptedException {
+    public MyALNSProcess(Solution s_, Instance instance, ALNSConfiguration c) throws InterruptedException {
         config = c;
         s_g = new MyALNSSolution(s_, instance);
         s_c = new MyALNSSolution(s_g);
@@ -255,7 +254,7 @@ public class MyALNSProcess {
         return this.apvm;
     }
 	*/
-    public IALNSConfig getConfig() {
+    public ALNSConfiguration getConfig() {
         return this.config;
     }
 
