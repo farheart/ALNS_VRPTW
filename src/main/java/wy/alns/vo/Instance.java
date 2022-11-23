@@ -23,16 +23,8 @@ import java.util.Random;
 public class Instance {
     private String name;
     private String type;
-    private Random r;
-    
-	public Random getRandom() {
-		return r;
-	}
 
-	public void setR(Random r) {
-		this.r = r;
-	}
-	
+
     /**
      * This list will keep all the nodes of the problem.
      * NOTE: position 0 of the list contains the depot.
@@ -54,20 +46,14 @@ public class Instance {
      */
     private Distance distance;
 
-    /**
-     * The total number of customers.
-     */
-    public int getCustomerNumber() {
-    	return this.customers.size();
-    }
+
 
 
     public Instance(int size, String name, String instanceType) throws IOException {
     	this.name = name;
     	this.type = instanceType;
 
-        r = new Random();
-        r.setSeed(-1);
+
 
     	this.loadVehicle(size, name);
         this.loadOrder(size, name);
@@ -145,4 +131,11 @@ public class Instance {
         }
         return dataFileName;
     }
+
+
+    public int getCustomerNumber() {
+        return this.customers.size();
+    }
+
+
 }

@@ -7,6 +7,7 @@ import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.operation.ALNSAbstractOperation;
+import wy.alns.util.RandomUtil;
 import wy.alns.vo.Route;
 
 /**
@@ -35,7 +36,7 @@ public class RandomDestroy extends ALNSAbstractOperation implements IALNSDestroy
 		while(s.removalCustomers.size() < removeNr ) {
 			
 			// 获取随机数
-			Random r = s.instance.getRandom();
+			Random r = RandomUtil.getRandom();
 			
     		ArrayList<Integer> routeList= new ArrayList<Integer>();
             for(int j = 0; j < s.routes.size(); j++)

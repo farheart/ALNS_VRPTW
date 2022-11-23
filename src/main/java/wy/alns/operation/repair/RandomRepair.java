@@ -3,6 +3,7 @@ package wy.alns.operation.repair;
 import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
+import wy.alns.util.RandomUtil;
 import wy.alns.vo.Measure;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.vo.Node;
@@ -26,7 +27,7 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
 		}
     	
     	// 获取随机数
-    	Random r = s.instance.getRandom();
+    	Random r = RandomUtil.getRandom();
     	int insertCusNr = s.removalCustomers.size();	
     	
     	for (int i = 0; i < insertCusNr; i++) {
