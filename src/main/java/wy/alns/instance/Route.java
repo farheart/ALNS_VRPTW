@@ -24,7 +24,7 @@ public class Route {
      * The cost of the current Route. It is calculated as the sum of the distances of every next node from the previous one.
      */   
 	private Cost cost; 
-    
+
     public Route(int id) {
         this.route = new ArrayList<>();
         this.id = id;
