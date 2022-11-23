@@ -65,7 +65,7 @@ public class MyALNSProcess {
     }
 
     public Solution improveSolution() throws Exception {
-        T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * s_c.cost.total;
+        T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * s_c.measure.totalCost;
         T = T_s;
         T_end = T_end_t * T_s;
         
@@ -88,13 +88,13 @@ public class MyALNSProcess {
             MyALNSSolution s_t = repairOperator.repair(s_destroy);
 
 
-            log.info("迭代次数 ：" +  i + "当前解 ：" + Math.round(s_t.cost.total * 100) / 100.0);
+            log.info("迭代次数 ：" +  i + "当前解 ：" + Math.round(s_t.measure.totalCost * 100) / 100.0);
             
             // 更新局部满意解
-            if (s_t.cost.total < s_c.cost.total) {
+            if (s_t.measure.totalCost < s_c.measure.totalCost) {
                 s_c = s_t;
                 // Upda更新全局满意解，sg全局满意解
-                if (s_t.cost.total < s_g.cost.total) {
+                if (s_t.measure.totalCost < s_g.measure.totalCost) {
                     handleNewGlobalMinimum(destroyOperator, repairOperator, s_t);
                 } else {
                 	// 更新局部满意解
@@ -162,7 +162,7 @@ public class MyALNSProcess {
     }
 
     private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(MyALNSSolution s_t) {
-        return Math.exp (-(s_t.cost.total - s_c.cost.total) / T);
+        return Math.exp (-(s_t.measure.totalCost - s_c.measure.totalCost) / T);
     }
 
     private int getQ(MyALNSSolution s_c2) {

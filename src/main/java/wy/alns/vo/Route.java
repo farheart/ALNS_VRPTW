@@ -21,17 +21,17 @@ public class Route {
     /**
      * The cost of the current Route. It is calculated as the sum of the distances of every next node from the previous one.
      */   
-	private Cost cost; 
+	private Measure measure;
 
     public Route(int id) {
         this.route = new ArrayList<>();
         this.id = id;
-        this.cost = new Cost();
+        this.measure = new Measure();
     }
     
     public Route cloneRoute() {
         Route clone = new Route(this.id);
-        clone.cost = new Cost(this.cost);
+        clone.measure = new Measure(this.measure);
         clone.route = new ArrayList<>(this.route);
 
         return clone;
@@ -84,7 +84,7 @@ public class Route {
     @Override
     public String toString() {
         String result =  "Route{" +
-                "cost = " + this.cost +
+                "cost = " + this.measure +
                 ", route = [";
 
         for (Node customer: this.route) {
@@ -97,15 +97,15 @@ public class Route {
 	/**
 	 * @return the cost
 	 */
-	public Cost getCost() {
-		return this.cost;
+	public Measure getCost() {
+		return this.measure;
 	}
 	
 	/**
-	 * @param cost the cost to set
+	 * @param measure the cost to set
 	 */
-	public void setCost(Cost cost) {
-		this.cost = cost;
+	public void setCost(Measure measure) {
+		this.measure = measure;
 	}
 
 }

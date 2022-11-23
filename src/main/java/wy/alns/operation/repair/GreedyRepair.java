@@ -1,7 +1,7 @@
 package wy.alns.operation.repair;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.vo.Cost;
+import wy.alns.vo.Measure;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.vo.Node;
 
@@ -43,19 +43,19 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
             	for (int i = 1; i < s.routes.get(j).getRoute().size() - 1; ++i) {
             		
             		// 评价插入情况
-    				Cost newCost = new Cost(s.cost);
-    				s.evaluateInsertCustomer(j, i, insertNode, newCost);
+    				Measure newMeasure = new Measure(s.measure);
+    				s.evaluateInsertCustomer(j, i, insertNode, newMeasure);
 
-            		if(newCost.total > Double.MAX_VALUE) {
-            			newCost.total = Double.MAX_VALUE;
+            		if(newMeasure.totalCost > Double.MAX_VALUE) {
+            			newMeasure.totalCost = Double.MAX_VALUE;
             		}
             		
             		// if a better insertion is found, set the position to insert in the move and update the minimum cost found
-            		if (newCost.total < bestCost) {
+            		if (newMeasure.totalCost < bestCost) {
             			//log.info(varCost.checkFeasible());
             			bestCusP = i;
             			bestRouteP = j;
-            			bestCost = newCost.total;	
+            			bestCost = newMeasure.totalCost;
             		}
             	}
         	}

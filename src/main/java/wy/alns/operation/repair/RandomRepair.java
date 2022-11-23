@@ -3,7 +3,7 @@ package wy.alns.operation.repair;
 import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.vo.Cost;
+import wy.alns.vo.Measure;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.vo.Node;
 import wy.alns.vo.Route;
@@ -39,8 +39,8 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     		// 最优插入方案
     		int bestRoutePosition = -1;
     		int bestCusomerPosition = -1;
-    		Cost bestCost = new Cost();
-    		bestCost.total = Double.MAX_VALUE;
+    		Measure bestMeasure = new Measure();
+    		bestMeasure.totalCost = Double.MAX_VALUE;
     		
     		ArrayList<Integer> routeList= new ArrayList<Integer>();
             for(int j = 0; j < s.routes.size(); j++)
@@ -74,14 +74,14 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     				int insertCusPosition = customerList.remove(0);
     				
     				// 评价插入情况
-    				Cost newCost = new Cost(s.cost);
-    				s.evaluateInsertCustomer(insertRoutePosition, insertCusPosition, insertNode, newCost);
+    				Measure newMeasure = new Measure(s.measure);
+    				s.evaluateInsertCustomer(insertRoutePosition, insertCusPosition, insertNode, newMeasure);
                     
     				// 更新最优插入位置
-    				if (newCost.total < bestCost.total) {
+    				if (newMeasure.totalCost < bestMeasure.totalCost) {
     					bestRoutePosition = insertRoutePosition;
     					bestCusomerPosition = insertCusPosition;
-    					bestCost = newCost;
+    					bestMeasure = newMeasure;
     				}
     			}
     			// 执行插入操作

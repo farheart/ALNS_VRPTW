@@ -56,7 +56,7 @@ public class SolutionValidator {
         		
         		totalCost += costInVehicle;
         		
-        		if (Math.abs(vehicle.getCost().cost - costInVehicle) > 0.001) checkCost = false;
+        		if (Math.abs(vehicle.getCost().distance - costInVehicle) > 0.001) checkCost = false;
         		if (Math.abs(vehicle.getCost().load - loadInVehicle) > 0.001) checkLoad = false;
         		if (Math.abs(vehicle.getCost().time - time) > 0.001) checkTime = false;
         		

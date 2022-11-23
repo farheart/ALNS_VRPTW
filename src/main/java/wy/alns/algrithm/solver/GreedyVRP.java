@@ -113,7 +113,7 @@ public class GreedyVRP {
             // A node that satisfies the capacity constraint found
             if (closestNode != null) {
                 // Increase the cost of the current route by the distance of the previous final node to the new one
-                currentVehicle.getCost().cost += smallestDistance;
+                currentVehicle.getCost().distance += smallestDistance;
 
                 // Increase the time of the current route by the distance of the previous final node to the new one and serves time
                 currentVehicle.getCost().time += smallestDistance;
@@ -135,7 +135,7 @@ public class GreedyVRP {
             // We didn't find any node that satisfies the condition.
             } else {
                 // Increase cost by the distance to travel from the last node back to depot
-                currentVehicle.getCost().cost += distance.between(lastInTheCurrentRoute, depot);
+                currentVehicle.getCost().distance += distance.between(lastInTheCurrentRoute, depot);
                 currentVehicle.getCost().time += distance.between(lastInTheCurrentRoute, depot);
 
                 // Terminate current route by adding the depot as a final destination
@@ -147,7 +147,7 @@ public class GreedyVRP {
                 solution.addRoute(currentVehicle);
 
                 // Increase the solution's total cost by the cost of the finalized route
-                solution.setTotalCost(solution.getTotalCost() + currentVehicle.getCost().cost);
+                solution.setTotalCost(solution.getTotalCost() + currentVehicle.getCost().distance);
                 
                 // If we used all vehicles, exit.
                 if ( this.vehicles.size()==0 ) {
@@ -165,13 +165,13 @@ public class GreedyVRP {
         }
 
         // Now add the final route to the solution
-        currentVehicle.getCost().cost += distance.between(currentVehicle.getLastNodeOfTheRoute(), depot);
+        currentVehicle.getCost().distance += distance.between(currentVehicle.getLastNodeOfTheRoute(), depot);
         currentVehicle.getCost().time += distance.between(currentVehicle.getLastNodeOfTheRoute(), depot);
         currentVehicle.addNodeToRoute(depot);
         currentVehicle.getCost().calculateTotalCost();
         
         solution.addRoute(currentVehicle);
-        solution.setTotalCost(solution.getTotalCost() + currentVehicle.getCost().cost);
+        solution.setTotalCost(solution.getTotalCost() + currentVehicle.getCost().distance);
         solution.setTotalCost((double)(Math.round(solution.getTotalCost() * 1000) / 1000.0));
 
         return solution;

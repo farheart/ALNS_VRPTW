@@ -15,7 +15,7 @@ import wy.alns.vo.*;
 public class MyALNSSolution {
 	
     public List<Route> routes;
-    public Cost cost;
+    public Measure measure;
     public int vehicleNr;
     public Instance instance;
 	
@@ -28,7 +28,7 @@ public class MyALNSSolution {
 
     public MyALNSSolution(Instance instance) {
         this.routes = new ArrayList<>();
-        this.cost = new Cost();
+        this.measure = new Measure();
         this.vehicleNr = 0;
         this.instance = instance;
         
@@ -39,9 +39,9 @@ public class MyALNSSolution {
     }
     
     public MyALNSSolution(Solution sol, Instance instance) {
-        this.cost = new Cost();
-        cost.cost = sol.getTotalCost();
-        cost.calculateTotalCost();
+        this.measure = new Measure();
+        measure.distance = sol.getTotalCost();
+        measure.calculateTotalCost();
         this.vehicleNr = sol.getVehicleNr();
         this.instance = instance;
         
@@ -57,7 +57,7 @@ public class MyALNSSolution {
     }
     
     public MyALNSSolution(MyALNSSolution sol) {
-    	this.cost = new Cost(sol.cost);
+    	this.measure = new Measure(sol.measure);
         this.vehicleNr = sol.vehicleNr;
         this.instance = sol.instance;
         
@@ -85,12 +85,12 @@ public class MyALNSSolution {
 		double cost = distance.between(n0, n1) - distance.between(n0, n) - distance.between(n, n1);
 		double load = -n.getDemand();
 
-		this.cost.cost += cost;
-		this.routes.get(routePosition).getCost().cost += cost;
+		this.measure.distance += cost;
+		this.routes.get(routePosition).getCost().distance += cost;
 		this.routes.get(routePosition).getCost().load += load;
 
-		this.cost.loadViolation -= this.routes.get(routePosition).getCost().loadViolation;
-		this.cost.timeViolation -= this.routes.get(routePosition).getCost().timeViolation;
+		this.measure.loadViolation -= this.routes.get(routePosition).getCost().loadViolation;
+		this.measure.timeViolation -= this.routes.get(routePosition).getCost().timeViolation;
 		
 		removalCustomers.add(route.removeNode(cusPosition));
 	}
@@ -110,11 +110,11 @@ public class MyALNSSolution {
 
 
 		// 更新当前路径、总路径的cost、load、load violation
-		this.cost.cost += cost;
-		this.routes.get(routePosition).getCost().cost += cost;
+		this.measure.distance += cost;
+		this.routes.get(routePosition).getCost().distance += cost;
 		this.routes.get(routePosition).getCost().load += load;
 		if (this.routes.get(routePosition).getCost().load > this.instance.getVehicleCapacity())
-			this.cost.loadViolation += this.routes.get(routePosition).getCost().load - this.instance.getVehicleCapacity();
+			this.measure.loadViolation += this.routes.get(routePosition).getCost().load - this.instance.getVehicleCapacity();
 		
 		route.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
 		
@@ -134,12 +134,12 @@ public class MyALNSSolution {
 		// 计算当前路径、总路径的time windows violation、time
 		this.routes.get(routePosition).getCost().time = time;
 		this.routes.get(routePosition).getCost().timeViolation = timeWindowViolation;
-		this.cost.timeViolation += timeWindowViolation;
+		this.measure.timeViolation += timeWindowViolation;
 		
-		this.cost.calculateTotalCost(this.alpha, this.beta);
+		this.measure.calculateTotalCost(this.alpha, this.beta);
 	}
 	
-	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Node insertCustomer, Cost newCost) {
+	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Node insertCustomer, Measure newMeasure) {
 		//TODO : duplicated TW
 		Distance distance = instance.getDistance();
 
@@ -154,10 +154,10 @@ public class MyALNSSolution {
 
 
 		
-		newCost.load += load;
-		newCost.cost += cost;
-		if (newCost.load > this.instance.getVehicleCapacity())
-			newCost.loadViolation += this.cost.load - this.instance.getVehicleCapacity();
+		newMeasure.load += load;
+		newMeasure.distance += cost;
+		if (newMeasure.load > this.instance.getVehicleCapacity())
+			newMeasure.loadViolation += this.measure.load - this.instance.getVehicleCapacity();
 		
 		route.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
 		
@@ -173,14 +173,14 @@ public class MyALNSSolution {
 			time += route.getRoute().get(i).getServiceTime();
 		}
 		
-		newCost.time = time;
-		newCost.timeViolation = timeWindowViolation;
+		newMeasure.time = time;
+		newMeasure.timeViolation = timeWindowViolation;
 		
-		newCost.calculateTotalCost(this.alpha, this.beta);
+		newMeasure.calculateTotalCost(this.alpha, this.beta);
 	}
 	
 	public boolean feasible() {
-		return (cost.timeViolation < 0.01 && cost.loadViolation < 0.01);
+		return (measure.timeViolation < 0.01 && measure.loadViolation < 0.01);
 	}
 	
 	public Solution toSolution() {
@@ -192,7 +192,7 @@ public class MyALNSSolution {
         }
 		
 		sol.setRoutes(solutionRoutes);
-		sol.setTotalCost(cost.cost);
+		sol.setTotalCost(measure.distance);
 		sol.setVehicleNr(vehicleNr);
 		
 		return sol;
@@ -201,7 +201,7 @@ public class MyALNSSolution {
     @Override
     public String toString() {
         String result = "Solution{" +
-                "Cost = " + cost +
+                "Cost = " + measure +
                 ", routes = [";
 
         for (Route vehicle: this.routes) {
@@ -212,9 +212,9 @@ public class MyALNSSolution {
     }
     
 	public int compareTo(MyALNSSolution arg0) {
-		if (this.cost.total >  arg0.cost.total ) {
+		if (this.measure.totalCost >  arg0.measure.totalCost) {
 			return 1;
-		} else if (this.cost == arg0.cost) {
+		} else if (this.measure == arg0.measure) {
 			return 0;
 		} else {
 			return -1;
