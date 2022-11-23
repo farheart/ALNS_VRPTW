@@ -3,17 +3,15 @@ package wy.alns.algrithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import wy.alns.vo.Cost;
-import wy.alns.vo.Node;
-import wy.alns.vo.Route;
-import wy.alns.vo.Instance;
+import wy.alns.vo.*;
 
-/**  
-* <p>Title: ALNSSolution</p>  
-* <p>Description: </p>  
-* @author zll_hust  
-* @date 2020年3月18日  
-*/
+
+/**
+ * MyALNSSolution
+ *
+ * @author Yu Wang
+ * @date  2022-11-19
+ */
 public class MyALNSSolution {
 	
     public List<Route> routes;
@@ -75,19 +73,18 @@ public class MyALNSSolution {
     }
     
 	public void removeCustomer(int routePosition, int cusPosition) {
-		//TODO 未进行时间窗去重处理
+		//TODO : duplicated TW
+		Distance distance = instance.getDistance();
+		
+		Route route = this.routes.get(routePosition);
 
-		double[][] distance = instance.getDistanceMatrix();
-		
-		Route removenRoute = this.routes.get(routePosition);
-		
-		//System.out.println(this);
-		double load = - removenRoute.getRoute().get(cusPosition).getDemand();
-		double cost = 
-				- distance[removenRoute.getRoute().get(cusPosition - 1).getId()][removenRoute.getRoute().get(cusPosition).getId()]
-				- distance[removenRoute.getRoute().get(cusPosition).getId()][removenRoute.getRoute().get(cusPosition + 1).getId()]
-				+ distance[removenRoute.getRoute().get(cusPosition - 1).getId()][removenRoute.getRoute().get(cusPosition + 1).getId()];
-		
+		Node n0 = route.getRoute().get(cusPosition - 1);
+		Node n = route.getRoute().get(cusPosition);
+		Node n1 = route.getRoute().get(cusPosition + 1);
+
+		double cost = distance.between(n0, n1) - distance.between(n0, n) - distance.between(n, n1);
+		double load = -n.getDemand();
+
 		this.cost.cost += cost;
 		this.routes.get(routePosition).getCost().cost += cost;
 		this.routes.get(routePosition).getCost().load += load;
@@ -95,22 +92,23 @@ public class MyALNSSolution {
 		this.cost.loadViolation -= this.routes.get(routePosition).getCost().loadViolation;
 		this.cost.timeViolation -= this.routes.get(routePosition).getCost().timeViolation;
 		
-		removalCustomers.add(removenRoute.removeNode(cusPosition));
+		removalCustomers.add(route.removeNode(cusPosition));
 	}
 	
 	public void insertCustomer(int routePosition, int insertCusPosition, Node insertCustomer) {
-		//TODO 时间窗去重未处理
-		double[][] distance = instance.getDistanceMatrix();
-		
-		Route insertRoute = this.routes.get(routePosition);
-		
-		// 计算load和cost的变化量
-		double load = + insertCustomer.getDemand();
-		double cost = 
-				+ distance[insertRoute.getRoute().get(insertCusPosition - 1).getId()][insertCustomer.getId()]
-				+ distance[insertCustomer.getId()][insertRoute.getRoute().get(insertCusPosition).getId()]
-				- distance[insertRoute.getRoute().get(insertCusPosition - 1).getId()][insertRoute.getRoute().get(insertCusPosition).getId()];
-		
+		//TODO : duplicated TW
+		Distance distance = instance.getDistance();
+
+		Route route = this.routes.get(routePosition);
+
+		Node n0 = route.getRoute().get(insertCusPosition - 1);
+		Node n = insertCustomer;
+		Node n1 = route.getRoute().get(insertCusPosition);
+
+		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
+		double load = +n.getDemand();
+
+
 		// 更新当前路径、总路径的cost、load、load violation
 		this.cost.cost += cost;
 		this.routes.get(routePosition).getCost().cost += cost;
@@ -118,19 +116,19 @@ public class MyALNSSolution {
 		if (this.routes.get(routePosition).getCost().load > this.instance.getVehicleCapacity())
 			this.cost.loadViolation += this.routes.get(routePosition).getCost().load - this.instance.getVehicleCapacity();
 		
-		insertRoute.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
+		route.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
 		
 		// 计算当前路径的time windows violation、time
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < insertRoute.getRoute().size(); i++) {	
-			time += distance[insertRoute.getRoute().get(i - 1).getId()][insertRoute.getRoute().get(i).getId()];
-			if (time < insertRoute.getRoute().get(i).getTimeWindow()[0])
-				time = insertRoute.getRoute().get(i).getTimeWindow()[0];
-			else if (time > insertRoute.getRoute().get(i).getTimeWindow()[1])
-				timeWindowViolation += time - insertRoute.getRoute().get(i).getTimeWindow()[1];
+		for (int i = 1; i < route.getRoute().size(); i++) {
+			time += distance.between(route.getRoute().get(i - 1), route.getRoute().get(i));
+			if (time < route.getRoute().get(i).getTimeWindow()[0])
+				time = route.getRoute().get(i).getTimeWindow()[0];
+			else if (time > route.getRoute().get(i).getTimeWindow()[1])
+				timeWindowViolation += time - route.getRoute().get(i).getTimeWindow()[1];
 			
-			time += insertRoute.getRoute().get(i).getServiceTime();
+			time += route.getRoute().get(i).getServiceTime();
 		}
 		
 		// 计算当前路径、总路径的time windows violation、time
@@ -142,34 +140,37 @@ public class MyALNSSolution {
 	}
 	
 	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Node insertCustomer, Cost newCost) {
-		//TODO 时间窗去重未处理
-		double[][] distance = instance.getDistanceMatrix();
-		
-		Route insertRoute = this.routes.get(routePosition).cloneRoute();
-		
-		double load = + insertCustomer.getDemand();
-		double cost = 
-				+ distance[insertRoute.getRoute().get(insertCusPosition - 1).getId()][insertCustomer.getId()]
-				+ distance[insertCustomer.getId()][insertRoute.getRoute().get(insertCusPosition).getId()]
-				- distance[insertRoute.getRoute().get(insertCusPosition - 1).getId()][insertRoute.getRoute().get(insertCusPosition).getId()];
+		//TODO : duplicated TW
+		Distance distance = instance.getDistance();
+
+		Route route = this.routes.get(routePosition).cloneRoute();
+
+		Node n0 = route.getRoute().get(insertCusPosition - 1);
+		Node n = insertCustomer;
+		Node n1 = route.getRoute().get(insertCusPosition);
+
+		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
+		double load = +n.getDemand();
+
+
 		
 		newCost.load += load;
 		newCost.cost += cost;
 		if (newCost.load > this.instance.getVehicleCapacity())
 			newCost.loadViolation += this.cost.load - this.instance.getVehicleCapacity();
 		
-		insertRoute.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
+		route.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
 		
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < insertRoute.getRoute().size(); i++) {	
-			time += distance[insertRoute.getRoute().get(i - 1).getId()][insertRoute.getRoute().get(i).getId()];
-			if (time < insertRoute.getRoute().get(i).getTimeWindow()[0])
-				time = insertRoute.getRoute().get(i).getTimeWindow()[0];
-			else if (time > insertRoute.getRoute().get(i).getTimeWindow()[1])
-				timeWindowViolation += time - insertRoute.getRoute().get(i).getTimeWindow()[1];
+		for (int i = 1; i < route.getRoute().size(); i++) {
+			time += distance.between(route.getRoute().get(i - 1), route.getRoute().get(i));
+			if (time < route.getRoute().get(i).getTimeWindow()[0])
+				time = route.getRoute().get(i).getTimeWindow()[0];
+			else if (time > route.getRoute().get(i).getTimeWindow()[1])
+				timeWindowViolation += time - route.getRoute().get(i).getTimeWindow()[1];
 			
-			time += insertRoute.getRoute().get(i).getServiceTime();
+			time += route.getRoute().get(i).getServiceTime();
 		}
 		
 		newCost.time = time;

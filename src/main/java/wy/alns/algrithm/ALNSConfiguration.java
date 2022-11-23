@@ -2,6 +2,13 @@ package wy.alns.algrithm;
 
 import lombok.Getter;
 
+
+/**
+ * ALNSConfiguration
+ *
+ * @author Yu Wang
+ * @date  2022-11-15
+ */
 @Getter
 public enum ALNSConfiguration  {
     DEFAULT(5000, 500, 0.1, 20, 5, 1, 0.99937, 0.05, 0.5);

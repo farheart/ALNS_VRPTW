@@ -4,6 +4,13 @@ import lombok.*;
 
 import java.util.*;
 
+
+/**
+ * ALNSAbstractOperation
+ *
+ * @author Yu Wang
+ * @date  2022-11-21
+ */
 @Data
 public abstract class ALNSAbstractOperation implements IALNSOperation {
     private final Random r = new Random();

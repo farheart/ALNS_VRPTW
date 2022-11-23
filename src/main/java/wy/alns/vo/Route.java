@@ -3,7 +3,12 @@ package wy.alns.vo;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Route
+ *
+ * @author Yu Wang
+ * @date  2022-11-15
+ */
 public class Route {
 	
 	private int id;

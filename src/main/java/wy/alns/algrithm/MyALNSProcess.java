@@ -3,6 +3,7 @@ package wy.alns.algrithm;
 import java.io.IOException;
 import java.util.Random;
 
+import lombok.extern.slf4j.Slf4j;
 import wy.alns.operation.destroy.IALNSDestroy;
 import wy.alns.operation.destroy.RandomDestroy;
 import wy.alns.operation.destroy.ShawDestroy;
@@ -13,6 +14,14 @@ import wy.alns.operation.repair.RandomRepair;
 import wy.alns.operation.repair.RegretRepair;
 import wy.alns.vo.Instance;
 
+
+/**
+ * MyALNSProcess
+ *
+ * @author Yu Wang
+ * @date  2022-11-19
+ */
+@Slf4j
 public class MyALNSProcess {
     // 参数
     private final ALNSConfiguration config;
@@ -79,7 +88,7 @@ public class MyALNSProcess {
             MyALNSSolution s_t = repairOperator.repair(s_destroy);
 
 
-            System.out.println("迭代次数 ：" +  i + "当前解 ：" + Math.round(s_t.cost.total * 100) / 100.0);
+            log.info("迭代次数 ：" +  i + "当前解 ：" + Math.round(s_t.cost.total * 100) / 100.0);
             
             // 更新局部满意解
             if (s_t.cost.total < s_c.cost.total) {
@@ -112,16 +121,16 @@ public class MyALNSProcess {
         
         // 输出程序耗时s
         double s = Math.round((System.currentTimeMillis() - t_start) * 1000) / 1000000.;
-        System.out.println("\nALNS progress cost " + s + "s.");
+        log.info("\nALNS progress cost " + s + "s.");
         
         // 输出算子使用情况
         for (IALNSDestroy destroy : destroy_ops){
-        	System.out.println(destroy.getClass().getName() + 
+        	log.info(destroy.getClass().getName() + 
         			" 被使用 " + destroy.getDraws() + "次.");
         }
         
         for (IALNSRepair repair : repair_ops){
-        	System.out.println(repair.getClass().getName() + 
+        	log.info(repair.getClass().getName() + 
         			" 被使用 " + repair.getDraws() + "次.");
         }
         solution.testTime = s;
@@ -144,7 +153,7 @@ public class MyALNSProcess {
     }
 
     private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, MyALNSSolution s_t) throws IOException {
-        //System.out.println(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, s_t.getCostFitness(), s_t.activeVehicles(), s_g.getUnscheduledJobs().size()));
+        //log.info(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, s_t.getCostFitness(), s_t.activeVehicles(), s_g.getUnscheduledJobs().size()));
 
         // Accept global best
         s_g = s_t;
@@ -157,8 +166,8 @@ public class MyALNSProcess {
     }
 
     private int getQ(MyALNSSolution s_c2) {
-        int q_l = Math.min((int) Math.ceil(0.05 * s_c2.instance.getCustomerNr()), 10);
-        int q_u = Math.min((int) Math.ceil(0.20 * s_c2.instance.getCustomerNr()), 30);
+        int q_l = Math.min((int) Math.ceil(0.05 * s_c2.instance.getCustomerNumber()), 10);
+        int q_u = Math.min((int) Math.ceil(0.20 * s_c2.instance.getCustomerNumber()), 30);
 
         Random r = new Random();
         return r.nextInt(q_u - q_l + 1) + q_l;

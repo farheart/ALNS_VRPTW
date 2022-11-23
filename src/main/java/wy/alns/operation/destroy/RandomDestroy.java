@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.operation.ALNSAbstractOperation;
 import wy.alns.vo.Route;
 
-/**  
-* <p>Title: RandomDestroy</p>  
-* <p>Description: </p>  
-* @author zll_hust  
-* @date 2020Äê3ÔÂ19ÈÕ  
-*/
+/**
+ * RandomDestroy
+ *
+ * @author Yu Wang
+ * @date  2022-11-20
+ */
+@Slf4j
 public class RandomDestroy extends ALNSAbstractOperation implements IALNSDestroy {
 	/*
 	@Override
@@ -26,7 +28,7 @@ public class RandomDestroy extends ALNSAbstractOperation implements IALNSDestroy
 	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
 		
 		if(s.removalCustomers.size() != 0) {
-			System.err.println("removalCustomers is not empty.");
+			log.error("removalCustomers is not empty.");
 			return s;
 		}
 		

@@ -6,7 +6,12 @@ import wy.alns.algrithm.Solution;
 import wy.alns.algrithm.solver.GreedyVRP;
 import wy.alns.vo.Instance;
 
-
+/**
+ * Solver
+ *
+ * @author Yu Wang
+ * @date  2022-11-17
+ */
 public class Solver {
 
     public Solver() {

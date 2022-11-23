@@ -3,18 +3,21 @@ package wy.alns.operation.destroy;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.operation.ALNSAbstractOperation;
+import wy.alns.vo.Distance;
 import wy.alns.vo.Node;
 import wy.alns.vo.Route;
 import wy.alns.vo.Instance;
 
-/**  
-* <p>Title: WorstCostDestroy</p>  
-* <p>Description: </p>  
-* @author zll_hust  
-* @date 2020Äê3ÔÂ19ÈÕ  
-*/
+/**
+ * WorstCostDestroy
+ *
+ * @author Yu Wang
+ * @date  2022-11-20
+ */
+@Slf4j
 public class WorstCostDestroy extends ALNSAbstractOperation implements IALNSDestroy {
     /*
 	@Override
@@ -27,7 +30,7 @@ public class WorstCostDestroy extends ALNSAbstractOperation implements IALNSDest
 	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
 		
 		if(s.removalCustomers.size() != 0) {
-			System.err.println("removalCustomers is not empty.");
+			log.error("removalCustomers is not empty.");
 			return s;
 		}
         
@@ -69,13 +72,13 @@ class Fitness implements Comparable<Fitness>{
 	}
 	
 	public static double calculateFitness(Instance instance, Node customer, Route route) {
-		double[][] distance = instance.getDistanceMatrix();
-		
-		double fitness = 
-				(route.getCost().getTimeViolation() + route.getCost().getLoadViolation() + customer.getDemand()) * 
-				( distance[customer.getId()][route.getRoute().get(0).getId()] +
-				distance[route.getRoute().get(0).getId()][customer.getId()] );
-	
+		Distance distance = instance.getDistance();
+
+		Node n0 = route.getRoute().get(0);
+		double v = route.getCost().getTimeViolation() + route.getCost().getLoadViolation() + customer.getDemand();
+		double distFactor = distance.between(customer, n0) + distance.between(n0, customer);
+		double fitness = v * distFactor;
+
 		return fitness;
 	}
 	

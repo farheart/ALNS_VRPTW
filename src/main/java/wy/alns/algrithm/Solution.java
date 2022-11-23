@@ -5,10 +5,12 @@ import java.util.List;
 
 import wy.alns.vo.Route;
 
+
 /**
- * @author zll_hust
+ * Solution
  *
- * An instance of this class repserents a solution to the VRP problem.
+ * @author Yu Wang
+ * @date  2022-11-19
  */
 public class Solution {
 	public double testTime;

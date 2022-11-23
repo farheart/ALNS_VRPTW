@@ -1,19 +1,25 @@
 package wy.alns.vo;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
 /**
  * Instance
+ *
+ * @author Yu Wang
+ * @date  2022-11-15
  */
 @Getter
+@Slf4j
 public class Instance {
     private String name;
     private String type;
@@ -36,7 +42,7 @@ public class Instance {
     /**
      * The available vehicles numbers.
      */
-    private int vehicleNr;
+    private int numVehicle;
     
     /**
      * The capacity of vehicles.
@@ -44,52 +50,45 @@ public class Instance {
     private int vehicleCapacity;
 
     /**
-     * A 2-D matrix that will keep the distances of every node to each other.
+     * distance map of every node to each other.
      */
-    private double[][] distanceMatrix;
+    private Distance distance;
 
     /**
      * The total number of customers.
      */
-    private int numberOfNodes;
-
-    public int getCustomerNr() {
-    	return this.numberOfNodes;
+    public int getCustomerNumber() {
+    	return this.customers.size();
     }
-	
+
+
     public Instance(int size, String name, String instanceType) throws IOException {
-        //读取算例数据
     	this.name = name;
-    	this.type = instanceType; 
-    	this.importVehicleData(size, name);
-    	
-    	this.customers = new ArrayList<Node>();
-        this.importCustomerData(size, name);
-       
-        this.distanceMatrix = new double[size + 5][size + 5];
-        createDistanceMatrix();
-        
+    	this.type = instanceType;
+
         r = new Random();
         r.setSeed(-1);
+
+    	this.loadVehicle(size, name);
+        this.loadOrder(size, name);
+
+        this.distance = new Distance(this.customers);
     }
     
-    //读取数据客户点数据
-    public void importCustomerData(int size, String name) throws IOException {
 
-    	String dataFileName = "";
-    	if (type.equals("Solomon"))
-    		dataFileName = "./instances" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
-    	else if (type.equals("Homberger"))
-    		dataFileName = "./instances" + "/homberger" + "/homberger_" + size + "/" + name + ".txt";
-    	
+    public void loadOrder(int size, String name) throws IOException {
+        this.customers = new ArrayList<Node>();
+
+        String dataFileName = findFileName(size, name);
+
         BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
 
         int data_in_x_lines = Integer.MAX_VALUE;
 
+        log.info(">> Loading customers ... ");
+
         String line;
-        
         while ((line = bReader.readLine()) != null) {
-        	//以空格为间隔符读取数据
             String datavalue[] = line.split("\\s+");
 
             if (datavalue.length > 0 && datavalue[0].equals("CUST")) {
@@ -109,24 +108,15 @@ public class Instance {
             data_in_x_lines--;
         }
         bReader.close();
-        
-        numberOfNodes = customers.size();
-        
-        System.out.println("Input customers success !");
-        
     }
-    
-    //读取数据车辆信息
-    public void importVehicleData(int size, String name) throws IOException {
 
-    	String dataFileName = "";
-    	if (type.equals("Solomon")) {
-    		dataFileName = "./instances" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
-        } else if (type.equals("Homberger")){
-    		dataFileName = "./instances" + "/homberger" + "/homberger_" + size + "/" + name + ".txt";
-        }
+
+    public void loadVehicle(int size, String name) throws IOException {
+        String dataFileName = findFileName(size, name);
 
         BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
+
+        log.info(">> Loading vehicles ... ");
 
         String line;
         int row = 0;
@@ -135,7 +125,7 @@ public class Instance {
 
             if (row == 4) {
             	//可用车辆数量
-                this.vehicleNr = Integer.valueOf(datavalue[1]);
+                this.numVehicle = Integer.valueOf(datavalue[1]);
                 //车辆容量
                 this.vehicleCapacity = Integer.valueOf(datavalue[2]);
                 break;
@@ -143,27 +133,16 @@ public class Instance {
             row++;
         }
         bReader.close();
-        
-        System.out.println("Input vehicle success !");
     }
 
 
-    
-    /**
-     * A helper function that creates the distance matrix.
-     */
-    private void createDistanceMatrix() {
-        for (int i = 0; i < this.numberOfNodes; i++) {
-            Node n1 = this.customers.get(i);
-
-            for (int j = 0; j < this.numberOfNodes; j++) {
-                Node n2 = this.customers.get(j);
-
-                this.distanceMatrix[i][j] =(double)(Math.round ( Math.sqrt(Math.pow(n1.getX() - n2.getX(), 2) +
-                        Math.pow(n1.getY() - n2.getY(), 2)) * 100 ) / 100.0);;
-            }
+    private String findFileName(int size, String name) {
+        String dataFileName = "";
+        if (type.equals("Solomon")) {
+            dataFileName = "./instances" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
+        } else if (type.equals("Homberger")) {
+            dataFileName = "./instances" + "/homberger" + "/homberger_" + size + "/" + name + ".txt";
         }
+        return dataFileName;
     }
-
-
 }

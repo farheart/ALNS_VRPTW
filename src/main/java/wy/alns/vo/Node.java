@@ -1,9 +1,10 @@
 package wy.alns.vo;
 
 /**
- * @author zll_hust
+ * Node: represent an customer order
  *
- * Every instance of this class represents a Node (customer) of the VRP problem.
+ * @author Yu Wang
+ * @date  2022-11-15
  */
 public class Node {
 	

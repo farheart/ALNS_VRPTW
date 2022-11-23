@@ -1,5 +1,12 @@
 package wy.alns.vo;
 
+
+/**
+ * Cost
+ *
+ * @author Yu Wang
+ * @date  2022-11-15
+ */
 public class Cost {
 	public double total;
 	public double cost; 

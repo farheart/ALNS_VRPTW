@@ -5,12 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import wy.alns.algrithm.Solution;
+import wy.alns.vo.Distance;
 import wy.alns.vo.Node;
 import wy.alns.vo.Route;
 import wy.alns.vo.Instance;
 
+
 /**
- * This class contains all the necessary functionality in order to solve the VRP problem using a greedy approach.
+ * GreedyVRP : solve using greedy
+ *
+ * @author Yu Wang
+ * @date  2022-11-17
  */
 public class GreedyVRP {
 
@@ -25,44 +30,40 @@ public class GreedyVRP {
     private List<Route> vehicles;
 
     /**
-     * The distance matrix for the customers
+     * distance map of every node to each other.
      */
-    private double[][] distanceMatrix;
+    private Distance distance;
     
     private int vehicleCapacity;
+    private int initialCustomerNr;
+
+    public int getCustomerNr() {
+        return this.initialCustomerNr;
+    }
+
+    public Distance getDistance() {
+        return this.distance;
+    }
+
 
     /**
      * Constructor
      */
     public GreedyVRP(Instance instance) { 	
 		this.customers = instance.getCustomers();
-		this.initialCustomerNr = instance.getCustomerNr();
-		this.distanceMatrix = instance.getDistanceMatrix();
+		this.initialCustomerNr = instance.getCustomerNumber();
+		this.distance = instance.getDistance();
 		this.vehicleCapacity = instance.getVehicleCapacity();
 		
-		int vehicleNr = instance.getVehicleNr();
+		int vehicleNr = instance.getNumVehicle();
 		this.vehicles = new ArrayList<Route>();
-		for(int i = 0;i < vehicleNr; ++i) {
+		for(int i = 0; i < vehicleNr; ++i) {
 			Route route = new Route(i);
 			this.vehicles.add(route);
         }
     }
-    
-    private int initialCustomerNr;
-    
-    public int getCustomerNr() {
-    	return this.initialCustomerNr;
-    }
 
-    public double[][] getDistanceMatrix() {
-        return distanceMatrix;
-    }
 
-    /**
-     * Finds and returns a solution to the VRP using greedy algorithm approach
-     *
-     * @return Solution
-     */
     public Solution getInitialSolution() {
         // The final Solution
         Solution solution = new Solution();
@@ -78,10 +79,10 @@ public class GreedyVRP {
 
         // Repeat until all customers are routed or if we run out vehicles.
         while (true) {
-
             // If we served all customers, exit.
-            if (this.customers.size() == 0)
+            if (this.customers.size() == 0) {
                 break;
+            }
 
             // Get the last node of the current route. We will try to find the closest node to it that also satisfies the capacity constraint.
             Node lastInTheCurrentRoute = currentVehicle.getLastNodeOfTheRoute();
@@ -94,15 +95,17 @@ public class GreedyVRP {
 
             // Find the nearest neighbor based on distance
             for (Node n: this.customers) {
-                double distance = this.distanceMatrix[lastInTheCurrentRoute.getId()][n.getId()];
+
+                double dist = this.distance.between(lastInTheCurrentRoute, n);
 
                 // If we found a customer with closer that the value of "smallestDistance" ,store him temporarily
-                if ( distance < smallestDistance &&
-                		(currentVehicle.getCost().load + n.getDemand()) <= vehicleCapacity &&
-                		(currentVehicle.getCost().time + distanceMatrix[currentVehicle.getId()][n.getId()]) < n.getTimeWindow()[1] &&
-                		(currentVehicle.getCost().time + distanceMatrix[currentVehicle.getId()][n.getId()] + n.getServiceTime() + distanceMatrix[n.getId()][depot.getId()]) < depot.getTimeWindow()[1] )
-                {
-                    smallestDistance = distance;
+                boolean ifDistValid = (dist < smallestDistance);
+                boolean ifCapacityValid = (currentVehicle.getCost().load + n.getDemand()) <= vehicleCapacity;
+                boolean ifArrTimeValid = (currentVehicle.getCost().time + distance.between(lastInTheCurrentRoute, n)) < n.getTimeWindow()[1];
+                boolean ifWithinSchedule = (currentVehicle.getCost().time + distance.between(lastInTheCurrentRoute, n) + n.getServiceTime() +  distance.between(n, depot) ) < depot.getTimeWindow()[1];
+
+                if (ifDistValid && ifCapacityValid && ifArrTimeValid && ifWithinSchedule) {
+                    smallestDistance = dist;
                     closestNode = n;
                 }
             }
@@ -132,8 +135,8 @@ public class GreedyVRP {
             // We didn't find any node that satisfies the condition.
             } else {
                 // Increase cost by the distance to travel from the last node back to depot
-                currentVehicle.getCost().cost += this.distanceMatrix[lastInTheCurrentRoute.getId()][depot.getId()];
-                currentVehicle.getCost().time += this.distanceMatrix[lastInTheCurrentRoute.getId()][depot.getId()];
+                currentVehicle.getCost().cost += distance.between(lastInTheCurrentRoute, depot);
+                currentVehicle.getCost().time += distance.between(lastInTheCurrentRoute, depot);
 
                 // Terminate current route by adding the depot as a final destination
                 currentVehicle.addNodeToRoute(depot);
@@ -162,8 +165,8 @@ public class GreedyVRP {
         }
 
         // Now add the final route to the solution
-        currentVehicle.getCost().cost += this.distanceMatrix[currentVehicle.getLastNodeOfTheRoute().getId()][depot.getId()];
-        currentVehicle.getCost().time += this.distanceMatrix[currentVehicle.getLastNodeOfTheRoute().getId()][depot.getId()];
+        currentVehicle.getCost().cost += distance.between(currentVehicle.getLastNodeOfTheRoute(), depot);
+        currentVehicle.getCost().time += distance.between(currentVehicle.getLastNodeOfTheRoute(), depot);
         currentVehicle.addNodeToRoute(depot);
         currentVehicle.getCost().calculateTotalCost();
         
@@ -173,4 +176,5 @@ public class GreedyVRP {
 
         return solution;
     }
+
 }

@@ -3,17 +3,20 @@ package wy.alns.operation.destroy;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.operation.ALNSAbstractOperation;
+import wy.alns.vo.Distance;
 import wy.alns.vo.Node;
 import wy.alns.vo.Route;
 
-/**  
-* <p>Title: ShawDestroy</p>  
-* <p>Description: </p>  
-* @author zll_hust  
-* @date 2020Äê3ÔÂ20ÈÕ  
-*/
+/**
+ * ShawDestroy
+ *
+ * @author Yu Wang
+ * @date  2022-11-20
+ */
+@Slf4j
 public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
 	/*
 	@Override
@@ -26,7 +29,7 @@ public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
 	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
 		
 		if(s.removalCustomers.size() != 0) {
-				System.err.println("removalCustomers is not empty.");
+				log.error("removalCustomers is not empty.");
 				return s;
 		}
 
@@ -71,8 +74,10 @@ public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
 		lastRoute = removenRoute;
 		lastRemovePos = -1;
 		lastRoutePos = -1;
-		
-		double[][] distance = s.instance.getDistanceMatrix();
+
+
+		Distance distance = s.instance.getDistance();
+		// double[][] distance = s.instance.getDistanceMatrix();
 		
 		while(s.removalCustomers.size() < removeNr ) {
 			
@@ -85,7 +90,7 @@ public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
 	        		int l = (lastRoute.getId() == s.routes.get(j).getId())? -1 : 1;
 	        		
 	        		double fitness = l * 2 + 
-	        				3 * distance[lastRemove.getId()][relatedNode.getId()] +
+	        				3 * distance.between(lastRemove, relatedNode) +
 	        				2 * Math.abs(lastRemove.getTimeWindow()[0] - relatedNode.getTimeWindow()[0]) +
 	        				2 * Math.abs(lastRemove.getDemand() - relatedNode.getDemand());
 	        		

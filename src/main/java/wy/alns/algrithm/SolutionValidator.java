@@ -1,30 +1,31 @@
 package wy.alns.algrithm;
 
+import wy.alns.vo.Distance;
 import wy.alns.vo.Route;
 import wy.alns.vo.Instance;
 
 
 
-/**  
-* <p>Title: CheckSolution</p>  
-* <p>Description: </p>  
-* @author zll_hust
-* @date 2020Äê3ÔÂ1ÈÕ  
-*/
+/**
+ * SolutionValidator
+ *
+ * @author Yu Wang
+ * @date  2022-11-21
+ */
 public class SolutionValidator {
 	
-	private double[][] distance;
+	private Instance instance;
 	
 	public SolutionValidator(Instance instance) {
-		this.distance = instance.getDistanceMatrix();
+		this.instance = instance;
 	}
 	
     public String Check(Solution solution) {
         String result = "";
         double totalCost = 0;
+		Distance distance = this.instance.getDistance();
 
         int id = 0;
-        
         for (int i = 0; i < solution.getRoutes().size(); i++) {
         	Route vehicle = solution.getRoutes().get(i);
         	if (vehicle.getRoute().size() >= 3) {
@@ -39,10 +40,12 @@ public class SolutionValidator {
         		boolean checkTime = true;
         		boolean checkTimeWindows = true;
 
-        		for (int j = 1; j < vehicle.getRoute().size(); j++) {	
-        			time += distance[vehicle.getRoute().get(j - 1).getId()][vehicle.getRoute().get(j).getId()];
-        			costInVehicle += distance[vehicle.getRoute().get(j - 1).getId()][vehicle.getRoute().get(j).getId()];
-        			loadInVehicle += vehicle.getRoute().get(j).getDemand();
+        		for (int j = 1; j < vehicle.getRoute().size(); j++) {
+					double dist = this.instance.getDistance().between(vehicle.getRoute().get(j - 1), vehicle.getRoute().get(j));
+					time += dist;
+					costInVehicle += dist;
+
+					loadInVehicle += vehicle.getRoute().get(j).getDemand();
         			if (time < vehicle.getRoute().get(j).getTimeWindow()[0])
         				time = vehicle.getRoute().get(j).getTimeWindow()[0];
         			else if (time > vehicle.getRoute().get(j).getTimeWindow()[1])

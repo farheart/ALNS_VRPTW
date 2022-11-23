@@ -3,24 +3,26 @@ package wy.alns.operation.repair;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import lombok.extern.slf4j.Slf4j;
 import wy.alns.vo.Cost;
 import wy.alns.algrithm.MyALNSSolution;
 import wy.alns.vo.Node;
 
 
-/**  
-* <p>Title: RegretRepair</p>  
-* <p>Description: </p>  
-* @author zll_hust  
-* @date 2020年3月20日  
-*/
+/**
+ * RegretRepair
+ *
+ * @author Yu Wang
+ * @date  2022-11-20
+ */
+@Slf4j
 public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
 
 	@Override
 	public MyALNSSolution repair(MyALNSSolution s) {
 		// 如果没有移除的客户，上一步错误
     	if(s.removalCustomers.size() == 0) {
-			System.err.println("removalCustomers is empty!");
+			log.error("removalCustomers is empty!");
 			return s;
 		}
     	
@@ -56,7 +58,7 @@ public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
             		
             		// if a better insertion is found, set the position to insert in the move and update the minimum cost found
             		if (newCost.total < first) {
-            			//System.out.println(varCost.checkFeasible());
+            			//log.info(varCost.checkFeasible());
             			bestCusP = i;
             			bestRouteP = j;
             			second = first;
