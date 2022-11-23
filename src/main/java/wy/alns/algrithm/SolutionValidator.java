@@ -1,9 +1,7 @@
-package zll.vrptw.algrithm;
+package wy.alns.algrithm;
 
-import java.util.Arrays;
-
-import zll.vrptw.instance.Route;
-import zll.vrptw.instance.Instance;
+import wy.alns.instance.Route;
+import wy.alns.instance.Instance;
 
 
 
@@ -13,11 +11,11 @@ import zll.vrptw.instance.Instance;
 * @author zll_hust
 * @date 2020Äê3ÔÂ1ÈÕ  
 */
-public class CheckSolution {
+public class SolutionValidator {
 	
 	private double[][] distance;
 	
-	public CheckSolution(Instance instance) {
+	public SolutionValidator(Instance instance) {
 		this.distance = instance.getDistanceMatrix();
 	}
 	

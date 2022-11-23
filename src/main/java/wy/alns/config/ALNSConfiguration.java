@@ -1,4 +1,4 @@
-package zll.vrptw.alns.config;
+package wy.alns.config;
 
 
 public enum ALNSConfiguration implements IALNSConfig {

@@ -1,4 +1,6 @@
-package zll.vrptw.instance;
+package wy.alns.instance;
+
+import lombok.Getter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,16 +10,11 @@ import java.util.List;
 import java.util.Random;
 
 
-/**  
-* <p>Title: SolomnInstance</p>  
-* <p>Description: </p>  
-* @author zll_hust  
-* @date 2020Äê3ÔÂ14ÈÕ  
-*/
+/**
+ * Instance
+ */
+@Getter
 public class Instance {
-	
-    private int[] vehicleInfo;
-    private int[][] customerInfo;
     private String name;
     private String type;
     private Random r;
@@ -56,22 +53,6 @@ public class Instance {
      */
     private int numberOfNodes;
 
-    public List<Node> getCustomers() {
-        return new ArrayList<>(this.customers);
-    }
-
-    public double[][] getDistanceMatrix() {
-        return this.distanceMatrix;
-    }
-    
-    public int getVehicleNr() {
-    	return this.vehicleNr;
-    }
-    
-    public int getVehicleCapacity() {
-    	return this.vehicleCapacity;
-    }
-    
     public int getCustomerNr() {
     	return this.numberOfNodes;
     }
@@ -165,18 +146,8 @@ public class Instance {
         
         System.out.println("Input vehicle success !");
     }
-    
-    public int[] getVehicleInfo() {
-        return vehicleInfo;
-    }
 
-    public int[][] getCustomerInfo() {
-        return customerInfo;
-    }
 
-    public String getName() {
-        return this.name;
-    }
     
     /**
      * A helper function that creates the distance matrix.
@@ -193,5 +164,6 @@ public class Instance {
             }
         }
     }
+
 
 }
