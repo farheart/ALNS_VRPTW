@@ -27,8 +27,6 @@ public class Route {
 
     /**
      * Constructor
-     *
-     * @param capacity The capacity for this Vehicle
      */
     public Route(int id) {
         this.route = new ArrayList<>();
