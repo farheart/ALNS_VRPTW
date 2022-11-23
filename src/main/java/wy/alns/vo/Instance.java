@@ -34,12 +34,8 @@ public class Instance {
     /**
      * The available vehicles numbers.
      */
-    private int numVehicle;
-    
-    /**
-     * The capacity of vehicles.
-     */
-    private int vehicleCapacity;
+    private List<Vehicle> vehicles;
+
 
     /**
      * distance map of every node to each other.
@@ -47,31 +43,25 @@ public class Instance {
     private Distance distance;
 
 
-
-
     public Instance(int size, String name, String instanceType) throws IOException {
     	this.name = name;
     	this.type = instanceType;
 
-
-
-    	this.loadVehicle(size, name);
-        this.loadOrder(size, name);
+        String dataFileName = findFileName(size, name);
+    	this.vehicles = this.loadVehicle(dataFileName);
+        this.customers = this.loadOrder(dataFileName);
 
         this.distance = new Distance(this.customers);
     }
     
 
-    public void loadOrder(int size, String name) throws IOException {
-        this.customers = new ArrayList<Node>();
-
-        String dataFileName = findFileName(size, name);
+    public ArrayList<Node> loadOrder(String dataFileName) throws IOException {
+        log.info(">> Loading customers ... ");
+        ArrayList<Node> customers = new ArrayList<Node>();
 
         BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
 
         int data_in_x_lines = Integer.MAX_VALUE;
-
-        log.info(">> Loading customers ... ");
 
         String line;
         while ((line = bReader.readLine()) != null) {
@@ -89,20 +79,20 @@ public class Instance {
                 customer.setDemand(Double.parseDouble(datavalue[4]));
                 customer.setTimeWindow(Double.parseDouble(datavalue[5]), Double.parseDouble(datavalue[6]));
                 customer.setServiceTime(Double.parseDouble(datavalue[7]));
-                this.customers.add(customer);
+                customers.add(customer);
             }
             data_in_x_lines--;
         }
         bReader.close();
+        return customers;
     }
 
 
-    public void loadVehicle(int size, String name) throws IOException {
-        String dataFileName = findFileName(size, name);
-
-        BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
-
+    public List<Vehicle> loadVehicle(String dataFileName) throws IOException {
         log.info(">> Loading vehicles ... ");
+
+        List<Vehicle> result = new ArrayList<>();
+        BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
 
         String line;
         int row = 0;
@@ -110,15 +100,23 @@ public class Instance {
             String datavalue[] = line.split("\\s+");
 
             if (row == 4) {
-            	//可用车辆数量
-                this.numVehicle = Integer.valueOf(datavalue[1]);
-                //车辆容量
-                this.vehicleCapacity = Integer.valueOf(datavalue[2]);
+            	// number of vehicles
+                int numVehicle = Integer.valueOf(datavalue[1]);
+
+                // capacity of vehicle
+                int vehicleCapacity = Integer.valueOf(datavalue[2]);
+
+                for (int i=0; i<numVehicle; i++) {
+                    Vehicle v = new Vehicle(String.valueOf(i));
+                    v.setCapacity(vehicleCapacity);
+                    result.add(v);
+                }
                 break;
             }
             row++;
         }
         bReader.close();
+        return result;
     }
 
 
@@ -136,6 +134,5 @@ public class Instance {
     public int getCustomerNumber() {
         return this.customers.size();
     }
-
 
 }

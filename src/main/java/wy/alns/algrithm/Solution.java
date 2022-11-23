@@ -94,7 +94,7 @@ public class Solution {
                 ", routes=[";
 
         for (Route vehicle: this.routes) {
-        	if (vehicle.getRoute().size() > 2)
+        	if (vehicle.getNodeList().size() > 2)
         		result += "\n\t" + vehicle;
         }
 

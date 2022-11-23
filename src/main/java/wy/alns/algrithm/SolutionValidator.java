@@ -28,7 +28,7 @@ public class SolutionValidator {
         int id = 0;
         for (int i = 0; i < solution.getRoutes().size(); i++) {
         	Route vehicle = solution.getRoutes().get(i);
-        	if (vehicle.getRoute().size() >= 3) {
+        	if (vehicle.getNodeList().size() >= 3) {
         		id++;
         		
         		double costInVehicle = 0;
@@ -40,25 +40,25 @@ public class SolutionValidator {
         		boolean checkTime = true;
         		boolean checkTimeWindows = true;
 
-        		for (int j = 1; j < vehicle.getRoute().size(); j++) {
-					double dist = this.instance.getDistance().between(vehicle.getRoute().get(j - 1), vehicle.getRoute().get(j));
+        		for (int j = 1; j < vehicle.getNodeList().size(); j++) {
+					double dist = this.instance.getDistance().between(vehicle.getNodeList().get(j - 1), vehicle.getNodeList().get(j));
 					time += dist;
 					costInVehicle += dist;
 
-					loadInVehicle += vehicle.getRoute().get(j).getDemand();
-        			if (time < vehicle.getRoute().get(j).getTimeWindow()[0])
-        				time = vehicle.getRoute().get(j).getTimeWindow()[0];
-        			else if (time > vehicle.getRoute().get(j).getTimeWindow()[1])
+					loadInVehicle += vehicle.getNodeList().get(j).getDemand();
+        			if (time < vehicle.getNodeList().get(j).getTimeWindow()[0])
+        				time = vehicle.getNodeList().get(j).getTimeWindow()[0];
+        			else if (time > vehicle.getNodeList().get(j).getTimeWindow()[1])
         				checkTimeWindows = false;
         			
-        			time += vehicle.getRoute().get(j).getServiceTime();
+        			time += vehicle.getNodeList().get(j).getServiceTime();
         		}
         		
         		totalCost += costInVehicle;
         		
-        		if (Math.abs(vehicle.getCost().distance - costInVehicle) > 0.001) checkCost = false;
-        		if (Math.abs(vehicle.getCost().load - loadInVehicle) > 0.001) checkLoad = false;
-        		if (Math.abs(vehicle.getCost().time - time) > 0.001) checkTime = false;
+        		if (Math.abs(vehicle.getMeasure().distance - costInVehicle) > 0.001) checkCost = false;
+        		if (Math.abs(vehicle.getMeasure().load - loadInVehicle) > 0.001) checkLoad = false;
+        		if (Math.abs(vehicle.getMeasure().time - time) > 0.001) checkTime = false;
         		
         		
         		result += "\n check route " + id + ": "

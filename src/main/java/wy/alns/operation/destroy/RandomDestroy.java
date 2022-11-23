@@ -48,13 +48,13 @@ public class RandomDestroy extends ALNSAbstractOperation implements IALNSDestroy
 			int removenRoutePosition = routeList.remove(0);
 			Route removenRoute = s.routes.get(removenRoutePosition);
 			
-			while(removenRoute.getRoute().size() <= 2) {
+			while(removenRoute.getNodeList().size() <= 2) {
 				removenRoutePosition = routeList.remove(0);
 				removenRoute = s.routes.get(removenRoutePosition);
 			}
 			
 			// 选择被移除的客户
-			int removenCustomerPosition = r.nextInt(removenRoute.getRoute().size() - 2) + 1;
+			int removenCustomerPosition = r.nextInt(removenRoute.getNodeList().size() - 2) + 1;
 			
 			s.removeCustomer(removenRoutePosition, removenCustomerPosition);
 		}

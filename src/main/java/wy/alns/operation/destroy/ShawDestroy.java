@@ -18,13 +18,7 @@ import wy.alns.vo.Route;
  */
 @Slf4j
 public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
-	/*
-	@Override
-	public ALNSStrategieVisualizationManager getVisualizationManager() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	*/
+
 	@Override
 	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
 		
@@ -48,24 +42,24 @@ public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
 		int removenRoutePosition = routeList.remove(0);
 		Route removenRoute = s.routes.get(removenRoutePosition);
 		
-		while(removenRoute.getRoute().size() <= 2) {
+		while(removenRoute.getNodeList().size() <= 2) {
 			removenRoutePosition = routeList.remove(0);
 			removenRoute = s.routes.get(removenRoutePosition);
 		}
 		
 		ArrayList<Integer> cusList= new ArrayList<Integer>();
-        for(int j = 1; j < removenRoute.getRoute().size() - 1; j++)
+        for(int j = 1; j < removenRoute.getNodeList().size() - 1; j++)
         	cusList.add(j);  
         
         Collections.shuffle(cusList);  
         
 		// 选择被移除客户所在的路径
 		int removenCusPosition = cusList.remove(0);
-		Node removenCus = removenRoute.getRoute().get(removenCusPosition);
+		Node removenCus = removenRoute.getNodeList().get(removenCusPosition);
 		
-		while(removenRoute.getRoute().size() <= 2) {
+		while(removenRoute.getNodeList().size() <= 2) {
 			removenCusPosition = cusList.remove(0);
-			removenCus = removenRoute.getRoute().get(removenCusPosition);
+			removenCus = removenRoute.getNodeList().get(removenCusPosition);
 		}
 
 		s.removeCustomer(removenRoutePosition, removenCusPosition);
@@ -84,9 +78,9 @@ public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
 			double minRelate = Double.MAX_VALUE;
 			
 			for(int j = 0; j < s.routes.size(); j++) {			
-	        	for (int i = 1; i < s.routes.get(j).getRoute().size() - 1;++i) {
+	        	for (int i = 1; i < s.routes.get(j).getNodeList().size() - 1; ++i) {
 	        		
-	        		Node relatedNode = s.routes.get(j).getRoute().get(i);
+	        		Node relatedNode = s.routes.get(j).getNodeList().get(i);
 	        		int l = (lastRoute.getId() == s.routes.get(j).getId())? -1 : 1;
 	        		
 	        		double fitness = l * 2 + 

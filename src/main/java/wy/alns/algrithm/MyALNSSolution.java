@@ -13,10 +13,12 @@ import wy.alns.vo.*;
  * @date  2022-11-19
  */
 public class MyALNSSolution {
-	
     public List<Route> routes;
+
     public Measure measure;
-    public int vehicleNr;
+
+	public int vehicleNr;
+
     public Instance instance;
 	
 	public double alpha;		// α
@@ -78,19 +80,19 @@ public class MyALNSSolution {
 		
 		Route route = this.routes.get(routePosition);
 
-		Node n0 = route.getRoute().get(cusPosition - 1);
-		Node n = route.getRoute().get(cusPosition);
-		Node n1 = route.getRoute().get(cusPosition + 1);
+		Node n0 = route.getNodeList().get(cusPosition - 1);
+		Node n = route.getNodeList().get(cusPosition);
+		Node n1 = route.getNodeList().get(cusPosition + 1);
 
 		double cost = distance.between(n0, n1) - distance.between(n0, n) - distance.between(n, n1);
 		double load = -n.getDemand();
 
 		this.measure.distance += cost;
-		this.routes.get(routePosition).getCost().distance += cost;
-		this.routes.get(routePosition).getCost().load += load;
+		this.routes.get(routePosition).getMeasure().distance += cost;
+		this.routes.get(routePosition).getMeasure().load += load;
 
-		this.measure.loadViolation -= this.routes.get(routePosition).getCost().loadViolation;
-		this.measure.timeViolation -= this.routes.get(routePosition).getCost().timeViolation;
+		this.measure.loadViolation -= this.routes.get(routePosition).getMeasure().loadViolation;
+		this.measure.timeViolation -= this.routes.get(routePosition).getMeasure().timeViolation;
 		
 		removalCustomers.add(route.removeNode(cusPosition));
 	}
@@ -99,11 +101,12 @@ public class MyALNSSolution {
 		//TODO : duplicated TW
 		Distance distance = instance.getDistance();
 
-		Route route = this.routes.get(routePosition);
+		Route curRoute = this.routes.get(routePosition);
+		Route route = curRoute;
 
-		Node n0 = route.getRoute().get(insertCusPosition - 1);
+		Node n0 = route.getNodeList().get(insertCusPosition - 1);
 		Node n = insertCustomer;
-		Node n1 = route.getRoute().get(insertCusPosition);
+		Node n1 = route.getNodeList().get(insertCusPosition);
 
 		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
 		double load = +n.getDemand();
@@ -111,29 +114,31 @@ public class MyALNSSolution {
 
 		// 更新当前路径、总路径的cost、load、load violation
 		this.measure.distance += cost;
-		this.routes.get(routePosition).getCost().distance += cost;
-		this.routes.get(routePosition).getCost().load += load;
-		if (this.routes.get(routePosition).getCost().load > this.instance.getVehicleCapacity())
-			this.measure.loadViolation += this.routes.get(routePosition).getCost().load - this.instance.getVehicleCapacity();
-		
-		route.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
+		curRoute.getMeasure().distance += cost;
+		curRoute.getMeasure().load += load;
+
+		if (curRoute.getMeasure().load > curRoute.getVehicle().getCapacity()) {
+			this.measure.loadViolation += curRoute.getMeasure().load - curRoute.getVehicle().getCapacity();
+		}
+
+		route.addNode(insertCustomer, insertCusPosition);;
 		
 		// 计算当前路径的time windows violation、time
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getRoute().size(); i++) {
-			time += distance.between(route.getRoute().get(i - 1), route.getRoute().get(i));
-			if (time < route.getRoute().get(i).getTimeWindow()[0])
-				time = route.getRoute().get(i).getTimeWindow()[0];
-			else if (time > route.getRoute().get(i).getTimeWindow()[1])
-				timeWindowViolation += time - route.getRoute().get(i).getTimeWindow()[1];
+		for (int i = 1; i < route.getNodeList().size(); i++) {
+			time += distance.between(route.getNodeList().get(i - 1), route.getNodeList().get(i));
+			if (time < route.getNodeList().get(i).getTimeWindow()[0])
+				time = route.getNodeList().get(i).getTimeWindow()[0];
+			else if (time > route.getNodeList().get(i).getTimeWindow()[1])
+				timeWindowViolation += time - route.getNodeList().get(i).getTimeWindow()[1];
 			
-			time += route.getRoute().get(i).getServiceTime();
+			time += route.getNodeList().get(i).getServiceTime();
 		}
 		
 		// 计算当前路径、总路径的time windows violation、time
-		this.routes.get(routePosition).getCost().time = time;
-		this.routes.get(routePosition).getCost().timeViolation = timeWindowViolation;
+		curRoute.getMeasure().time = time;
+		curRoute.getMeasure().timeViolation = timeWindowViolation;
 		this.measure.timeViolation += timeWindowViolation;
 		
 		this.measure.calculateTotalCost(this.alpha, this.beta);
@@ -145,9 +150,9 @@ public class MyALNSSolution {
 
 		Route route = this.routes.get(routePosition).cloneRoute();
 
-		Node n0 = route.getRoute().get(insertCusPosition - 1);
+		Node n0 = route.getNodeList().get(insertCusPosition - 1);
 		Node n = insertCustomer;
-		Node n1 = route.getRoute().get(insertCusPosition);
+		Node n1 = route.getNodeList().get(insertCusPosition);
 
 		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
 		double load = +n.getDemand();
@@ -156,21 +161,23 @@ public class MyALNSSolution {
 		
 		newMeasure.load += load;
 		newMeasure.distance += cost;
-		if (newMeasure.load > this.instance.getVehicleCapacity())
-			newMeasure.loadViolation += this.measure.load - this.instance.getVehicleCapacity();
+//		if (newMeasure.load > this.instance.getVehicleCapacity())
+		if (newMeasure.load > route.getVehicle().getCapacity()) {
+			newMeasure.loadViolation += this.measure.load - route.getVehicle().getCapacity();
+		}
 		
-		route.addNodeToRouteWithIndex(insertCustomer, insertCusPosition);;
+		route.addNode(insertCustomer, insertCusPosition);;
 		
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getRoute().size(); i++) {
-			time += distance.between(route.getRoute().get(i - 1), route.getRoute().get(i));
-			if (time < route.getRoute().get(i).getTimeWindow()[0])
-				time = route.getRoute().get(i).getTimeWindow()[0];
-			else if (time > route.getRoute().get(i).getTimeWindow()[1])
-				timeWindowViolation += time - route.getRoute().get(i).getTimeWindow()[1];
+		for (int i = 1; i < route.getNodeList().size(); i++) {
+			time += distance.between(route.getNodeList().get(i - 1), route.getNodeList().get(i));
+			if (time < route.getNodeList().get(i).getTimeWindow()[0])
+				time = route.getNodeList().get(i).getTimeWindow()[0];
+			else if (time > route.getNodeList().get(i).getTimeWindow()[1])
+				timeWindowViolation += time - route.getNodeList().get(i).getTimeWindow()[1];
 			
-			time += route.getRoute().get(i).getServiceTime();
+			time += route.getNodeList().get(i).getServiceTime();
 		}
 		
 		newMeasure.time = time;
