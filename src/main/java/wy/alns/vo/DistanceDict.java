@@ -22,10 +22,10 @@ public class DistanceDict {
 
 
     public static double calDistance(Order n1, Order n2) {
-        double x1 = n1.getX();
-        double y1 = n1.getY();
-        double x2 = n2.getX();
-        double y2 = n2.getY();
+        double x1 = n1.getLocation().getX();
+        double y1 = n1.getLocation().getY();
+        double x2 = n2.getLocation().getX();
+        double y2 = n2.getLocation().getY();
 
         return Math.round(
                 Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) * 100

@@ -13,15 +13,7 @@ public class Order {
 	private double[] timeWindow;
 	private double serviceTime;
 
-    /**
-     * The X-axis coordinate in a theoretical 2-D space for the specific customer.
-     */
-    private double x;
-
-    /**
-     * The Y-axis coordinate in a theoretical 2-D space for the specific customer.
-     */
-    private double y;
+    private Location location;
 
     /**
      * A unique identifier for the customer
@@ -35,8 +27,7 @@ public class Order {
 
 
     public Order(Order n) {
-    	this.x = n.x;
-    	this.y = n.y;
+    	this.location = n.location;
     	this.id = n.id;
     	this.demand = n.demand;
     	this.serviceTime = n.serviceTime;

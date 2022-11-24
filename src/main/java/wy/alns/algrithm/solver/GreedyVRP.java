@@ -27,7 +27,7 @@ public class GreedyVRP {
     private List<Route> routeList;
 
     /**
-     * distanceDict map of every node to each other.
+     * distanceDict store distance between every node to each other.
      */
     private DistanceDict distanceDict;
 

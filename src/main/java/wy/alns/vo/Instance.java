@@ -80,8 +80,12 @@ public class Instance {
                 if (cols.length > 0) {
                     Order order = new Order();
                     order.setId(Integer.parseInt(cols[1]));
-                    order.setX(Double.parseDouble(cols[2]));
-                    order.setY(Double.parseDouble(cols[3]));
+
+                    double X = (Double.parseDouble(cols[2]));
+                    double Y = (Double.parseDouble(cols[3]));
+                    Location loc = new Location(X, Y);
+                    order.setLocation(loc);
+
                     order.setDemand(Double.parseDouble(cols[4]));
                     order.setTimeWindow(Double.parseDouble(cols[5]), Double.parseDouble(cols[6]));
                     order.setServiceTime(Double.parseDouble(cols[7]));
