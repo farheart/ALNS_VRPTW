@@ -84,7 +84,7 @@ public class GreedyVRP {
 
                 // If we found a customer with closer that the value of "smallestDistance" ,store him temporarily
                 boolean ifDistValid = (dist < smallestDistance);
-                boolean ifCapacityValid = (curRoute.getMeasure().load + n.getDemand()) <= curRoute.getVehicle().getCapacity();
+                boolean ifCapacityValid = (curRoute.getMeasure().amount + n.getAmount()) <= curRoute.getVehicle().getCapacity();
                 boolean ifArrTimeValid = (curRoute.getMeasure().time + distanceDict.between(lastInTheCurrentRoute, n)) < n.getTimeWindow().getEnd();
                 boolean ifWithinSchedule = (curRoute.getMeasure().time + distanceDict.between(lastInTheCurrentRoute, n) + n.getServiceTime() +  distanceDict.between(n, depot) ) < depot.getTimeWindow().getEnd();
 
@@ -108,7 +108,7 @@ public class GreedyVRP {
                 curRoute.getMeasure().time += closestOrder.getServiceTime();
                 
                 // Increase the load of the vehicle by the demand of the new node-customer
-                curRoute.getMeasure().load += closestOrder.getDemand();
+                curRoute.getMeasure().amount += closestOrder.getAmount();
 
                 // Add the closest node to the route
                 curRoute.append(closestOrder);

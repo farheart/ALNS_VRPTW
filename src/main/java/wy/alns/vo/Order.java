@@ -12,7 +12,7 @@ import lombok.*;
 public class Order {
     private int id;
 
-    private double demand;
+    private double amount;
 
     private Location location;
 
@@ -21,9 +21,9 @@ public class Order {
 	private TimeWindow timeWindow;
 
     public Order(Order n) {
-    	this.location = n.location;
     	this.id = n.id;
-    	this.demand = n.demand;
+    	this.location = n.location;
+    	this.amount = n.amount;
     	this.serviceTime = n.serviceTime;
     	this.timeWindow = n.timeWindow;
     }

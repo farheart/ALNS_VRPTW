@@ -66,7 +66,7 @@ class Fitness implements Comparable<Fitness>{
 		DistanceDict distanceDict = instance.getDistanceDict();
 
 		Order n0 = route.getOrderList().get(0);
-		double v = route.getMeasure().getTimeViolation() + route.getMeasure().getLoadViolation() + customer.getDemand();
+		double v = route.getMeasure().getTimeViolation() + route.getMeasure().getLoadViolation() + customer.getAmount();
 		double distFactor = distanceDict.between(customer, n0) + distanceDict.between(n0, customer);
 		double fitness = v * distFactor;
 

@@ -39,7 +39,7 @@ public class SolutionValidator {
 					time += dist;
 					distanceByVehicle += dist;
 
-					loadInVehicle += route.getOrderList().get(j).getDemand();
+					loadInVehicle += route.getOrderList().get(j).getAmount();
         			if (time < route.getOrderList().get(j).getTimeWindow().getStart())
         				time = route.getOrderList().get(j).getTimeWindow().getStart();
         			else if (time > route.getOrderList().get(j).getTimeWindow().getEnd())
@@ -50,7 +50,7 @@ public class SolutionValidator {
         		totalCost += distanceByVehicle;
 
 				boolean checkCost = (Math.abs(route.getMeasure().distance - distanceByVehicle) <= 0.001);
-				boolean checkLoad = (Math.abs(route.getMeasure().load - loadInVehicle) <= 0.001);
+				boolean checkLoad = (Math.abs(route.getMeasure().amount - loadInVehicle) <= 0.001);
 				boolean checkTime = (Math.abs(route.getMeasure().time - time) <= 0.001);
 
         		result += "\nroute " + id + ": "

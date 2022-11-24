@@ -14,7 +14,7 @@ public class Measure {
 	public double totalCost;
 	public double distance;
 	public double time; 
-	public double load;
+	public double amount;
 	
 	public double loadViolation;
 	public double timeViolation; 
@@ -22,7 +22,7 @@ public class Measure {
 	public Measure(){
 		totalCost = 0;
 		distance = 0;
-		load = 0;
+		amount = 0;
 		time = 0;
 		
 		loadViolation = 0;
@@ -32,7 +32,7 @@ public class Measure {
 	public Measure(Measure measure) {
 		this.totalCost = measure.totalCost;
 		this.distance = measure.distance;
-		this.load = measure.load;
+		this.amount = measure.amount;
 		this.time = measure.time;
 		
 		this.loadViolation = measure.loadViolation;

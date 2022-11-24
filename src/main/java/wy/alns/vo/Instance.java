@@ -85,7 +85,7 @@ public class Instance {
                     double Y = (Double.parseDouble(cols[3]));
                     order.setLocation(new Location(X, Y));
 
-                    order.setDemand(Double.parseDouble(cols[4]));
+                    order.setAmount(Double.parseDouble(cols[4]));
 
                     double s = Double.parseDouble(cols[5]);
                     double e = Double.parseDouble(cols[6]);

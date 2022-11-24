@@ -76,11 +76,11 @@ public class ALNSSolution {
 		Order n1 = route.getOrderList().get(cusPosition + 1);
 
 		double dist = distanceDict.between(n0, n1) - distanceDict.between(n0, n) - distanceDict.between(n, n1);
-		double load = -n.getDemand();
+		double amount = -n.getAmount();
 
 		this.measure.distance += dist;
 		route.getMeasure().distance += dist;
-		route.getMeasure().load += load;
+		route.getMeasure().amount += amount;
 
 		this.measure.loadViolation -= route.getMeasure().loadViolation;
 		this.measure.timeViolation -= route.getMeasure().timeViolation;
@@ -100,15 +100,15 @@ public class ALNSSolution {
 		Order n1 = route.getOrderList().get(insertCusPosition);
 
 		double dist = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
-		double load = +n.getDemand();
+		double amount = +n.getAmount();
 
 		// update dist, load,load violation of current route and total
 		this.measure.distance += dist;
 		route.getMeasure().distance += dist;
-		route.getMeasure().load += load;
+		route.getMeasure().amount += amount;
 
-		if (route.getMeasure().load > route.getVehicle().getCapacity()) {
-			this.measure.loadViolation += route.getMeasure().load - route.getVehicle().getCapacity();
+		if (route.getMeasure().amount > route.getVehicle().getCapacity()) {
+			this.measure.loadViolation += route.getMeasure().amount - route.getVehicle().getCapacity();
 		}
 		route.addNode(insertCustomer, insertCusPosition);;
 		
@@ -144,13 +144,13 @@ public class ALNSSolution {
 		Order n1 = route.getOrderList().get(insertCusPosition);
 
 		double cost = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
-		double load = +n.getDemand();
+		double amount = +n.getAmount();
 
-		evalMeasure.load += load;
+		evalMeasure.amount += amount;
 		evalMeasure.distance += cost;
 
-		if (evalMeasure.load > route.getVehicle().getCapacity()) {
-			evalMeasure.loadViolation += this.measure.load - route.getVehicle().getCapacity();
+		if (evalMeasure.amount > route.getVehicle().getCapacity()) {
+			evalMeasure.loadViolation += this.measure.amount - route.getVehicle().getCapacity();
 		}
 		
 		route.addNode(insertCustomer, insertCusPosition);;
