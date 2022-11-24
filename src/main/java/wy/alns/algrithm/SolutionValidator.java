@@ -26,7 +26,7 @@ public class SolutionValidator {
         int id = 0;
         for (int i = 0; i < solution.getRoutes().size(); i++) {
         	Route route = solution.getRoutes().get(i);
-        	if (route.getNodeList().size() >= 3) {
+        	if (route.getOrderList().size() >= 3) {
         		id++;
         		
         		double distanceByVehicle = 0;
@@ -34,18 +34,18 @@ public class SolutionValidator {
         		double time = 0;
 				boolean checkTimeWindows = true;
 
-        		for (int j = 1; j < route.getNodeList().size(); j++) {
-					double dist = this.instance.getDistance().between(route.getNodeList().get(j - 1), route.getNodeList().get(j));
+        		for (int j = 1; j < route.getOrderList().size(); j++) {
+					double dist = this.instance.getDistance().between(route.getOrderList().get(j - 1), route.getOrderList().get(j));
 					time += dist;
 					distanceByVehicle += dist;
 
-					loadInVehicle += route.getNodeList().get(j).getDemand();
-        			if (time < route.getNodeList().get(j).getTimeWindow()[0])
-        				time = route.getNodeList().get(j).getTimeWindow()[0];
-        			else if (time > route.getNodeList().get(j).getTimeWindow()[1])
+					loadInVehicle += route.getOrderList().get(j).getDemand();
+        			if (time < route.getOrderList().get(j).getTimeWindow()[0])
+        				time = route.getOrderList().get(j).getTimeWindow()[0];
+        			else if (time > route.getOrderList().get(j).getTimeWindow()[1])
         				checkTimeWindows = false;
         			
-        			time += route.getNodeList().get(j).getServiceTime();
+        			time += route.getOrderList().get(j).getServiceTime();
         		}
         		totalCost += distanceByVehicle;
 

@@ -168,8 +168,8 @@ public class ALNS {
 
 
     private int getQ(ALNSSolution s_c2) {
-        int q_l = Math.min((int) Math.ceil(0.05 * s_c2.instance.getCustomerNumber()), 10);
-        int q_u = Math.min((int) Math.ceil(0.20 * s_c2.instance.getCustomerNumber()), 30);
+        int q_l = Math.min((int) Math.ceil(0.05 * s_c2.instance.getOrderNum()), 10);
+        int q_u = Math.min((int) Math.ceil(0.20 * s_c2.instance.getOrderNum()), 30);
 
         Random r = new Random();
         return r.nextInt(q_u - q_l + 1) + q_l;

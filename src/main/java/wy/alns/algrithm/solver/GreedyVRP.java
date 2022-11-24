@@ -1,11 +1,11 @@
 package wy.alns.algrithm.solver;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import wy.alns.algrithm.Solution;
 import wy.alns.vo.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -19,7 +19,7 @@ public class GreedyVRP {
     /**
      * customers
      */
-    private List<Node> customerList;
+    private List<Order> orderList;
 
     /**
      * routes
@@ -30,37 +30,18 @@ public class GreedyVRP {
      * distance map of every node to each other.
      */
     private Distance distance;
-    
-    // private int vehicleCapacity;
-//    private int initialCustomerNr;
 
-//    public int getCustomerNr() {
-//        return this.initialCustomerNr;
-//    }
-
-    public Distance getDistance() {
-        return this.distance;
-    }
 
 
     /**
      * Constructor
      */
-    public GreedyVRP(Instance instance) { 	
-//		this.initialCustomerNr = instance.getCustomerNumber();
-
-		this.customerList = instance.getCustomers();
+    public GreedyVRP(Instance instance) {
+		this.orderList = instance.getOrderList();
+		this.routeList = new ArrayList<Route>();
 		this.distance = instance.getDistance();
 
-
-//		this.vehicleCapacity = instance.getVehicleCapacity();
-//		int vehicleNr = instance.getNumVehicle();
-
-
-		this.routeList = new ArrayList<Route>();
-
-
-        for (Vehicle v : instance.getVehicles()) {
+        for (Vehicle v : instance.getVehicleList()) {
 			Route route = new Route("route_" + v.getId(), v);
 			this.routeList.add(route);
         }
@@ -72,7 +53,7 @@ public class GreedyVRP {
         Solution solution = new Solution();
 
         // Fetch the depot node.
-        Node depot = this.customerList.remove(0);
+        Order depot = this.orderList.remove(0);
 
         // Fetch the first available vehicle
         Route curRoute = this.routeList.remove(0);
@@ -83,21 +64,21 @@ public class GreedyVRP {
         // Repeat until all customers are routed or if we run out vehicles.
         while (true) {
             // If we served all customers, exit.
-            if (this.customerList.size() == 0) {
+            if (this.orderList.size() == 0) {
                 break;
             }
 
             // Get the last node of the current route. We will try to find the closest node to it that also satisfies the capacity constraint.
-            Node lastInTheCurrentRoute = curRoute.getLastNodeOfTheRoute();
+            Order lastInTheCurrentRoute = curRoute.getLastNodeOfTheRoute();
 
             // The distance of the closest node, if any, to the last node in the route.
             double smallestDistance = Double.MAX_VALUE;
 
             // The closest node, if any, to the last node in the route that also satisfies the capacity constraint.
-            Node closestNode = null;
+            Order closestOrder = null;
 
             // Find the nearest neighbor based on distance
-            for (Node n: this.customerList) {
+            for (Order n: this.orderList) {
 
                 double dist = this.distance.between(lastInTheCurrentRoute, n);
 
@@ -109,12 +90,12 @@ public class GreedyVRP {
 
                 if (ifDistValid && ifCapacityValid && ifArrTimeValid && ifWithinSchedule) {
                     smallestDistance = dist;
-                    closestNode = n;
+                    closestOrder = n;
                 }
             }
             
             // A node that satisfies the capacity constraint found
-            if (closestNode != null) {
+            if (closestOrder != null) {
                 // Increase the cost of the current route by the distance of the previous final node to the new one
                 curRoute.getMeasure().distance += smallestDistance;
 
@@ -122,18 +103,18 @@ public class GreedyVRP {
                 curRoute.getMeasure().time += smallestDistance;
                 
                 // waiting time windows open
-                if (curRoute.getMeasure().time < closestNode.getTimeWindow()[0]) curRoute.getMeasure().time = closestNode.getTimeWindow()[0];
+                if (curRoute.getMeasure().time < closestOrder.getTimeWindow()[0]) curRoute.getMeasure().time = closestOrder.getTimeWindow()[0];
                 
-                curRoute.getMeasure().time += closestNode.getServiceTime();
+                curRoute.getMeasure().time += closestOrder.getServiceTime();
                 
                 // Increase the load of the vehicle by the demand of the new node-customer
-                curRoute.getMeasure().load += closestNode.getDemand();
+                curRoute.getMeasure().load += closestOrder.getDemand();
 
                 // Add the closest node to the route
-                curRoute.append(closestNode);
+                curRoute.append(closestOrder);
                 
                 // Remove customer from the non-served customers list.
-                this.customerList.remove(closestNode);
+                this.orderList.remove(closestOrder);
 
             // We didn't find any node that satisfies the condition.
             } else {

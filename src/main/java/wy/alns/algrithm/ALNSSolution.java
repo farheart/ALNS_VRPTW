@@ -25,7 +25,7 @@ public class ALNSSolution {
 	
 	public static final double penalty = 1000;
 	
-	public ArrayList<Node> removalCustomers;
+	public ArrayList<Order> removalCustomers;
 
     public ALNSSolution(Instance instance) {
         this.routes = new ArrayList<>();
@@ -36,7 +36,7 @@ public class ALNSSolution {
         this.alpha = penalty;
         this.beta = penalty;
         
-        this.removalCustomers = new ArrayList<Node>();
+        this.removalCustomers = new ArrayList<Order>();
     }
     
     public ALNSSolution(Solution sol, Instance instance) {
@@ -62,7 +62,7 @@ public class ALNSSolution {
             this.routes.add(route.cloneRoute());
         }
         
-        this.removalCustomers = new ArrayList<Node>();
+        this.removalCustomers = new ArrayList<Order>();
     }
     
 	public void removeCustomer(int routePosition, int cusPosition) {
@@ -71,9 +71,9 @@ public class ALNSSolution {
 
 		Route route = this.routes.get(routePosition);
 
-		Node n0 = route.getNodeList().get(cusPosition - 1);
-		Node n = route.getNodeList().get(cusPosition);
-		Node n1 = route.getNodeList().get(cusPosition + 1);
+		Order n0 = route.getOrderList().get(cusPosition - 1);
+		Order n = route.getOrderList().get(cusPosition);
+		Order n1 = route.getOrderList().get(cusPosition + 1);
 
 		double dist = distance.between(n0, n1) - distance.between(n0, n) - distance.between(n, n1);
 		double load = -n.getDemand();
@@ -89,15 +89,15 @@ public class ALNSSolution {
 	}
 
 
-	public void insertCustomer(int routePosition, int insertCusPosition, Node insertCustomer) {
+	public void insertCustomer(int routePosition, int insertCusPosition, Order insertCustomer) {
 		//TODO : duplicated TW
 		Distance distance = instance.getDistance();
 
 		Route route = this.routes.get(routePosition);
 
-		Node n0 = route.getNodeList().get(insertCusPosition - 1);
-		Node n = insertCustomer;
-		Node n1 = route.getNodeList().get(insertCusPosition);
+		Order n0 = route.getOrderList().get(insertCusPosition - 1);
+		Order n = insertCustomer;
+		Order n1 = route.getOrderList().get(insertCusPosition);
 
 		double dist = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
 		double load = +n.getDemand();
@@ -115,14 +115,14 @@ public class ALNSSolution {
 		// calculate TW violation, time
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getNodeList().size(); i++) {
-			time += distance.between(route.getNodeList().get(i - 1), route.getNodeList().get(i));
-			if (time < route.getNodeList().get(i).getTimeWindow()[0]) {
-				time = route.getNodeList().get(i).getTimeWindow()[0];
-			} else if (time > route.getNodeList().get(i).getTimeWindow()[1]) {
-				timeWindowViolation += time - route.getNodeList().get(i).getTimeWindow()[1];
+		for (int i = 1; i < route.getOrderList().size(); i++) {
+			time += distance.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
+			if (time < route.getOrderList().get(i).getTimeWindow()[0]) {
+				time = route.getOrderList().get(i).getTimeWindow()[0];
+			} else if (time > route.getOrderList().get(i).getTimeWindow()[1]) {
+				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow()[1];
 			}
-			time += route.getNodeList().get(i).getServiceTime();
+			time += route.getOrderList().get(i).getServiceTime();
 		}
 
 		route.getMeasure().time = time;
@@ -133,15 +133,15 @@ public class ALNSSolution {
 	}
 
 
-	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Node insertCustomer, Measure evalMeasure) {
+	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Order insertCustomer, Measure evalMeasure) {
 		//TODO : duplicated TW
 		Distance distance = instance.getDistance();
 
 		Route route = this.routes.get(routePosition).cloneRoute();
 
-		Node n0 = route.getNodeList().get(insertCusPosition - 1);
-		Node n = insertCustomer;
-		Node n1 = route.getNodeList().get(insertCusPosition);
+		Order n0 = route.getOrderList().get(insertCusPosition - 1);
+		Order n = insertCustomer;
+		Order n1 = route.getOrderList().get(insertCusPosition);
 
 		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
 		double load = +n.getDemand();
@@ -157,14 +157,14 @@ public class ALNSSolution {
 		
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getNodeList().size(); i++) {
-			time += distance.between(route.getNodeList().get(i - 1), route.getNodeList().get(i));
-			if (time < route.getNodeList().get(i).getTimeWindow()[0]) {
-				time = route.getNodeList().get(i).getTimeWindow()[0];
-			} else if (time > route.getNodeList().get(i).getTimeWindow()[1]) {
-				timeWindowViolation += time - route.getNodeList().get(i).getTimeWindow()[1];
+		for (int i = 1; i < route.getOrderList().size(); i++) {
+			time += distance.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
+			if (time < route.getOrderList().get(i).getTimeWindow()[0]) {
+				time = route.getOrderList().get(i).getTimeWindow()[0];
+			} else if (time > route.getOrderList().get(i).getTimeWindow()[1]) {
+				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow()[1];
 			}
-			time += route.getNodeList().get(i).getServiceTime();
+			time += route.getOrderList().get(i).getServiceTime();
 		}
 		
 		evalMeasure.time = time;

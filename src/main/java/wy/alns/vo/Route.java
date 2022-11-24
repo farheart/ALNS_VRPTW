@@ -21,7 +21,7 @@ public class Route {
     /**
      * A sequence of Customers, that will be served from the current Vehicle.
      */
-    private List<Node> nodeList;
+    private List<Order> orderList;
 
 
     /**
@@ -33,7 +33,7 @@ public class Route {
     public Route(String id, Vehicle v) {
         this.id = id;
         this.vehicle = v;
-        this.nodeList = new ArrayList<>();
+        this.orderList = new ArrayList<>();
         this.measure = new Measure();
     }
 
@@ -41,34 +41,34 @@ public class Route {
     public Route cloneRoute() {
         Route result = new Route(this.id, this.vehicle);
         result.measure = new Measure(this.measure);
-        result.nodeList = new ArrayList<>(this.nodeList);
+        result.orderList = new ArrayList<>(this.orderList);
         return result;
     }
 
     /**
      * Returns the last node in the route
      */
-    public Node getLastNodeOfTheRoute() {
-        return this.nodeList.get(this.nodeList.size() - 1);
+    public Order getLastNodeOfTheRoute() {
+        return this.orderList.get(this.orderList.size() - 1);
     }
 
     /**
      * Adds a customer in the end of the route.
      *
-     * @param node The new customer to be inserted.
+     * @param order The new customer to be inserted.
      */
-    public void append(Node node) {
-        this.nodeList.add(node);
+    public void append(Order order) {
+        this.orderList.add(order);
     }
 
     /**
      * Adds a customer in the route in a specific position in the sequence.
      *
-     * @param node The new customer to be inserted
+     * @param order The new customer to be inserted
      * @param index The position in which the customer will be inserted.
      */
-    public void addNode(Node node, int index) {
-        this.nodeList.add(index, node);
+    public void addNode(Order order, int index) {
+        this.orderList.add(index, order);
     }
 
     /**
@@ -77,14 +77,14 @@ public class Route {
      * @param index The index from which the customer will be removed
      * @return The removed customer.
      */
-    public Node removeNode(int index) {
-        return this.nodeList.remove(index);
+    public Order removeNode(int index) {
+        return this.orderList.remove(index);
     }
 
     @Override
     public String toString() {
-        String nodeListStr = "nodeList : [";
-        for (Node customer: this.nodeList) {
+        String nodeListStr = "orderList : [";
+        for (Order customer: this.orderList) {
             nodeListStr += "\n\t\t" + customer;
         }
         nodeListStr += "\n\t]";

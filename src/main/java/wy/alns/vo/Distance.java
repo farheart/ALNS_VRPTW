@@ -15,13 +15,13 @@ public class Distance {
     private final Map<String, Double> distanceMap;
 
 
-    public Distance(List<Node> nodeList) {
+    public Distance(List<Order> orderList) {
         this.distanceMap = new HashMap<>();
-        this.init(nodeList);
+        this.init(orderList);
     }
 
 
-    public static double calDistance(Node n1, Node n2) {
+    public static double calDistance(Order n1, Order n2) {
         double x1 = n1.getX();
         double y1 = n1.getY();
         double x2 = n2.getX();
@@ -33,21 +33,21 @@ public class Distance {
     }
 
 
-    public double between(Node n1, Node n2) {
+    public double between(Order n1, Order n2) {
         return this.distanceMap.get(getNodePairKey(n1, n2));
     }
 
 
-    private void init(List<Node> nodeList) {
-        for (Node n1: nodeList) {
-            for (Node n2: nodeList) {
+    private void init(List<Order> orderList) {
+        for (Order n1: orderList) {
+            for (Order n2: orderList) {
                 this.distanceMap.put(getNodePairKey(n1, n2), calDistance(n1, n2));
             }
         }
     }
 
 
-    public static String getNodePairKey(Node n1, Node n2) {
+    public static String getNodePairKey(Order n1, Order n2) {
         return n1.getId() + "~" + n2.getId();
     }
 }

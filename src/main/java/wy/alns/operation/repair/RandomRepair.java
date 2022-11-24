@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.ALNSSolution;
 import wy.alns.util.RandomUtil;
 import wy.alns.vo.Measure;
-import wy.alns.vo.Node;
+import wy.alns.vo.Order;
 import wy.alns.vo.Route;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     	
     	for (int i = 0; i < insertCusNr; i++) {
     		
-    		Node insertNode = s.removalCustomers.remove(0);
+    		Order insertOrder = s.removalCustomers.remove(0);
     		
     		// 随机决定查找多少条路径
     		int randomRouteNr = r.nextInt(s.routes.size() - 1) + 1;
@@ -55,16 +55,16 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     			int insertRoutePosition = routeList.remove(0);
     			Route insertRoute = s.routes.get(insertRoutePosition);
     			
-    			while(insertRoute.getNodeList().size() < 1) {
+    			while(insertRoute.getOrderList().size() < 1) {
     				insertRoutePosition = routeList.remove(0);
     				insertRoute = s.routes.get(insertRoutePosition);
     			}
     			
     			// 随机决定查找多少个位置
-    			int insertTimes = r.nextInt(insertRoute.getNodeList().size() - 1) + 1;
+    			int insertTimes = r.nextInt(insertRoute.getOrderList().size() - 1) + 1;
     			
         		ArrayList<Integer> customerList= new ArrayList<Integer>();
-                for(int k = 1; k < insertRoute.getNodeList().size(); k++)
+                for(int k = 1; k < insertRoute.getOrderList().size(); k++)
                 	customerList.add(k);  
                 
                 Collections.shuffle(customerList); 
@@ -76,7 +76,7 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     				
     				// 评价插入情况
     				Measure evalMeasure = new Measure(s.measure);
-    				s.evaluateInsertCustomer(insertRoutePosition, insertCusPosition, insertNode, evalMeasure);
+    				s.evaluateInsertCustomer(insertRoutePosition, insertCusPosition, insertOrder, evalMeasure);
                     
     				// 更新最优插入位置
     				if (evalMeasure.totalCost < bestMeasure.totalCost) {
@@ -86,7 +86,7 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     				}
     			}
     			// 执行插入操作
-    			s.insertCustomer(bestRoutePosition, bestCusomerPosition, insertNode);
+    			s.insertCustomer(bestRoutePosition, bestCusomerPosition, insertOrder);
     		}
     	}
     	

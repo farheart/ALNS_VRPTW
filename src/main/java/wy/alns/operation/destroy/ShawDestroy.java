@@ -6,7 +6,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.ALNSSolution;
 import wy.alns.vo.Distance;
-import wy.alns.vo.Node;
+import wy.alns.vo.Order;
 import wy.alns.vo.Route;
 
 /**
@@ -24,7 +24,7 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 			return s;
 		}
 
-		Node lastRemove;
+		Order lastRemove;
 		Route lastRoute;
 		int lastRemovePos;
 		int lastRoutePos;
@@ -39,24 +39,24 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 		int removenRoutePosition = routeList.remove(0);
 		Route removenRoute = s.routes.get(removenRoutePosition);
 		
-		while(removenRoute.getNodeList().size() <= 2) {
+		while(removenRoute.getOrderList().size() <= 2) {
 			removenRoutePosition = routeList.remove(0);
 			removenRoute = s.routes.get(removenRoutePosition);
 		}
 		
 		ArrayList<Integer> cusList= new ArrayList<Integer>();
-        for(int j = 1; j < removenRoute.getNodeList().size() - 1; j++)
+        for(int j = 1; j < removenRoute.getOrderList().size() - 1; j++)
         	cusList.add(j);  
         
         Collections.shuffle(cusList);  
         
 		// 选择被移除客户所在的路径
 		int removenCusPosition = cusList.remove(0);
-		Node removenCus = removenRoute.getNodeList().get(removenCusPosition);
+		Order removenCus = removenRoute.getOrderList().get(removenCusPosition);
 		
-		while(removenRoute.getNodeList().size() <= 2) {
+		while(removenRoute.getOrderList().size() <= 2) {
 			removenCusPosition = cusList.remove(0);
-			removenCus = removenRoute.getNodeList().get(removenCusPosition);
+			removenCus = removenRoute.getOrderList().get(removenCusPosition);
 		}
 
 		s.removeCustomer(removenRoutePosition, removenCusPosition);
@@ -75,19 +75,19 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 			double minRelate = Double.MAX_VALUE;
 			
 			for(int j = 0; j < s.routes.size(); j++) {			
-	        	for (int i = 1; i < s.routes.get(j).getNodeList().size() - 1; ++i) {
+	        	for (int i = 1; i < s.routes.get(j).getOrderList().size() - 1; ++i) {
 	        		
-	        		Node relatedNode = s.routes.get(j).getNodeList().get(i);
+	        		Order relatedOrder = s.routes.get(j).getOrderList().get(i);
 	        		int l = (lastRoute.getId() == s.routes.get(j).getId())? -1 : 1;
 	        		
 	        		double fitness = l * 2 + 
-	        				3 * distance.between(lastRemove, relatedNode) +
-	        				2 * Math.abs(lastRemove.getTimeWindow()[0] - relatedNode.getTimeWindow()[0]) +
-	        				2 * Math.abs(lastRemove.getDemand() - relatedNode.getDemand());
+	        				3 * distance.between(lastRemove, relatedOrder) +
+	        				2 * Math.abs(lastRemove.getTimeWindow()[0] - relatedOrder.getTimeWindow()[0]) +
+	        				2 * Math.abs(lastRemove.getDemand() - relatedOrder.getDemand());
 	        		
 	        		if(minRelate > fitness) {
 	        			minRelate = fitness;
-	        			lastRemove = relatedNode;
+	        			lastRemove = relatedOrder;
 	        			lastRoute = s.routes.get(j);
 	        			lastRemovePos = i;
 	        			lastRoutePos = j;
