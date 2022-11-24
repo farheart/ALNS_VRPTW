@@ -47,15 +47,11 @@ public class GreedyVRP {
         // Add the depot to the vehicle.
         curRoute.append(depot);
 
-        // Repeat until all customers are routed or if we run out vehicles.
-        while (true) {
-            // If we served all customers, exit.
-            if (this.instance.getDeliveryList().size() == 0) {
-                break;
-            }
+        // Loop until all delivery are batched or no available vehicles.
+        while ((this.instance.getDeliveryList().size() > 0) && (this.routeList.size() > 0)) {
 
             // Get the last node of the current route. We will try to find the closest node to it that also satisfies the capacity constraint.
-            Delivery lastInTheCurrentRoute = curRoute.getLastNodeOfTheRoute();
+            Delivery lastDelivery = curRoute.getLastNodeOfTheRoute();
 
             // The distance of the closest node, if any, to the last node in the route.
             double smallestDistance = Double.MAX_VALUE;
@@ -65,16 +61,15 @@ public class GreedyVRP {
 
             // Find the nearest neighbor based on distance
             for (Delivery n: this.instance.getDeliveryList()) {
+                double dist = this.instance.getDistanceDict().between(lastDelivery, n);
 
-                double dist = this.instance.getDistanceDict().between(lastInTheCurrentRoute, n);
+                // if find a closer delivery, save it
+                boolean ifCloser = (dist < smallestDistance);
+                boolean ifCapacityOK = (curRoute.getMeasure().amount + n.getAmount() <= curRoute.getVehicle().getCapacity());
+                boolean ifArrTimeOK = (curRoute.getMeasure().time + dist < n.getTimeWindow().getEnd());
+                boolean ifDepotOK = (curRoute.getMeasure().time + dist + n.getServiceTime() +  this.instance.getDistanceDict().between(n, depot) < depot.getTimeWindow().getEnd());
 
-                // If we found a customer with closer that the value of "smallestDistance" ,store him temporarily
-                boolean ifDistValid = (dist < smallestDistance);
-                boolean ifCapacityValid = (curRoute.getMeasure().amount + n.getAmount()) <= curRoute.getVehicle().getCapacity();
-                boolean ifArrTimeValid = (curRoute.getMeasure().time + this.instance.getDistanceDict().between(lastInTheCurrentRoute, n)) < n.getTimeWindow().getEnd();
-                boolean ifWithinSchedule = (curRoute.getMeasure().time + this.instance.getDistanceDict().between(lastInTheCurrentRoute, n) + n.getServiceTime() +  this.instance.getDistanceDict().between(n, depot) ) < depot.getTimeWindow().getEnd();
-
-                if (ifDistValid && ifCapacityValid && ifArrTimeValid && ifWithinSchedule) {
+                if (ifCloser && ifCapacityOK && ifArrTimeOK && ifDepotOK) {
                     smallestDistance = dist;
                     closestDelivery = n;
                 }
@@ -105,8 +100,8 @@ public class GreedyVRP {
             // We didn't find any node that satisfies the condition.
             } else {
                 // Increase cost by the distance to travel from the last node back to depot
-                curRoute.getMeasure().distance += this.instance.getDistanceDict().between(lastInTheCurrentRoute, depot);
-                curRoute.getMeasure().time += this.instance.getDistanceDict().between(lastInTheCurrentRoute, depot);
+                curRoute.getMeasure().distance += this.instance.getDistanceDict().between(lastDelivery, depot);
+                curRoute.getMeasure().time += this.instance.getDistanceDict().between(lastDelivery, depot);
 
                 // Terminate current route by adding the depot as a final destination
                 curRoute.append(depot);
