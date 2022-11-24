@@ -22,7 +22,6 @@ public class Instance {
     private String name;
     private String type;
 
-
     /**
      * All orders, where index = 0 : Depot
      */
@@ -35,7 +34,7 @@ public class Instance {
 
 
     /**
-     * distanceDict map of every node to each other.
+     * distanceDict store distance between every node to each other.
      */
     private DistanceDict distanceDict;
 

@@ -11,11 +11,11 @@ import lombok.Data;
  */
 @Data
 public class AbstractService {
-    private int id;
+    protected int id;
 
-    private Location location;
+    protected Location location;
 
-    private double serviceTime;
+    protected double serviceTime;
 
-    private TimeWindow timeWindow;
+    protected TimeWindow timeWindow;
 }

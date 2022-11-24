@@ -3,22 +3,14 @@ package wy.alns.vo;
 import lombok.*;
 
 /**
- * Delivery: represent a customer order
+ * Delivery: represent a customer order delivery
  *
  * @author Yu Wang
  * @date  2022-11-15
  */
 @Data
-public class Delivery {
-    private int id;
-
+public class Delivery extends AbstractService {
     private double amount;
-
-    private Location location;
-
-	private double serviceTime;
-
-	private TimeWindow timeWindow;
 
     public Delivery(Delivery n) {
     	this.id = n.id;
