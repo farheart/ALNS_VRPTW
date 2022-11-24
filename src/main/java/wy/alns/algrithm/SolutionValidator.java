@@ -40,9 +40,9 @@ public class SolutionValidator {
 					distanceByVehicle += dist;
 
 					loadInVehicle += route.getOrderList().get(j).getDemand();
-        			if (time < route.getOrderList().get(j).getTimeWindow()[0])
-        				time = route.getOrderList().get(j).getTimeWindow()[0];
-        			else if (time > route.getOrderList().get(j).getTimeWindow()[1])
+        			if (time < route.getOrderList().get(j).getTimeWindow().getStart())
+        				time = route.getOrderList().get(j).getTimeWindow().getStart();
+        			else if (time > route.getOrderList().get(j).getTimeWindow().getEnd())
         				checkTimeWindows = false;
         			
         			time += route.getOrderList().get(j).getServiceTime();

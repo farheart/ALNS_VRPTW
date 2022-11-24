@@ -117,10 +117,10 @@ public class ALNSSolution {
 		double timeWindowViolation = 0;
 		for (int i = 1; i < route.getOrderList().size(); i++) {
 			time += distanceDict.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
-			if (time < route.getOrderList().get(i).getTimeWindow()[0]) {
-				time = route.getOrderList().get(i).getTimeWindow()[0];
-			} else if (time > route.getOrderList().get(i).getTimeWindow()[1]) {
-				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow()[1];
+			if (time < route.getOrderList().get(i).getTimeWindow().getStart()) {
+				time = route.getOrderList().get(i).getTimeWindow().getStart();
+			} else if (time > route.getOrderList().get(i).getTimeWindow().getEnd()) {
+				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow().getEnd();
 			}
 			time += route.getOrderList().get(i).getServiceTime();
 		}
@@ -159,10 +159,10 @@ public class ALNSSolution {
 		double timeWindowViolation = 0;
 		for (int i = 1; i < route.getOrderList().size(); i++) {
 			time += distanceDict.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
-			if (time < route.getOrderList().get(i).getTimeWindow()[0]) {
-				time = route.getOrderList().get(i).getTimeWindow()[0];
-			} else if (time > route.getOrderList().get(i).getTimeWindow()[1]) {
-				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow()[1];
+			if (time < route.getOrderList().get(i).getTimeWindow().getStart()) {
+				time = route.getOrderList().get(i).getTimeWindow().getStart();
+			} else if (time > route.getOrderList().get(i).getTimeWindow().getEnd()) {
+				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow().getEnd();
 			}
 			time += route.getOrderList().get(i).getServiceTime();
 		}

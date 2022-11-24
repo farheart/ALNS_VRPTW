@@ -83,11 +83,14 @@ public class Instance {
 
                     double X = (Double.parseDouble(cols[2]));
                     double Y = (Double.parseDouble(cols[3]));
-                    Location loc = new Location(X, Y);
-                    order.setLocation(loc);
+                    order.setLocation(new Location(X, Y));
 
                     order.setDemand(Double.parseDouble(cols[4]));
-                    order.setTimeWindow(Double.parseDouble(cols[5]), Double.parseDouble(cols[6]));
+
+                    double s = Double.parseDouble(cols[5]);
+                    double e = Double.parseDouble(cols[6]);
+                    order.setTimeWindow(new TimeWindow(s, e));
+
                     order.setServiceTime(Double.parseDouble(cols[7]));
                     result.add(order);
                 }

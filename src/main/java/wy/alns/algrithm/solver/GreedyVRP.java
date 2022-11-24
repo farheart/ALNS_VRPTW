@@ -85,8 +85,8 @@ public class GreedyVRP {
                 // If we found a customer with closer that the value of "smallestDistance" ,store him temporarily
                 boolean ifDistValid = (dist < smallestDistance);
                 boolean ifCapacityValid = (curRoute.getMeasure().load + n.getDemand()) <= curRoute.getVehicle().getCapacity();
-                boolean ifArrTimeValid = (curRoute.getMeasure().time + distanceDict.between(lastInTheCurrentRoute, n)) < n.getTimeWindow()[1];
-                boolean ifWithinSchedule = (curRoute.getMeasure().time + distanceDict.between(lastInTheCurrentRoute, n) + n.getServiceTime() +  distanceDict.between(n, depot) ) < depot.getTimeWindow()[1];
+                boolean ifArrTimeValid = (curRoute.getMeasure().time + distanceDict.between(lastInTheCurrentRoute, n)) < n.getTimeWindow().getEnd();
+                boolean ifWithinSchedule = (curRoute.getMeasure().time + distanceDict.between(lastInTheCurrentRoute, n) + n.getServiceTime() +  distanceDict.between(n, depot) ) < depot.getTimeWindow().getEnd();
 
                 if (ifDistValid && ifCapacityValid && ifArrTimeValid && ifWithinSchedule) {
                     smallestDistance = dist;
@@ -103,7 +103,7 @@ public class GreedyVRP {
                 curRoute.getMeasure().time += smallestDistance;
                 
                 // waiting time windows open
-                if (curRoute.getMeasure().time < closestOrder.getTimeWindow()[0]) curRoute.getMeasure().time = closestOrder.getTimeWindow()[0];
+                if (curRoute.getMeasure().time < closestOrder.getTimeWindow().getStart()) curRoute.getMeasure().time = closestOrder.getTimeWindow().getStart();
                 
                 curRoute.getMeasure().time += closestOrder.getServiceTime();
                 

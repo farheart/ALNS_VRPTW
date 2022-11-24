@@ -1,13 +1,13 @@
 package wy.alns.operation.destroy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.ALNSSolution;
 import wy.alns.vo.DistanceDict;
 import wy.alns.vo.Order;
 import wy.alns.vo.Route;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * ShawDestroy
@@ -82,7 +82,7 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	        		
 	        		double fitness = l * 2 + 
 	        				3 * distanceDict.between(lastRemove, relatedOrder) +
-	        				2 * Math.abs(lastRemove.getTimeWindow()[0] - relatedOrder.getTimeWindow()[0]) +
+	        				2 * Math.abs(lastRemove.getTimeWindow().getStart() - relatedOrder.getTimeWindow().getStart()) +
 	        				2 * Math.abs(lastRemove.getDemand() - relatedOrder.getDemand());
 	        		
 	        		if(minRelate > fitness) {
