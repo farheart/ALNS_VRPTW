@@ -41,19 +41,19 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
             	for (int i = 1; i < s.routes.get(j).getNodeList().size() - 1; ++i) {
             		
             		// 评价插入情况
-    				Measure newMeasure = new Measure(s.measure);
-    				s.evaluateInsertCustomer(j, i, insertNode, newMeasure);
+    				Measure evalMeasure = new Measure(s.measure);
+    				s.evaluateInsertCustomer(j, i, insertNode, evalMeasure);
 
-            		if(newMeasure.totalCost > Double.MAX_VALUE) {
-            			newMeasure.totalCost = Double.MAX_VALUE;
+            		if(evalMeasure.totalCost > Double.MAX_VALUE) {
+            			evalMeasure.totalCost = Double.MAX_VALUE;
             		}
             		
             		// if a better insertion is found, set the position to insert in the move and update the minimum cost found
-            		if (newMeasure.totalCost < bestCost) {
+            		if (evalMeasure.totalCost < bestCost) {
             			//log.info(varCost.checkFeasible());
             			bestCusP = i;
             			bestRouteP = j;
-            			bestCost = newMeasure.totalCost;
+            			bestCost = evalMeasure.totalCost;
             		}
             	}
         	}

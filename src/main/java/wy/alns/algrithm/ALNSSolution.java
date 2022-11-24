@@ -1,9 +1,9 @@
 package wy.alns.algrithm;
 
+import wy.alns.vo.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import wy.alns.vo.*;
 
 
 /**
@@ -14,53 +14,44 @@ import wy.alns.vo.*;
  */
 public class ALNSSolution {
     public List<Route> routes;
-
     public Measure measure;
 
-	public int vehicleNr;
+	public int numVehicle;
 
     public Instance instance;
+
+	public double alpha;
+	public double beta;
 	
-	public double alpha;		// α
-	public double beta;		// β
-	
-	public static final double  punish = 1000;
+	public static final double penalty = 1000;
 	
 	public ArrayList<Node> removalCustomers;
 
     public ALNSSolution(Instance instance) {
         this.routes = new ArrayList<>();
         this.measure = new Measure();
-        this.vehicleNr = 0;
+        this.numVehicle = 0;
         this.instance = instance;
         
-        this.alpha = punish;
-        this.beta = punish;
+        this.alpha = penalty;
+        this.beta = penalty;
         
         this.removalCustomers = new ArrayList<Node>();
     }
     
     public ALNSSolution(Solution sol, Instance instance) {
-        this.measure = new Measure();
+		this(instance);
+        this.numVehicle = sol.getNumVehicle();
         measure.distance = sol.getTotalCost();
         measure.calculateTotalCost();
-        this.vehicleNr = sol.getVehicleNr();
-        this.instance = instance;
-        
-        this.alpha = punish;
-        this.beta = punish;
-        
-        this.routes = new ArrayList<>();
         for (Route route: sol.getRoutes()) {
             this.routes.add(route.cloneRoute());
         }
-        
-        this.removalCustomers = new ArrayList<Node>();
     }
     
     public ALNSSolution(ALNSSolution sol) {
     	this.measure = new Measure(sol.measure);
-        this.vehicleNr = sol.vehicleNr;
+        this.numVehicle = sol.numVehicle;
         this.instance = sol.instance;
         
         this.alpha = sol.alpha;
@@ -77,74 +68,72 @@ public class ALNSSolution {
 	public void removeCustomer(int routePosition, int cusPosition) {
 		//TODO : duplicated TW
 		Distance distance = instance.getDistance();
-		
+
 		Route route = this.routes.get(routePosition);
 
 		Node n0 = route.getNodeList().get(cusPosition - 1);
 		Node n = route.getNodeList().get(cusPosition);
 		Node n1 = route.getNodeList().get(cusPosition + 1);
 
-		double cost = distance.between(n0, n1) - distance.between(n0, n) - distance.between(n, n1);
+		double dist = distance.between(n0, n1) - distance.between(n0, n) - distance.between(n, n1);
 		double load = -n.getDemand();
 
-		this.measure.distance += cost;
-		this.routes.get(routePosition).getMeasure().distance += cost;
-		this.routes.get(routePosition).getMeasure().load += load;
+		this.measure.distance += dist;
+		route.getMeasure().distance += dist;
+		route.getMeasure().load += load;
 
-		this.measure.loadViolation -= this.routes.get(routePosition).getMeasure().loadViolation;
-		this.measure.timeViolation -= this.routes.get(routePosition).getMeasure().timeViolation;
+		this.measure.loadViolation -= route.getMeasure().loadViolation;
+		this.measure.timeViolation -= route.getMeasure().timeViolation;
 		
 		removalCustomers.add(route.removeNode(cusPosition));
 	}
-	
+
+
 	public void insertCustomer(int routePosition, int insertCusPosition, Node insertCustomer) {
 		//TODO : duplicated TW
 		Distance distance = instance.getDistance();
 
-		Route curRoute = this.routes.get(routePosition);
-		Route route = curRoute;
+		Route route = this.routes.get(routePosition);
 
 		Node n0 = route.getNodeList().get(insertCusPosition - 1);
 		Node n = insertCustomer;
 		Node n1 = route.getNodeList().get(insertCusPosition);
 
-		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
+		double dist = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
 		double load = +n.getDemand();
 
+		// update dist, load,load violation of current route and total
+		this.measure.distance += dist;
+		route.getMeasure().distance += dist;
+		route.getMeasure().load += load;
 
-		// 更新当前路径、总路径的cost、load、load violation
-		this.measure.distance += cost;
-		curRoute.getMeasure().distance += cost;
-		curRoute.getMeasure().load += load;
-
-		if (curRoute.getMeasure().load > curRoute.getVehicle().getCapacity()) {
-			this.measure.loadViolation += curRoute.getMeasure().load - curRoute.getVehicle().getCapacity();
+		if (route.getMeasure().load > route.getVehicle().getCapacity()) {
+			this.measure.loadViolation += route.getMeasure().load - route.getVehicle().getCapacity();
 		}
-
 		route.addNode(insertCustomer, insertCusPosition);;
 		
-		// 计算当前路径的time windows violation、time
+		// calculate TW violation, time
 		double time = 0;
 		double timeWindowViolation = 0;
 		for (int i = 1; i < route.getNodeList().size(); i++) {
 			time += distance.between(route.getNodeList().get(i - 1), route.getNodeList().get(i));
-			if (time < route.getNodeList().get(i).getTimeWindow()[0])
+			if (time < route.getNodeList().get(i).getTimeWindow()[0]) {
 				time = route.getNodeList().get(i).getTimeWindow()[0];
-			else if (time > route.getNodeList().get(i).getTimeWindow()[1])
+			} else if (time > route.getNodeList().get(i).getTimeWindow()[1]) {
 				timeWindowViolation += time - route.getNodeList().get(i).getTimeWindow()[1];
-			
+			}
 			time += route.getNodeList().get(i).getServiceTime();
 		}
-		
-		// 计算当前路径、总路径的time windows violation、time
-		curRoute.getMeasure().time = time;
-		curRoute.getMeasure().timeViolation = timeWindowViolation;
+
+		route.getMeasure().time = time;
+		route.getMeasure().timeViolation = timeWindowViolation;
+
 		this.measure.timeViolation += timeWindowViolation;
-		
 		this.measure.calculateTotalCost(this.alpha, this.beta);
 	}
-	
-	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Node insertCustomer, Measure newMeasure) {
+
+
+	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Node insertCustomer, Measure evalMeasure) {
 		//TODO : duplicated TW
 		Distance distance = instance.getDistance();
 
@@ -157,13 +146,11 @@ public class ALNSSolution {
 		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
 		double load = +n.getDemand();
 
+		evalMeasure.load += load;
+		evalMeasure.distance += cost;
 
-		
-		newMeasure.load += load;
-		newMeasure.distance += cost;
-//		if (newMeasure.load > this.instance.getVehicleCapacity())
-		if (newMeasure.load > route.getVehicle().getCapacity()) {
-			newMeasure.loadViolation += this.measure.load - route.getVehicle().getCapacity();
+		if (evalMeasure.load > route.getVehicle().getCapacity()) {
+			evalMeasure.loadViolation += this.measure.load - route.getVehicle().getCapacity();
 		}
 		
 		route.addNode(insertCustomer, insertCusPosition);;
@@ -172,24 +159,26 @@ public class ALNSSolution {
 		double timeWindowViolation = 0;
 		for (int i = 1; i < route.getNodeList().size(); i++) {
 			time += distance.between(route.getNodeList().get(i - 1), route.getNodeList().get(i));
-			if (time < route.getNodeList().get(i).getTimeWindow()[0])
+			if (time < route.getNodeList().get(i).getTimeWindow()[0]) {
 				time = route.getNodeList().get(i).getTimeWindow()[0];
-			else if (time > route.getNodeList().get(i).getTimeWindow()[1])
+			} else if (time > route.getNodeList().get(i).getTimeWindow()[1]) {
 				timeWindowViolation += time - route.getNodeList().get(i).getTimeWindow()[1];
-			
+			}
 			time += route.getNodeList().get(i).getServiceTime();
 		}
 		
-		newMeasure.time = time;
-		newMeasure.timeViolation = timeWindowViolation;
+		evalMeasure.time = time;
+		evalMeasure.timeViolation = timeWindowViolation;
 		
-		newMeasure.calculateTotalCost(this.alpha, this.beta);
+		evalMeasure.calculateTotalCost(this.alpha, this.beta);
 	}
-	
-	public boolean feasible() {
+
+
+	public boolean isFeasible() {
 		return (measure.timeViolation < 0.01 && measure.loadViolation < 0.01);
 	}
-	
+
+
 	public Solution toSolution() {
 		Solution sol = new Solution();
 		
@@ -200,7 +189,7 @@ public class ALNSSolution {
 		
 		sol.setRoutes(solutionRoutes);
 		sol.setTotalCost(measure.distance);
-		sol.setVehicleNr(vehicleNr);
+		sol.setNumVehicle(numVehicle);
 		
 		return sol;
 	}

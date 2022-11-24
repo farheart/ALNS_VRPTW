@@ -1,9 +1,10 @@
 package wy.alns.algrithm;
 
+import lombok.Data;
+import wy.alns.vo.Route;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import wy.alns.vo.Route;
 
 
 /**
@@ -12,6 +13,7 @@ import wy.alns.vo.Route;
  * @author Yu Wang
  * @date  2022-11-19
  */
+@Data
 public class Solution {
 	public double testTime;
 
@@ -28,7 +30,7 @@ public class Solution {
     /**
      * The number of the vehicles.
      */
-    private int vehicleNr;
+    private int numVehicle;
 
     /**
      * Default constructor
@@ -36,68 +38,28 @@ public class Solution {
     public Solution() {
         this.routes = new ArrayList<>();
         this.totalCost = 0;
-        this.vehicleNr = 0;
-    }
-
-    public List<Route> getRoutes() {
-        return routes;
-    }
-    
-    public void setRoutes(List<Route> routes) {
-        this.routes = routes;
+        this.numVehicle = 0;
     }
 
     public void addRoute(Route route) {
         this.routes.add(route);
     }
 
-    public double getTotalCost() {
-        return totalCost;
-    }
-
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
-    }
-    
-    
-    public int getVehicleNr() {
-        return vehicleNr;
-    }
-    
-    public void setVehicleNr(int vehicleNr) {
-        this.vehicleNr = vehicleNr;
-    }
-      
 
     /**
-     * This function creates and returns an exact copy of the current solution
-     *
-     * @return Solution, a copy of this solution.
+     * Return an exact copy of the current solution
      */
     public Solution clone() {
         Solution clone = new Solution();
 
         clone.totalCost = this.totalCost;
-        clone.vehicleNr = this.vehicleNr;
+        clone.numVehicle = this.numVehicle;
 
         for (Route route: this.routes) {
             clone.routes.add(route.cloneRoute());
         }
-
         return clone;
     }
-    
-    @Override
-    public String toString() {
-        String result = "Solution : {"
-            + "\ntotalCost : " +  Math.round(totalCost * 100) / 100.0
-            + ", \nroutes : [";
 
-        for (Route route: this.routes) {
-        	if (route.getNodeList().size() > 2)
-        		result += "\n" + route;
-        }
 
-        return result + "]\n}";
-    }
 }

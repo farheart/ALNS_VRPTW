@@ -1,13 +1,15 @@
 package wy.alns.operation.repair;
 
-import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
+import wy.alns.algrithm.ALNSSolution;
 import wy.alns.util.RandomUtil;
 import wy.alns.vo.Measure;
-import wy.alns.algrithm.ALNSSolution;
 import wy.alns.vo.Node;
 import wy.alns.vo.Route;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 /**
  * RandomRepair
@@ -73,14 +75,14 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     				int insertCusPosition = customerList.remove(0);
     				
     				// 评价插入情况
-    				Measure newMeasure = new Measure(s.measure);
-    				s.evaluateInsertCustomer(insertRoutePosition, insertCusPosition, insertNode, newMeasure);
+    				Measure evalMeasure = new Measure(s.measure);
+    				s.evaluateInsertCustomer(insertRoutePosition, insertCusPosition, insertNode, evalMeasure);
                     
     				// 更新最优插入位置
-    				if (newMeasure.totalCost < bestMeasure.totalCost) {
+    				if (evalMeasure.totalCost < bestMeasure.totalCost) {
     					bestRoutePosition = insertRoutePosition;
     					bestCusomerPosition = insertCusPosition;
-    					bestMeasure = newMeasure;
+    					bestMeasure = evalMeasure;
     				}
     			}
     			// 执行插入操作

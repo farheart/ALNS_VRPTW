@@ -1,25 +1,24 @@
 package wy.alns.algrithm;
 
-import wy.alns.vo.Distance;
-import wy.alns.vo.Route;
 import wy.alns.vo.Instance;
-
+import wy.alns.vo.Route;
 
 
 /**
  * SolutionValidator
  *
  * @author Yu Wang
- * @date  2022-11-21
- */
+ * @date  2022-11-22
+*/
 public class SolutionValidator {
-	
 	private Instance instance;
-	
+
+
 	public SolutionValidator(Instance instance) {
 		this.instance = instance;
 	}
-	
+
+
     public String Check(Solution solution) {
         String result = "";
         double totalCost = 0;
@@ -33,9 +32,8 @@ public class SolutionValidator {
         		double distanceByVehicle = 0;
         		double loadInVehicle = 0;
         		double time = 0;
-
-
 				boolean checkTimeWindows = true;
+
         		for (int j = 1; j < route.getNodeList().size(); j++) {
 					double dist = this.instance.getDistance().between(route.getNodeList().get(j - 1), route.getNodeList().get(j));
 					time += dist;

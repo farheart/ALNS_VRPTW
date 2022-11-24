@@ -1,8 +1,5 @@
 package wy.alns.algrithm;
 
-import java.io.IOException;
-import java.util.Random;
-
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.operation.IALNSOperation;
 import wy.alns.operation.destroy.IALNSDestroy;
@@ -15,17 +12,20 @@ import wy.alns.operation.repair.RandomRepair;
 import wy.alns.operation.repair.RegretRepair;
 import wy.alns.vo.Instance;
 
+import java.io.IOException;
+import java.util.Random;
+
 
 /**
  * ALNS
  *
  * @author Yu Wang
- * @date  2022-11-19
+ * @date  2022-11-20
  */
 @Slf4j
 public class ALNS {
-    // 参数
     private final ALNSConfig config;
+
     private final IALNSDestroy[] destroy_ops = new IALNSDestroy[]{
             //new ProximityZoneDestroy(),
             //new ZoneDestroy(),
@@ -35,6 +35,7 @@ public class ALNS {
             new RandomDestroy(),
             new WorstCostDestroy()
     };
+
     private final IALNSRepair[] repair_ops = new IALNSRepair[]{
             new RegretRepair(),
             new GreedyRepair(),
@@ -42,68 +43,65 @@ public class ALNS {
     };
 
     private final double T_end_t = 0.01;
-    // 全局满意解
-    private ALNSSolution s_g = null;
-    // 局部满意解
-    private ALNSSolution s_c = null;
+    // Global Best Solution
+    private ALNSSolution globalBestSol = null;
+    // Local Best Solution
+    private ALNSSolution localBestSol = null;
     private int i = 0;
     // time
     private double T;
     private double T_s;
     // time start
-    private long t_start;
+    private long timeStart;
     // time end
     private double T_end;
     
 
     public ALNS(Solution s_, Instance instance, ALNSConfig c) throws InterruptedException {
         config = c;
-        s_g = new ALNSSolution(s_, instance);
-        s_c = new ALNSSolution(s_g);
+        globalBestSol = new ALNSSolution(s_, instance);
+        localBestSol = new ALNSSolution(globalBestSol);
         
         // 初始化alns参数
         initStrategies();
     }
 
     public Solution improveSolution() throws Exception {
-        T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * s_c.measure.totalCost;
+        T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * localBestSol.measure.totalCost;
         T = T_s;
         T_end = T_end_t * T_s;
         
         // 计时开始
-        t_start = System.currentTimeMillis();
+        timeStart = System.currentTimeMillis();
         
         while (true) {
         	// Generate new solution from local best solution s_c
-            ALNSSolution s_c_new = new ALNSSolution(s_c);
+            ALNSSolution s_c_new = new ALNSSolution(localBestSol);
             int q = getQ(s_c_new);
             
             // Find the best operators
             IALNSDestroy destroyOperator = this.chooseOperatorByChance(this.destroy_ops);
             IALNSRepair repairOperator = this.chooseOperatorByChance(this.repair_ops);
 
-            // destroy
-            ALNSSolution s_destroy = destroyOperator.destroy(s_c_new, q);
+            // destroy then repair
+            ALNSSolution solDestroy = destroyOperator.destroy(s_c_new, q);
+            ALNSSolution solRepair = repairOperator.repair(solDestroy);
 
-            // repair
-            ALNSSolution s_t = repairOperator.repair(s_destroy);
-
-
-            log.info(">> Iteration : " +  i + ", Current TotalCost : " + Math.round(s_t.measure.totalCost * 100) / 100.0);
+            log.info(">> Iteration : " +  i + ", Current TotalCost : " + Math.round(solRepair.measure.totalCost * 100) / 100.0);
             
-            // 更新局部满意解
-            if (s_t.measure.totalCost < s_c.measure.totalCost) {
-                s_c = s_t;
-                // Upda更新全局满意解，sg全局满意解
-                if (s_t.measure.totalCost < s_g.measure.totalCost) {
-                    handleNewGlobalMinimum(destroyOperator, repairOperator, s_t);
+            // Update local best solution
+            if (solRepair.measure.totalCost < localBestSol.measure.totalCost) {
+                localBestSol = solRepair;
+                // Update global best solution
+                if (solRepair.measure.totalCost < globalBestSol.measure.totalCost) {
+                    handleNewGlobalMinimum(destroyOperator, repairOperator, solRepair);
                 } else {
-                	// 更新局部满意解
+                	// Update local best solution
                     handleNewLocalMinimum(destroyOperator, repairOperator);
                 }
             } else {
-            	// 概率接受较差解
-                handleWorseSolution(destroyOperator, repairOperator, s_t);
+            	// Accept worse solution by chance
+                handleWorseSolution(destroyOperator, repairOperator, solRepair);
             }
 
             
@@ -114,14 +112,14 @@ public class ALNS {
             T = config.getC() * T;
             i++;
             
-            if (i > config.getOmega() && s_g.feasible()) break;
+            if (i > config.getOmega() && globalBestSol.isFeasible()) break;
             if (i > config.getOmega() * 1.5 ) break;
         }
         
-        Solution solution = s_g.toSolution();
+        Solution solution = globalBestSol.toSolution();
         
         // 输出程序耗时s
-        double s = Math.round((System.currentTimeMillis() - t_start) * 1000) / 1000000.;
+        double s = Math.round((System.currentTimeMillis() - timeStart) * 1000) / 1000000.;
         log.info(">> Run time = " + s + " sec");
 
 
@@ -144,7 +142,7 @@ public class ALNS {
         // Accept worse solution by calculated probability
     	double p_accept = calculateProbabilityToAcceptTempSolutionAsNewCurrent(s_t);
         if (Math.random() < p_accept) {
-            s_c = s_t;
+            localBestSol = s_t;
         }
         destroyOperator.incPi(config.getSigma_3());
         repairOperator.incPi(config.getSigma_3());
@@ -155,18 +153,19 @@ public class ALNS {
         repairOperator.incPi(config.getSigma_2());
     }
 
-    private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution s_t) throws IOException {
-        //log.info(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, s_t.getCostFitness(), s_t.activeVehicles(), s_g.getUnscheduledJobs().size()));
+    private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution solRepair) throws IOException {
+        //log.info(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, solRepair.getCostFitness(), solRepair.activeVehicles(), s_g.getUnscheduledJobs().size()));
 
         // Accept global best
-        s_g = s_t;
+        this.globalBestSol = solRepair;
         destroyOperator.incPi(config.getSigma_1());
         repairOperator.incPi(config.getSigma_1());
     }
 
     private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(ALNSSolution s_t) {
-        return Math.exp (-(s_t.measure.totalCost - s_c.measure.totalCost) / T);
+        return Math.exp(-(s_t.measure.totalCost - localBestSol.measure.totalCost) / T);
     }
+
 
     private int getQ(ALNSSolution s_c2) {
         int q_l = Math.min((int) Math.ceil(0.05 * s_c2.instance.getCustomerNumber()), 10);
@@ -241,7 +240,5 @@ public class ALNS {
             rpr.setP(1 / (double) repair_ops.length);
         }
     }
-
-
 
 }

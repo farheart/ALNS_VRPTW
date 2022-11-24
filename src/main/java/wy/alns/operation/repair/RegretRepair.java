@@ -1,12 +1,12 @@
 package wy.alns.operation.repair;
 
+import lombok.extern.slf4j.Slf4j;
+import wy.alns.algrithm.ALNSSolution;
+import wy.alns.vo.Measure;
+import wy.alns.vo.Node;
+
 import java.util.ArrayList;
 import java.util.Collections;
-
-import lombok.extern.slf4j.Slf4j;
-import wy.alns.vo.Measure;
-import wy.alns.algrithm.ALNSSolution;
-import wy.alns.vo.Node;
 
 
 /**
@@ -47,22 +47,22 @@ public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
             	for (int i = 1; i < s.routes.get(j).getNodeList().size() - 1; ++i) {
             		
             		// 评价插入情况
-    				Measure newMeasure = new Measure(s.measure);
-    				s.evaluateInsertCustomer(j, i, insertNode, newMeasure);
+    				Measure evalMeasure = new Measure(s.measure);
+    				s.evaluateInsertCustomer(j, i, insertNode, evalMeasure);
 
-            		if(newMeasure.totalCost > Double.MAX_VALUE) {
-            			newMeasure.totalCost = Double.MAX_VALUE;
+            		if(evalMeasure.totalCost > Double.MAX_VALUE) {
+            			evalMeasure.totalCost = Double.MAX_VALUE;
             		}
             		
             		// if a better insertion is found, set the position to insert in the move and update the minimum cost found
-            		if (newMeasure.totalCost < first) {
+            		if (evalMeasure.totalCost < first) {
             			//log.info(varCost.checkFeasible());
             			bestCusP = i;
             			bestRouteP = j;
             			second = first;
-            			first = newMeasure.totalCost;
-            		}else if(newMeasure.totalCost < second && newMeasure.totalCost != first) {
-            			second = newMeasure.totalCost;
+            			first = evalMeasure.totalCost;
+            		}else if(evalMeasure.totalCost < second && evalMeasure.totalCost != first) {
+            			second = evalMeasure.totalCost;
             		}
             	}
         	}
