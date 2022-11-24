@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.MyALNSSolution;
-import wy.alns.operation.ALNSAbstractOperation;
+import wy.alns.algrithm.ALNSSolution;
 import wy.alns.vo.Distance;
 import wy.alns.vo.Node;
 import wy.alns.vo.Route;
@@ -20,7 +19,7 @@ import wy.alns.vo.Route;
 public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 
 	@Override
-	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
+	public ALNSSolution destroy(ALNSSolution s, int removeNr) throws Exception {
 		if (!checkSolution(s)) {
 			return s;
 		}

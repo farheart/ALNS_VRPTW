@@ -7,12 +7,12 @@ import wy.alns.vo.*;
 
 
 /**
- * MyALNSSolution
+ * ALNSSolution
  *
  * @author Yu Wang
  * @date  2022-11-19
  */
-public class MyALNSSolution {
+public class ALNSSolution {
     public List<Route> routes;
 
     public Measure measure;
@@ -28,7 +28,7 @@ public class MyALNSSolution {
 	
 	public ArrayList<Node> removalCustomers;
 
-    public MyALNSSolution(Instance instance) {
+    public ALNSSolution(Instance instance) {
         this.routes = new ArrayList<>();
         this.measure = new Measure();
         this.vehicleNr = 0;
@@ -40,7 +40,7 @@ public class MyALNSSolution {
         this.removalCustomers = new ArrayList<Node>();
     }
     
-    public MyALNSSolution(Solution sol, Instance instance) {
+    public ALNSSolution(Solution sol, Instance instance) {
         this.measure = new Measure();
         measure.distance = sol.getTotalCost();
         measure.calculateTotalCost();
@@ -58,7 +58,7 @@ public class MyALNSSolution {
         this.removalCustomers = new ArrayList<Node>();
     }
     
-    public MyALNSSolution(MyALNSSolution sol) {
+    public ALNSSolution(ALNSSolution sol) {
     	this.measure = new Measure(sol.measure);
         this.vehicleNr = sol.vehicleNr;
         this.instance = sol.instance;
@@ -218,7 +218,7 @@ public class MyALNSSolution {
         return result + "]}";
     }
     
-	public int compareTo(MyALNSSolution arg0) {
+	public int compareTo(ALNSSolution arg0) {
 		if (this.measure.totalCost >  arg0.measure.totalCost) {
 			return 1;
 		} else if (this.measure == arg0.measure) {

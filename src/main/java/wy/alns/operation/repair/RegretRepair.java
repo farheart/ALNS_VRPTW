@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.vo.Measure;
-import wy.alns.algrithm.MyALNSSolution;
+import wy.alns.algrithm.ALNSSolution;
 import wy.alns.vo.Node;
 
 
@@ -19,7 +19,7 @@ import wy.alns.vo.Node;
 public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
 
 	@Override
-	public MyALNSSolution repair(MyALNSSolution s) {
+	public ALNSSolution repair(ALNSSolution s) {
 		if (!checkSolution(s)) {
 			return s;
 		}

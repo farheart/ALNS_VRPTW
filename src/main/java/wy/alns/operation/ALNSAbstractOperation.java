@@ -2,7 +2,6 @@ package wy.alns.operation;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.MyALNSSolution;
 
 import java.util.*;
 

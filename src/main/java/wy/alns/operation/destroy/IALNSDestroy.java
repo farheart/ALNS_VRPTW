@@ -1,8 +1,8 @@
 package wy.alns.operation.destroy;
 
-import wy.alns.algrithm.MyALNSSolution;
+import wy.alns.algrithm.ALNSSolution;
 import wy.alns.operation.IALNSOperation;
 
 public interface IALNSDestroy extends IALNSOperation {
-    MyALNSSolution destroy(MyALNSSolution s, int nodes) throws Exception;
+    ALNSSolution destroy(ALNSSolution s, int nodes) throws Exception;
 }

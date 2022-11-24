@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Random;
 
 import lombok.extern.slf4j.Slf4j;
+import wy.alns.operation.IALNSOperation;
 import wy.alns.operation.destroy.IALNSDestroy;
 import wy.alns.operation.destroy.RandomDestroy;
 import wy.alns.operation.destroy.ShawDestroy;
@@ -16,13 +17,13 @@ import wy.alns.vo.Instance;
 
 
 /**
- * MyALNSProcess
+ * ALNS
  *
  * @author Yu Wang
  * @date  2022-11-19
  */
 @Slf4j
-public class MyALNSProcess {
+public class ALNS {
     // 参数
     private final ALNSConfiguration config;
     private final IALNSDestroy[] destroy_ops = new IALNSDestroy[]{
@@ -42,9 +43,9 @@ public class MyALNSProcess {
 
     private final double T_end_t = 0.01;
     // 全局满意解
-    private MyALNSSolution s_g = null;
+    private ALNSSolution s_g = null;
     // 局部满意解
-    private MyALNSSolution s_c = null;
+    private ALNSSolution s_c = null;
     private int i = 0;
     // time
     private double T;
@@ -55,10 +56,10 @@ public class MyALNSProcess {
     private double T_end;
     
 
-    public MyALNSProcess(Solution s_, Instance instance, ALNSConfiguration c) throws InterruptedException {
+    public ALNS(Solution s_, Instance instance, ALNSConfiguration c) throws InterruptedException {
         config = c;
-        s_g = new MyALNSSolution(s_, instance);
-        s_c = new MyALNSSolution(s_g);
+        s_g = new ALNSSolution(s_, instance);
+        s_c = new ALNSSolution(s_g);
         
         // 初始化alns参数
         initStrategies();
@@ -74,18 +75,18 @@ public class MyALNSProcess {
         
         while (true) {
         	// Generate new solution from local best solution s_c
-            MyALNSSolution s_c_new = new MyALNSSolution(s_c);
+            ALNSSolution s_c_new = new ALNSSolution(s_c);
             int q = getQ(s_c_new);
             
             // Find the best operators
-            IALNSDestroy destroyOperator = getALNSDestroyOperator();
-            IALNSRepair repairOperator = getALNSRepairOperator();
+            IALNSDestroy destroyOperator = this.chooseOperatorByChance(this.destroy_ops);
+            IALNSRepair repairOperator = this.chooseOperatorByChance(this.repair_ops);
 
             // destroy
-            MyALNSSolution s_destroy = destroyOperator.destroy(s_c_new, q);
+            ALNSSolution s_destroy = destroyOperator.destroy(s_c_new, q);
 
             // repair
-            MyALNSSolution s_t = repairOperator.repair(s_destroy);
+            ALNSSolution s_t = repairOperator.repair(s_destroy);
 
 
             log.info(">> Iteration : " +  i + ", Current TotalCost : " + Math.round(s_t.measure.totalCost * 100) / 100.0);
@@ -139,7 +140,7 @@ public class MyALNSProcess {
         return solution;
     }
 
-    private void handleWorseSolution(IALNSDestroy destroyOperator, IALNSRepair repairOperator, MyALNSSolution s_t) {
+    private void handleWorseSolution(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution s_t) {
         // Accept worse solution by calculated probability
     	double p_accept = calculateProbabilityToAcceptTempSolutionAsNewCurrent(s_t);
         if (Math.random() < p_accept) {
@@ -154,7 +155,7 @@ public class MyALNSProcess {
         repairOperator.incPi(config.getSigma_2());
     }
 
-    private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, MyALNSSolution s_t) throws IOException {
+    private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution s_t) throws IOException {
         //log.info(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, s_t.getCostFitness(), s_t.activeVehicles(), s_g.getUnscheduledJobs().size()));
 
         // Accept global best
@@ -163,11 +164,11 @@ public class MyALNSProcess {
         repairOperator.incPi(config.getSigma_1());
     }
 
-    private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(MyALNSSolution s_t) {
+    private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(ALNSSolution s_t) {
         return Math.exp (-(s_t.measure.totalCost - s_c.measure.totalCost) / T);
     }
 
-    private int getQ(MyALNSSolution s_c2) {
+    private int getQ(ALNSSolution s_c2) {
         int q_l = Math.min((int) Math.ceil(0.05 * s_c2.instance.getCustomerNumber()), 10);
         int q_u = Math.min((int) Math.ceil(0.20 * s_c2.instance.getCustomerNumber()), 30);
 
@@ -177,9 +178,8 @@ public class MyALNSProcess {
 
 
     private void segmentFinsihed() {
+        // Update factor of Destroy operator
         double w_sum = 0;
-
-        // Update factor of Destroy Operator
         for (IALNSDestroy dstr : destroy_ops) {
             double w_old1 = dstr.getW() * (1 - config.getR_p());
             double recentFactor = dstr.getDraws() < 1 ? 0 : (double) dstr.getPi() / (double) dstr.getDraws();
@@ -188,21 +188,22 @@ public class MyALNSProcess {
             w_sum += w_new;
             dstr.setW(w_new);
         }
-        // Update weight factor of Destroy Operator
+        // Update weight
         for (IALNSDestroy dstr : destroy_ops) {
             dstr.setP(dstr.getW() / w_sum);
             //dstr.setDraws(0);
             //dstr.setPi(0);
         }
+
+        // Update factor of Repair operator
         w_sum = 0;
-        // Update neue Gewichtung der Repair Operatoren
         for (IALNSRepair rpr : repair_ops) {
             double recentFactor = rpr.getDraws() < 1 ? 0 : (double) rpr.getPi() / (double) rpr.getDraws();
             double w_new = (rpr.getW() * (1 - config.getR_p())) + config.getR_p() * recentFactor;
             w_sum += w_new;
             rpr.setW(w_new);
         }
-        // Update neue Wahrs. der Repair Operatoren
+        // Update weight
         for (IALNSRepair rpr : repair_ops) {
             rpr.setP(rpr.getW() / w_sum);
             //rpr.setDraws(0);
@@ -211,34 +212,18 @@ public class MyALNSProcess {
     }
 
 
-    private IALNSRepair getALNSRepairOperator() {
+    private <T extends IALNSOperation> T chooseOperatorByChance(T[] ops) {
         double random = Math.random();
         double threshold = 0.;
-        for (IALNSRepair rpr : repair_ops) {
-            threshold += rpr.getP();
+        for (T op : ops) {
+            threshold += op.getP();
             if (random <= threshold) {
-                rpr.drawn();
-                return rpr;
+                op.drawn();
+                return op;
             }
         }
-        repair_ops[repair_ops.length - 1].drawn();
-        return repair_ops[repair_ops.length - 1];
-    }
-
-
-    private IALNSDestroy getALNSDestroyOperator() {
-        double random = Math.random();
-        double threshold = 0.;
-        for (IALNSDestroy dstr : destroy_ops) {
-            threshold += dstr.getP();
-            if (random <= threshold) {
-                dstr.drawn();
-                return dstr;
-            }
-        }
-        
-        destroy_ops[destroy_ops.length - 1].drawn();
-        return destroy_ops[destroy_ops.length - 1];
+        ops[ops.length - 1].drawn();
+        return ops[ops.length - 1];
     }
 
 
@@ -256,56 +241,7 @@ public class MyALNSProcess {
             rpr.setP(1 / (double) repair_ops.length);
         }
     }
-    /*
-    public ALNSObserver getO() {
-        return this.o;
-    }
 
-    public ALNSProcessVisualizationManager getApvm() {
-        return this.apvm;
-    }
-	*/
-    public ALNSConfiguration getConfig() {
-        return this.config;
-    }
 
-    public IALNSDestroy[] getDestroy_ops() {
-        return this.destroy_ops;
-    }
 
-    public IALNSRepair[] getRepair_ops() {
-        return this.repair_ops;
-    }
-
-    public MyALNSSolution getS_g() {
-        return this.s_g;
-    }
-
-    public MyALNSSolution getS_c() {
-        return this.s_c;
-    }
-
-    public int getI() {
-        return this.i;
-    }
-
-    public double getT() {
-        return this.T;
-    }
-
-    public double getT_s() {
-        return this.T_s;
-    }
-
-    public long getT_start() {
-        return this.t_start;
-    }
-
-    public double getT_end_t() {
-        return this.T_end_t;
-    }
-
-    public double getT_end() {
-        return this.T_end;
-    }
 }

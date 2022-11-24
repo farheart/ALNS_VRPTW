@@ -67,7 +67,7 @@ public class Test {
         Solution is = solver.getInitialSolution(instance);
         Solution ims = solver.improveSolution(is, config, instance);
 //        log.info(">> Solution : " + ims.toString());
-//        log.info(">> Validation : \n" + solutionValidator.Check(ims));
+        log.info(">> Validation : \n" + solutionValidator.Check(ims));
         
         String[] result = {String.valueOf(ims.getTotalCost()), String.valueOf(ims.testTime)};
         return result;
