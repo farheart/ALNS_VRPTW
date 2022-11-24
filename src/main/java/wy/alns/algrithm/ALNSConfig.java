@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 public enum ALNSConfig {
-    DEFAULT(50000, 500, 0.1, 20, 5, 1, 0.99937, 0.05, 0.5);
+    DEFAULT(10000, 500, 0.1, 20, 5, 1, 0.99937, 0.05, 0.5);
 
     private final int omega; // iteration numbers
     private final int tau; //更新算子选择概率的间隔迭代次数

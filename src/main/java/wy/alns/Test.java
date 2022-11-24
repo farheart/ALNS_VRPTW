@@ -33,8 +33,8 @@ public class Test {
 
 
     public static void main(String args[]) throws Exception {
-//        String[] instanceNames = { "C101" };
-        String[] instanceNames = { "C102" };
+        String[] instanceNames = { "C101" };
+//        String[] instanceNames = { "C102" };
         String[][] result = new String[instanceNames.length][];
         
         for (int j = 0; j < instanceNames.length; j = j + 1) {

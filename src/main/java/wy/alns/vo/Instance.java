@@ -3,13 +3,11 @@ package wy.alns.vo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 
 /**
@@ -47,87 +45,82 @@ public class Instance {
     	this.name = name;
     	this.type = instanceType;
 
-        String dataFileName = findFileName(size, name);
-    	this.vehicles = this.loadVehicle(dataFileName);
-        this.customers = this.loadOrder(dataFileName);
+        List<String> dataLineList = this.loadData(size, name);
+        this.vehicles = this.loadVehicle(dataLineList);
+        this.customers = this.loadOrder(dataLineList);
 
         this.distance = new Distance(this.customers);
     }
-    
-
-    public ArrayList<Node> loadOrder(String dataFileName) throws IOException {
-        log.info(">> Loading customers ... ");
-        ArrayList<Node> customers = new ArrayList<Node>();
-
-        BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
-
-        int data_in_x_lines = Integer.MAX_VALUE;
-
-        String line;
-        while ((line = bReader.readLine()) != null) {
-            String datavalue[] = line.split("\\s+");
-
-            if (datavalue.length > 0 && datavalue[0].equals("CUST")) {
-                data_in_x_lines = 2;
-            }
-            
-            if (data_in_x_lines < 1 && datavalue.length > 0) {
-            	Node customer = new Node();
-                customer.setId(Integer.parseInt(datavalue[1]));
-                customer.setX(Double.parseDouble(datavalue[2]));
-                customer.setY(Double.parseDouble(datavalue[3]));
-                customer.setDemand(Double.parseDouble(datavalue[4]));
-                customer.setTimeWindow(Double.parseDouble(datavalue[5]), Double.parseDouble(datavalue[6]));
-                customer.setServiceTime(Double.parseDouble(datavalue[7]));
-                customers.add(customer);
-            }
-            data_in_x_lines--;
-        }
-        bReader.close();
-        return customers;
-    }
 
 
-    public List<Vehicle> loadVehicle(String dataFileName) throws IOException {
-        log.info(">> Loading vehicles ... ");
-
-        List<Vehicle> result = new ArrayList<>();
-        BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
-
-        String line;
-        int row = 0;
-        while ((line = bReader.readLine()) != null) {
-            String datavalue[] = line.split("\\s+");
-
-            if (row == 4) {
-            	// number of vehicles
-                int numVehicle = Integer.valueOf(datavalue[1]);
-
-                // capacity of vehicle
-                int vehicleCapacity = Integer.valueOf(datavalue[2]);
-
-                for (int i=0; i<numVehicle; i++) {
-                    Vehicle v = new Vehicle(String.valueOf(i));
-                    v.setCapacity(vehicleCapacity);
-                    result.add(v);
-                }
-                break;
-            }
-            row++;
-        }
-        bReader.close();
-        return result;
-    }
-
-
-    private String findFileName(int size, String name) {
+    private List<String> loadData(int size, String name) throws IOException {
         String dataFileName = "";
         if (type.equals("Solomon")) {
             dataFileName = "./instances" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
         } else if (type.equals("Homberger")) {
             dataFileName = "./instances" + "/homberger" + "/homberger_" + size + "/" + name + ".txt";
         }
-        return dataFileName;
+        return Files.readAllLines(Paths.get(dataFileName));
+    }
+
+
+    public ArrayList<Node> loadOrder(List<String> lineList) {
+        log.info(">> Loading customers ... ");
+
+        ArrayList<Node> result = new ArrayList<Node>();
+
+        int tableStartLineNIndex = Integer.MAX_VALUE;
+        for (int i=0; i<lineList.size(); ++i) {
+            String line = lineList.get(i);
+            if (line.startsWith("CUSTOMER")) {
+                tableStartLineNIndex = i + 3;
+            }
+
+            if (i >= tableStartLineNIndex) {
+                String cols[] = line.split("\\s+");
+                if (cols.length > 0) {
+                    Node customer = new Node();
+                    customer.setId(Integer.parseInt(cols[1]));
+                    customer.setX(Double.parseDouble(cols[2]));
+                    customer.setY(Double.parseDouble(cols[3]));
+                    customer.setDemand(Double.parseDouble(cols[4]));
+                    customer.setTimeWindow(Double.parseDouble(cols[5]), Double.parseDouble(cols[6]));
+                    customer.setServiceTime(Double.parseDouble(cols[7]));
+                    result.add(customer);
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public List<Vehicle> loadVehicle(List<String> lineList) throws IOException {
+        log.info(">> Loading vehicles ... ");
+
+        ArrayList<Vehicle> result = new ArrayList<>();
+
+        int tableStartLineNIndex = Integer.MAX_VALUE;
+        for (int i=0; i<lineList.size(); ++i) {
+            String line = lineList.get(i);
+            if (line.startsWith("VEHICLE")) {
+                tableStartLineNIndex = i + 2;
+            }
+
+            if (i == tableStartLineNIndex) {
+                String cols[] = line.split("\\s+");
+                if (cols.length == 3) {
+                    int numVehicle = Integer.valueOf(cols[1]);
+                    int vehicleCapacity = Integer.valueOf(cols[2]);
+                    for (int vi = 0; vi < numVehicle; vi++) {
+                        Vehicle v = new Vehicle(String.valueOf(vi));
+                        v.setCapacity(vehicleCapacity);
+                        result.add(v);
+                    }
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
 
