@@ -18,19 +18,11 @@ import wy.alns.vo.Instance;
  * @date  2022-11-20
  */
 @Slf4j
-public class WorstCostDestroy extends ALNSAbstractOperation implements IALNSDestroy {
-    /*
-	@Override
-	public ALNSStrategieVisualizationManager getVisualizationManager() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	*/
+public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
+
 	@Override
 	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
-		
-		if(s.removalCustomers.size() != 0) {
-			log.error("removalCustomers is not empty.");
+		if (!checkSolution(s)) {
 			return s;
 		}
         

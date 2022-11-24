@@ -17,14 +17,12 @@ import wy.alns.vo.Route;
  * @date  2022-11-20
  */
 @Slf4j
-public class ShawDestroy extends ALNSAbstractOperation implements IALNSDestroy {
+public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 
 	@Override
 	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
-		
-		if(s.removalCustomers.size() != 0) {
-				log.error("removalCustomers is not empty.");
-				return s;
+		if (!checkSolution(s)) {
+			return s;
 		}
 
 		Node lastRemove;

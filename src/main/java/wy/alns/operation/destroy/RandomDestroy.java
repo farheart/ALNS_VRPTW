@@ -17,22 +17,16 @@ import wy.alns.vo.Route;
  * @date  2022-11-20
  */
 @Slf4j
-public class RandomDestroy extends ALNSAbstractOperation implements IALNSDestroy {
-	/*
-	@Override
-	public ALNSStrategieVisualizationManager getVisualizationManager() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	*/
+public class RandomDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
+
 	@Override
 	public MyALNSSolution destroy(MyALNSSolution s, int removeNr) throws Exception {
-		
-		if(s.removalCustomers.size() != 0) {
-			log.error("removalCustomers is not empty.");
+
+		if (!checkSolution(s)) {
 			return s;
 		}
-		
+
+
 		while(s.removalCustomers.size() < removeNr ) {
 			
 			// 获取随机数
@@ -61,5 +55,7 @@ public class RandomDestroy extends ALNSAbstractOperation implements IALNSDestroy
 
 		return s;
 	}
+
+
 
 }

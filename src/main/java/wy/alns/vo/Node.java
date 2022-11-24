@@ -97,12 +97,11 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node{" +
-                "x=" + x +
-                ", y=" + y +
-                ", id=" + id +
-                ", demand=" + demand +
-                '}';
+        return "Node[" + this.id + "] \t{"
+            + "x=" + x
+            + ", y=" + y
+            + ", demand=" + demand
+            + '}';
     }
 
     @Override

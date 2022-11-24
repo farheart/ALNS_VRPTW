@@ -87,9 +87,9 @@ public class Route {
         for (Node customer: this.nodeList) {
             nodeListStr += "\n\t\t" + customer;
         }
-        nodeListStr += "\n]";
+        nodeListStr += "\n\t]";
 
-        String result =  "Route[" + this.id + "] : {\n\t" + nodeListStr + ",\n\tmeasure = " + this.measure.toString() + "\n}";
+        String result =  "Route[" + this.id + "] : {\n\t" + nodeListStr + ",\n\tmeasure = " + this.measure.toString() + "\n}\n";
         return result;
     }
 

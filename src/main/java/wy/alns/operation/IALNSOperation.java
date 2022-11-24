@@ -1,12 +1,11 @@
 package wy.alns.operation;
 
 public interface IALNSOperation {
-
     int getPi();
 
     void setPi(int pi);
 
-    void addToPi(int pi);
+    void incPi(int pi);
 
     double getP();
 
@@ -21,7 +20,4 @@ public interface IALNSOperation {
     int getDraws();
 
     void setDraws(int d);
-
-    //ALNSStrategieVisualizationManager getVisualizationManager();
-
 }

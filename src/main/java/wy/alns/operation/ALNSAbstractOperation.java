@@ -1,6 +1,8 @@
 package wy.alns.operation;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import wy.alns.algrithm.MyALNSSolution;
 
 import java.util.*;
 
@@ -12,22 +14,26 @@ import java.util.*;
  * @date  2022-11-21
  */
 @Data
+@Slf4j
 public abstract class ALNSAbstractOperation implements IALNSOperation {
     private final Random r = new Random();
+
     private int pi;
     private double p;
     private int draws;
     private double w;
 
-    @Override
+
     // 被使用的次数
+    @Override
     public void drawn() {
         draws++;
     }
 
-    @Override
+
     // 优化最优满意解，则增加pi值
-    public void addToPi(int pi) {
+    @Override
+    public void incPi(int pi) {
         this.pi += pi;
     }
 

@@ -88,7 +88,7 @@ public class MyALNSProcess {
             MyALNSSolution s_t = repairOperator.repair(s_destroy);
 
 
-            log.info("迭代次数 ：" +  i + "当前解 ：" + Math.round(s_t.measure.totalCost * 100) / 100.0);
+            log.info(">> Iteration : " +  i + ", Current TotalCost : " + Math.round(s_t.measure.totalCost * 100) / 100.0);
             
             // 更新局部满意解
             if (s_t.measure.totalCost < s_c.measure.totalCost) {
@@ -121,18 +121,20 @@ public class MyALNSProcess {
         
         // 输出程序耗时s
         double s = Math.round((System.currentTimeMillis() - t_start) * 1000) / 1000000.;
-        log.info("\nALNS progress cost " + s + "s.");
-        
-        // 输出算子使用情况
-        for (IALNSDestroy destroy : destroy_ops){
-        	log.info(destroy.getClass().getName() + 
-        			" 被使用 " + destroy.getDraws() + "次.");
+        log.info(">> Run time = " + s + " sec");
+
+
+        // Utilization of operators
+        String msg = "";
+        for (IALNSDestroy op : destroy_ops){
+        	msg += op.getDraws() +" invokes  - [" + op.getClass().getName() +  "]\n";
         }
         
-        for (IALNSRepair repair : repair_ops){
-        	log.info(repair.getClass().getName() + 
-        			" 被使用 " + repair.getDraws() + "次.");
+        for (IALNSRepair op : repair_ops){
+            msg += op.getDraws() +" invokes  - [" + op.getClass().getName() +  "]\n";
         }
+        log.info(">> Statistics of operator utilization : \n" + msg);
+
         solution.testTime = s;
         return solution;
     }
@@ -143,13 +145,13 @@ public class MyALNSProcess {
         if (Math.random() < p_accept) {
             s_c = s_t;
         }
-        destroyOperator.addToPi(config.getSigma_3());
-        repairOperator.addToPi(config.getSigma_3());
+        destroyOperator.incPi(config.getSigma_3());
+        repairOperator.incPi(config.getSigma_3());
     }
 
     private void handleNewLocalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator) {
-        destroyOperator.addToPi(config.getSigma_2());
-        repairOperator.addToPi(config.getSigma_2());
+        destroyOperator.incPi(config.getSigma_2());
+        repairOperator.incPi(config.getSigma_2());
     }
 
     private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, MyALNSSolution s_t) throws IOException {
@@ -157,8 +159,8 @@ public class MyALNSProcess {
 
         // Accept global best
         s_g = s_t;
-        destroyOperator.addToPi(config.getSigma_1());
-        repairOperator.addToPi(config.getSigma_1());
+        destroyOperator.incPi(config.getSigma_1());
+        repairOperator.incPi(config.getSigma_1());
     }
 
     private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(MyALNSSolution s_t) {
