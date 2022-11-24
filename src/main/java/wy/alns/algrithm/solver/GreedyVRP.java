@@ -19,7 +19,7 @@ public class GreedyVRP {
     /**
      * customers
      */
-    private List<Order> orderList;
+    private List<Delivery> deliveryList;
 
     /**
      * routes
@@ -37,7 +37,7 @@ public class GreedyVRP {
      * Constructor
      */
     public GreedyVRP(Instance instance) {
-		this.orderList = instance.getOrderList();
+		this.deliveryList = instance.getDeliveryList();
 		this.routeList = new ArrayList<Route>();
 		this.distanceDict = instance.getDistanceDict();
 
@@ -53,7 +53,7 @@ public class GreedyVRP {
         Solution solution = new Solution();
 
         // Fetch the depot node.
-        Order depot = this.orderList.remove(0);
+        Delivery depot = this.deliveryList.remove(0);
 
         // Fetch the first available vehicle
         Route curRoute = this.routeList.remove(0);
@@ -64,21 +64,21 @@ public class GreedyVRP {
         // Repeat until all customers are routed or if we run out vehicles.
         while (true) {
             // If we served all customers, exit.
-            if (this.orderList.size() == 0) {
+            if (this.deliveryList.size() == 0) {
                 break;
             }
 
             // Get the last node of the current route. We will try to find the closest node to it that also satisfies the capacity constraint.
-            Order lastInTheCurrentRoute = curRoute.getLastNodeOfTheRoute();
+            Delivery lastInTheCurrentRoute = curRoute.getLastNodeOfTheRoute();
 
             // The distanceDict of the closest node, if any, to the last node in the route.
             double smallestDistance = Double.MAX_VALUE;
 
             // The closest node, if any, to the last node in the route that also satisfies the capacity constraint.
-            Order closestOrder = null;
+            Delivery closestDelivery = null;
 
             // Find the nearest neighbor based on distanceDict
-            for (Order n: this.orderList) {
+            for (Delivery n: this.deliveryList) {
 
                 double dist = this.distanceDict.between(lastInTheCurrentRoute, n);
 
@@ -90,12 +90,12 @@ public class GreedyVRP {
 
                 if (ifDistValid && ifCapacityValid && ifArrTimeValid && ifWithinSchedule) {
                     smallestDistance = dist;
-                    closestOrder = n;
+                    closestDelivery = n;
                 }
             }
             
             // A node that satisfies the capacity constraint found
-            if (closestOrder != null) {
+            if (closestDelivery != null) {
                 // Increase the cost of the current route by the distanceDict of the previous final node to the new one
                 curRoute.getMeasure().distance += smallestDistance;
 
@@ -103,18 +103,18 @@ public class GreedyVRP {
                 curRoute.getMeasure().time += smallestDistance;
                 
                 // waiting time windows open
-                if (curRoute.getMeasure().time < closestOrder.getTimeWindow().getStart()) curRoute.getMeasure().time = closestOrder.getTimeWindow().getStart();
+                if (curRoute.getMeasure().time < closestDelivery.getTimeWindow().getStart()) curRoute.getMeasure().time = closestDelivery.getTimeWindow().getStart();
                 
-                curRoute.getMeasure().time += closestOrder.getServiceTime();
+                curRoute.getMeasure().time += closestDelivery.getServiceTime();
                 
                 // Increase the load of the vehicle by the demand of the new node-customer
-                curRoute.getMeasure().amount += closestOrder.getAmount();
+                curRoute.getMeasure().amount += closestDelivery.getAmount();
 
                 // Add the closest node to the route
-                curRoute.append(closestOrder);
+                curRoute.append(closestDelivery);
                 
                 // Remove customer from the non-served customers list.
-                this.orderList.remove(closestOrder);
+                this.deliveryList.remove(closestDelivery);
 
             // We didn't find any node that satisfies the condition.
             } else {

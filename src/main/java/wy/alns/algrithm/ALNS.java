@@ -26,7 +26,7 @@ import java.util.Random;
 public class ALNS {
     private final ALNSConfig config;
 
-    private final IALNSDestroy[] destroy_ops = new IALNSDestroy[]{
+    private final IALNSDestroy[] destroyOperators = new IALNSDestroy[]{
             //new ProximityZoneDestroy(),
             //new ZoneDestroy(),
             //new NodesCountDestroy(false),
@@ -36,7 +36,7 @@ public class ALNS {
             new WorstCostDestroy()
     };
 
-    private final IALNSRepair[] repair_ops = new IALNSRepair[]{
+    private final IALNSRepair[] repairOperators = new IALNSRepair[]{
             new RegretRepair(),
             new GreedyRepair(),
             new RandomRepair()
@@ -61,17 +61,16 @@ public class ALNS {
         config = c;
         globalBestSol = new ALNSSolution(s_, instance);
         localBestSol = new ALNSSolution(globalBestSol);
-        
-        // 初始化alns参数
-        initStrategies();
+
+        initOperators(this.destroyOperators);
+        initOperators(this.repairOperators);
     }
 
     public Solution improveSolution() throws Exception {
         T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * localBestSol.measure.totalCost;
         T = T_s;
         T_end = T_end_t * T_s;
-        
-        // 计时开始
+
         timeStart = System.currentTimeMillis();
         
         while (true) {
@@ -80,8 +79,8 @@ public class ALNS {
             int q = getQ(s_c_new);
             
             // Find the best operators
-            IALNSDestroy destroyOperator = this.chooseOperatorByChance(this.destroy_ops);
-            IALNSRepair repairOperator = this.chooseOperatorByChance(this.repair_ops);
+            IALNSDestroy destroyOperator = this.chooseOperatorByChance(this.destroyOperators);
+            IALNSRepair repairOperator = this.chooseOperatorByChance(this.repairOperators);
 
             // destroy then repair
             ALNSSolution solDestroy = destroyOperator.destroy(s_c_new, q);
@@ -117,19 +116,18 @@ public class ALNS {
         }
         
         Solution solution = globalBestSol.toSolution();
-        
-        // 输出程序耗时s
+
+        // time elapsed
         double s = Math.round((System.currentTimeMillis() - timeStart) * 1000) / 1000000.;
         log.info(">> Run time = " + s + " sec");
 
-
         // Utilization of operators
         String msg = "";
-        for (IALNSDestroy op : destroy_ops){
+        for (IALNSDestroy op : destroyOperators){
         	msg += op.getDraws() +" invokes  - [" + op.getClass().getName() +  "]\n";
         }
         
-        for (IALNSRepair op : repair_ops){
+        for (IALNSRepair op : repairOperators){
             msg += op.getDraws() +" invokes  - [" + op.getClass().getName() +  "]\n";
         }
         log.info(">> Statistics of operator utilization : \n" + msg);
@@ -148,10 +146,12 @@ public class ALNS {
         repairOperator.incPi(config.getSigma_3());
     }
 
+
     private void handleNewLocalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator) {
         destroyOperator.incPi(config.getSigma_2());
         repairOperator.incPi(config.getSigma_2());
     }
+
 
     private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution solRepair) throws IOException {
         //log.info(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, solRepair.getCostFitness(), solRepair.activeVehicles(), s_g.getUnscheduledJobs().size()));
@@ -161,6 +161,7 @@ public class ALNS {
         destroyOperator.incPi(config.getSigma_1());
         repairOperator.incPi(config.getSigma_1());
     }
+
 
     private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(ALNSSolution s_t) {
         return Math.exp(-(s_t.measure.totalCost - localBestSol.measure.totalCost) / T);
@@ -179,7 +180,7 @@ public class ALNS {
     private void segmentFinsihed() {
         // Update factor of Destroy operator
         double w_sum = 0;
-        for (IALNSDestroy dstr : destroy_ops) {
+        for (IALNSDestroy dstr : destroyOperators) {
             double w_old1 = dstr.getW() * (1 - config.getR_p());
             double recentFactor = dstr.getDraws() < 1 ? 0 : (double) dstr.getPi() / (double) dstr.getDraws();
             double w_old2 = config.getR_p() * recentFactor;
@@ -187,8 +188,9 @@ public class ALNS {
             w_sum += w_new;
             dstr.setW(w_new);
         }
+
         // Update weight
-        for (IALNSDestroy dstr : destroy_ops) {
+        for (IALNSDestroy dstr : destroyOperators) {
             dstr.setP(dstr.getW() / w_sum);
             //dstr.setDraws(0);
             //dstr.setPi(0);
@@ -196,14 +198,15 @@ public class ALNS {
 
         // Update factor of Repair operator
         w_sum = 0;
-        for (IALNSRepair rpr : repair_ops) {
+        for (IALNSRepair rpr : repairOperators) {
             double recentFactor = rpr.getDraws() < 1 ? 0 : (double) rpr.getPi() / (double) rpr.getDraws();
             double w_new = (rpr.getW() * (1 - config.getR_p())) + config.getR_p() * recentFactor;
             w_sum += w_new;
             rpr.setW(w_new);
         }
+
         // Update weight
-        for (IALNSRepair rpr : repair_ops) {
+        for (IALNSRepair rpr : repairOperators) {
             rpr.setP(rpr.getW() / w_sum);
             //rpr.setDraws(0);
             //rpr.setPi(0);
@@ -226,18 +229,12 @@ public class ALNS {
     }
 
 
-    private void initStrategies() {
-        for (IALNSDestroy dstr : destroy_ops) {
-        	dstr.setDraws(0);
-            dstr.setPi(0);
-            dstr.setW(1.);
-            dstr.setP(1 / (double) destroy_ops.length);
-        }
-        for (IALNSRepair rpr : repair_ops) {
-            rpr.setDraws(0);
-        	rpr.setPi(0);
-            rpr.setW(1.);
-            rpr.setP(1 / (double) repair_ops.length);
+    private <T extends IALNSOperation> void initOperators(T[] ops) {
+        for (T op : ops) {
+        	op.setDraws(0);
+            op.setPi(0);
+            op.setW(1.);
+            op.setP(1 / (double) ops.length);
         }
     }
 

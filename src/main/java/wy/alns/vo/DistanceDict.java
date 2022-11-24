@@ -15,13 +15,13 @@ public class DistanceDict {
     private final Map<String, Double> distanceMap;
 
 
-    public DistanceDict(List<Order> orderList) {
+    public DistanceDict(List<Delivery> deliveryList) {
         this.distanceMap = new HashMap<>();
-        this.init(orderList);
+        this.init(deliveryList);
     }
 
 
-    public static double calDistance(Order n1, Order n2) {
+    public static double calDistance(Delivery n1, Delivery n2) {
         double x1 = n1.getLocation().getX();
         double y1 = n1.getLocation().getY();
         double x2 = n2.getLocation().getX();
@@ -33,21 +33,21 @@ public class DistanceDict {
     }
 
 
-    public double between(Order n1, Order n2) {
+    public double between(Delivery n1, Delivery n2) {
         return this.distanceMap.get(getNodePairKey(n1, n2));
     }
 
 
-    private void init(List<Order> orderList) {
-        for (Order n1: orderList) {
-            for (Order n2: orderList) {
+    private void init(List<Delivery> deliveryList) {
+        for (Delivery n1: deliveryList) {
+            for (Delivery n2: deliveryList) {
                 this.distanceMap.put(getNodePairKey(n1, n2), calDistance(n1, n2));
             }
         }
     }
 
 
-    public static String getNodePairKey(Order n1, Order n2) {
+    public static String getNodePairKey(Delivery n1, Delivery n2) {
         return n1.getId() + "~" + n2.getId();
     }
 }

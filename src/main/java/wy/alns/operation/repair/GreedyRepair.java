@@ -1,9 +1,9 @@
 package wy.alns.operation.repair;
 
 import lombok.extern.slf4j.Slf4j;
+import wy.alns.vo.Delivery;
 import wy.alns.vo.Measure;
 import wy.alns.algrithm.ALNSSolution;
-import wy.alns.vo.Order;
 
 /**
  * GreedyRepair
@@ -24,7 +24,7 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
     	
 		for(int k = 0; k < removeNr; k++) {
 			
-			Order insertOrder = s.removalCustomers.remove(0);
+			Delivery insertDelivery = s.removalCustomers.remove(0);
 			
 			double bestCost;
 			int bestCusP = -1;
@@ -33,16 +33,16 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
         	
 			for(int j = 0; j < s.routes.size(); j++) {			
         		
-				if(s.routes.get(j).getOrderList().size() < 1) {
+				if(s.routes.get(j).getDeliveryList().size() < 1) {
         			continue;
         		}
         		
 				// 寻找最优插入位置
-            	for (int i = 1; i < s.routes.get(j).getOrderList().size() - 1; ++i) {
+            	for (int i = 1; i < s.routes.get(j).getDeliveryList().size() - 1; ++i) {
             		
             		// 评价插入情况
     				Measure evalMeasure = new Measure(s.measure);
-    				s.evaluateInsertCustomer(j, i, insertOrder, evalMeasure);
+    				s.evaluateInsertCustomer(j, i, insertDelivery, evalMeasure);
 
             		if(evalMeasure.totalCost > Double.MAX_VALUE) {
             			evalMeasure.totalCost = Double.MAX_VALUE;
@@ -57,7 +57,7 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
             		}
             	}
         	}
-			s.insertCustomer(bestRouteP, bestCusP, insertOrder);
+			s.insertCustomer(bestRouteP, bestCusP, insertDelivery);
 		}
         return s;
     }

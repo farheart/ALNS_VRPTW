@@ -3,13 +3,13 @@ package wy.alns.vo;
 import lombok.*;
 
 /**
- * Order: represent a customer order
+ * Delivery: represent a customer order
  *
  * @author Yu Wang
  * @date  2022-11-15
  */
 @Data
-public class Order {
+public class Delivery {
     private int id;
 
     private double amount;
@@ -20,7 +20,7 @@ public class Order {
 
 	private TimeWindow timeWindow;
 
-    public Order(Order n) {
+    public Delivery(Delivery n) {
     	this.id = n.id;
     	this.location = n.location;
     	this.amount = n.amount;
@@ -28,7 +28,7 @@ public class Order {
     	this.timeWindow = n.timeWindow;
     }
 
-    public Order() {
+    public Delivery() {
 	}
 
 }

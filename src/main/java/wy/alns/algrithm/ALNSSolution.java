@@ -25,7 +25,7 @@ public class ALNSSolution {
 	
 	public static final double penalty = 1000;
 	
-	public ArrayList<Order> removalCustomers;
+	public ArrayList<Delivery> removalCustomers;
 
     public ALNSSolution(Instance instance) {
         this.routes = new ArrayList<>();
@@ -36,7 +36,7 @@ public class ALNSSolution {
         this.alpha = penalty;
         this.beta = penalty;
         
-        this.removalCustomers = new ArrayList<Order>();
+        this.removalCustomers = new ArrayList<Delivery>();
     }
     
     public ALNSSolution(Solution sol, Instance instance) {
@@ -62,7 +62,7 @@ public class ALNSSolution {
             this.routes.add(route.cloneRoute());
         }
         
-        this.removalCustomers = new ArrayList<Order>();
+        this.removalCustomers = new ArrayList<Delivery>();
     }
     
 	public void removeCustomer(int routePosition, int cusPosition) {
@@ -71,9 +71,9 @@ public class ALNSSolution {
 
 		Route route = this.routes.get(routePosition);
 
-		Order n0 = route.getOrderList().get(cusPosition - 1);
-		Order n = route.getOrderList().get(cusPosition);
-		Order n1 = route.getOrderList().get(cusPosition + 1);
+		Delivery n0 = route.getDeliveryList().get(cusPosition - 1);
+		Delivery n = route.getDeliveryList().get(cusPosition);
+		Delivery n1 = route.getDeliveryList().get(cusPosition + 1);
 
 		double dist = distanceDict.between(n0, n1) - distanceDict.between(n0, n) - distanceDict.between(n, n1);
 		double amount = -n.getAmount();
@@ -89,15 +89,15 @@ public class ALNSSolution {
 	}
 
 
-	public void insertCustomer(int routePosition, int insertCusPosition, Order insertCustomer) {
+	public void insertCustomer(int routePosition, int insertCusPosition, Delivery insertCustomer) {
 		//TODO : duplicated TW
 		DistanceDict distanceDict = instance.getDistanceDict();
 
 		Route route = this.routes.get(routePosition);
 
-		Order n0 = route.getOrderList().get(insertCusPosition - 1);
-		Order n = insertCustomer;
-		Order n1 = route.getOrderList().get(insertCusPosition);
+		Delivery n0 = route.getDeliveryList().get(insertCusPosition - 1);
+		Delivery n = insertCustomer;
+		Delivery n1 = route.getDeliveryList().get(insertCusPosition);
 
 		double dist = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
 		double amount = +n.getAmount();
@@ -115,14 +115,14 @@ public class ALNSSolution {
 		// calculate TW violation, time
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getOrderList().size(); i++) {
-			time += distanceDict.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
-			if (time < route.getOrderList().get(i).getTimeWindow().getStart()) {
-				time = route.getOrderList().get(i).getTimeWindow().getStart();
-			} else if (time > route.getOrderList().get(i).getTimeWindow().getEnd()) {
-				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow().getEnd();
+		for (int i = 1; i < route.getDeliveryList().size(); i++) {
+			time += distanceDict.between(route.getDeliveryList().get(i - 1), route.getDeliveryList().get(i));
+			if (time < route.getDeliveryList().get(i).getTimeWindow().getStart()) {
+				time = route.getDeliveryList().get(i).getTimeWindow().getStart();
+			} else if (time > route.getDeliveryList().get(i).getTimeWindow().getEnd()) {
+				timeWindowViolation += time - route.getDeliveryList().get(i).getTimeWindow().getEnd();
 			}
-			time += route.getOrderList().get(i).getServiceTime();
+			time += route.getDeliveryList().get(i).getServiceTime();
 		}
 
 		route.getMeasure().time = time;
@@ -133,15 +133,15 @@ public class ALNSSolution {
 	}
 
 
-	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Order insertCustomer, Measure evalMeasure) {
+	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Delivery insertCustomer, Measure evalMeasure) {
 		//TODO : duplicated TW
 		DistanceDict distanceDict = instance.getDistanceDict();
 
 		Route route = this.routes.get(routePosition).cloneRoute();
 
-		Order n0 = route.getOrderList().get(insertCusPosition - 1);
-		Order n = insertCustomer;
-		Order n1 = route.getOrderList().get(insertCusPosition);
+		Delivery n0 = route.getDeliveryList().get(insertCusPosition - 1);
+		Delivery n = insertCustomer;
+		Delivery n1 = route.getDeliveryList().get(insertCusPosition);
 
 		double cost = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
 		double amount = +n.getAmount();
@@ -157,14 +157,14 @@ public class ALNSSolution {
 		
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getOrderList().size(); i++) {
-			time += distanceDict.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
-			if (time < route.getOrderList().get(i).getTimeWindow().getStart()) {
-				time = route.getOrderList().get(i).getTimeWindow().getStart();
-			} else if (time > route.getOrderList().get(i).getTimeWindow().getEnd()) {
-				timeWindowViolation += time - route.getOrderList().get(i).getTimeWindow().getEnd();
+		for (int i = 1; i < route.getDeliveryList().size(); i++) {
+			time += distanceDict.between(route.getDeliveryList().get(i - 1), route.getDeliveryList().get(i));
+			if (time < route.getDeliveryList().get(i).getTimeWindow().getStart()) {
+				time = route.getDeliveryList().get(i).getTimeWindow().getStart();
+			} else if (time > route.getDeliveryList().get(i).getTimeWindow().getEnd()) {
+				timeWindowViolation += time - route.getDeliveryList().get(i).getTimeWindow().getEnd();
 			}
-			time += route.getOrderList().get(i).getServiceTime();
+			time += route.getDeliveryList().get(i).getServiceTime();
 		}
 		
 		evalMeasure.time = time;

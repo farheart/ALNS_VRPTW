@@ -26,7 +26,7 @@ public class Instance {
     /**
      * All orders, where index = 0 : Depot
      */
-    private List<Order> orderList;
+    private List<Delivery> deliveryList;
 
     /**
      * The available vehicles
@@ -46,9 +46,9 @@ public class Instance {
 
         List<String> dataLineList = this.loadData(size, name);
         this.vehicleList = this.loadVehicle(dataLineList);
-        this.orderList = this.loadOrder(dataLineList);
+        this.deliveryList = this.loadOrder(dataLineList);
 
-        this.distanceDict = new DistanceDict(this.orderList);
+        this.distanceDict = new DistanceDict(this.deliveryList);
     }
 
 
@@ -63,10 +63,10 @@ public class Instance {
     }
 
 
-    public ArrayList<Order> loadOrder(List<String> lineList) {
+    public ArrayList<Delivery> loadOrder(List<String> lineList) {
         log.info(">> Loading customers ... ");
 
-        ArrayList<Order> result = new ArrayList<Order>();
+        ArrayList<Delivery> result = new ArrayList<Delivery>();
 
         int tableStartLineNIndex = Integer.MAX_VALUE;
         for (int i=0; i<lineList.size(); ++i) {
@@ -78,21 +78,21 @@ public class Instance {
             if (i >= tableStartLineNIndex) {
                 String cols[] = line.split("\\s+");
                 if (cols.length > 0) {
-                    Order order = new Order();
-                    order.setId(Integer.parseInt(cols[1]));
+                    Delivery delivery = new Delivery();
+                    delivery.setId(Integer.parseInt(cols[1]));
 
                     double X = (Double.parseDouble(cols[2]));
                     double Y = (Double.parseDouble(cols[3]));
-                    order.setLocation(new Location(X, Y));
+                    delivery.setLocation(new Location(X, Y));
 
-                    order.setAmount(Double.parseDouble(cols[4]));
+                    delivery.setAmount(Double.parseDouble(cols[4]));
 
                     double s = Double.parseDouble(cols[5]);
                     double e = Double.parseDouble(cols[6]);
-                    order.setTimeWindow(new TimeWindow(s, e));
+                    delivery.setTimeWindow(new TimeWindow(s, e));
 
-                    order.setServiceTime(Double.parseDouble(cols[7]));
-                    result.add(order);
+                    delivery.setServiceTime(Double.parseDouble(cols[7]));
+                    result.add(delivery);
                 }
             }
         }
@@ -131,7 +131,7 @@ public class Instance {
 
 
     public int getOrderNum() {
-        return this.orderList.size();
+        return this.deliveryList.size();
     }
 
 }

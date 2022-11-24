@@ -5,8 +5,8 @@ import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.ALNSSolution;
+import wy.alns.vo.Delivery;
 import wy.alns.vo.DistanceDict;
-import wy.alns.vo.Order;
 import wy.alns.vo.Route;
 import wy.alns.vo.Instance;
 
@@ -28,7 +28,7 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
 		// 计算fitness值，对客户进行评估。
 		ArrayList<Fitness> customerFitness = new  ArrayList<Fitness>();
         for(Route route : s.routes) {
-        	for (Order customer : route.getOrderList()) {
+        	for (Delivery customer : route.getDeliveryList()) {
         		double fitness = Fitness.calculateFitness(s.instance, customer, route);
         		customerFitness.add(new Fitness(customer.getId(), fitness));
         	}
@@ -39,8 +39,8 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
         for(int i = 0; i < removeNr; ++i) removal.add(customerFitness.get(i).customerNo);
         
         for(int j = 0; j < s.routes.size(); j++) {
-        	for (int i = 0; i < s.routes.get(j).getOrderList().size(); ++i) {
-        		Order customer = s.routes.get(j).getOrderList().get(i);
+        	for (int i = 0; i < s.routes.get(j).getDeliveryList().size(); ++i) {
+        		Delivery customer = s.routes.get(j).getDeliveryList().get(i);
         		if(removal.contains(customer.getId())) {
         			s.removeCustomer(j, i);
         		}	
@@ -62,10 +62,10 @@ class Fitness implements Comparable<Fitness>{
 		fitness = f;
 	}
 	
-	public static double calculateFitness(Instance instance, Order customer, Route route) {
+	public static double calculateFitness(Instance instance, Delivery customer, Route route) {
 		DistanceDict distanceDict = instance.getDistanceDict();
 
-		Order n0 = route.getOrderList().get(0);
+		Delivery n0 = route.getDeliveryList().get(0);
 		double v = route.getMeasure().getTimeViolation() + route.getMeasure().getLoadViolation() + customer.getAmount();
 		double distFactor = distanceDict.between(customer, n0) + distanceDict.between(n0, customer);
 		double fitness = v * distFactor;
