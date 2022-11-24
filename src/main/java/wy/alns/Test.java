@@ -59,12 +59,15 @@ public class Test {
         Solver solver = new Solver();
 
         Solution initSol = solver.getInitialSolution(instance);
+        log.info(">> Init Solution : " + initSol.toString());
+
         Solution sol = solver.improveSolution(initSol, config, instance);
         log.info(">> Solution : " + sol.toString());
 
         SolutionValidator solutionValidator = new SolutionValidator(instance);
         log.info(">> Validation : \n" + solutionValidator.Check(sol));
-        
+
+
         String[] result = {String.valueOf(sol.getTotalCost()), String.valueOf(sol.testTime)};
         return result;
     }

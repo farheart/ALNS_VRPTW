@@ -10,7 +10,7 @@ import lombok.Data;
  * @date  2022-11-22
  */
 @Data
-public class AbstractService {
+public abstract class AbstractService {
     protected int id;
 
     protected Location location;

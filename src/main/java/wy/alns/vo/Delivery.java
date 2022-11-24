@@ -9,6 +9,8 @@ import lombok.*;
  * @date  2022-11-15
  */
 @Data
+@ToString(callSuper=true)
+@EqualsAndHashCode(callSuper=true)
 public class Delivery extends AbstractService {
     private double amount;
 
