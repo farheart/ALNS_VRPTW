@@ -2,17 +2,11 @@ package wy.alns;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import wy.alns.algrithm.Solution;
 import wy.alns.algrithm.SolutionValidator;
 import wy.alns.algrithm.solver.Solver;
-import wy.alns.algrithm.ALNSConfiguration;
+import wy.alns.algrithm.ALNSConfig;
 import wy.alns.vo.Instance;
-
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -47,7 +41,7 @@ public class Test {
                     instanceNames[j],  // Instance name
                     "Solomon",  // Type: Homberger / Solomon
                     25,  // Number of orders£¬Solomon: 25,50,100, Homberger: 200£¬400
-                    ALNSConfiguration.DEFAULT  // Configuration Parameters
+                    ALNSConfig.DEFAULT  // Configuration Parameters
             );
         }
         log.info(">> ALL DONE");
@@ -58,18 +52,19 @@ public class Test {
         String name,
         String instanceType,
         int size,
-        ALNSConfiguration config
+        ALNSConfig config
     ) throws Exception {
         Instance instance = new Instance(size, name, instanceType);
-        SolutionValidator solutionValidator = new SolutionValidator(instance);
         Solver solver = new Solver();
 
-        Solution is = solver.getInitialSolution(instance);
-        Solution ims = solver.improveSolution(is, config, instance);
-//        log.info(">> Solution : " + ims.toString());
-        log.info(">> Validation : \n" + solutionValidator.Check(ims));
+        Solution initSol = solver.getInitialSolution(instance);
+        Solution sol = solver.improveSolution(initSol, config, instance);
+        log.info(">> Solution : " + sol.toString());
+
+        SolutionValidator solutionValidator = new SolutionValidator(instance);
+        log.info(">> Validation : \n" + solutionValidator.Check(sol));
         
-        String[] result = {String.valueOf(ims.getTotalCost()), String.valueOf(ims.testTime)};
+        String[] result = {String.valueOf(sol.getTotalCost()), String.valueOf(sol.testTime)};
         return result;
     }
 

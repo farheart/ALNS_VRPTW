@@ -10,7 +10,7 @@ import lombok.Getter;
  * @date  2022-11-15
  */
 @Getter
-public enum ALNSConfiguration  {
+public enum ALNSConfig {
     DEFAULT(5000, 500, 0.1, 20, 5, 1, 0.99937, 0.05, 0.5);
     private final int omega;//迭代次数
     private final int tau;//更新算子选择概率的间隔迭代次数
@@ -22,7 +22,7 @@ public enum ALNSConfiguration  {
     private final double delta;
     private final double big_omega;
 
-    ALNSConfiguration(int omega, int tau, double r_p, int sigma_1, int sigma_2, int sigma_3, double c, double delta, double big_omega) {
+    ALNSConfig(int omega, int tau, double r_p, int sigma_1, int sigma_2, int sigma_3, double c, double delta, double big_omega) {
         this.omega = omega;
         this.tau = tau;
         this.r_p = r_p;

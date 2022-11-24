@@ -25,7 +25,7 @@ import wy.alns.vo.Instance;
 @Slf4j
 public class ALNS {
     // ²ÎÊý
-    private final ALNSConfiguration config;
+    private final ALNSConfig config;
     private final IALNSDestroy[] destroy_ops = new IALNSDestroy[]{
             //new ProximityZoneDestroy(),
             //new ZoneDestroy(),
@@ -56,7 +56,7 @@ public class ALNS {
     private double T_end;
     
 
-    public ALNS(Solution s_, Instance instance, ALNSConfiguration c) throws InterruptedException {
+    public ALNS(Solution s_, Instance instance, ALNSConfig c) throws InterruptedException {
         config = c;
         s_g = new ALNSSolution(s_, instance);
         s_c = new ALNSSolution(s_g);
