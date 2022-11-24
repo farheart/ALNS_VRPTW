@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.ALNSSolution;
-import wy.alns.vo.Distance;
+import wy.alns.vo.DistanceDict;
 import wy.alns.vo.Order;
 import wy.alns.vo.Route;
 import wy.alns.vo.Instance;
@@ -63,11 +63,11 @@ class Fitness implements Comparable<Fitness>{
 	}
 	
 	public static double calculateFitness(Instance instance, Order customer, Route route) {
-		Distance distance = instance.getDistance();
+		DistanceDict distanceDict = instance.getDistanceDict();
 
 		Order n0 = route.getOrderList().get(0);
 		double v = route.getMeasure().getTimeViolation() + route.getMeasure().getLoadViolation() + customer.getDemand();
-		double distFactor = distance.between(customer, n0) + distance.between(n0, customer);
+		double distFactor = distanceDict.between(customer, n0) + distanceDict.between(n0, customer);
 		double fitness = v * distFactor;
 
 		return fitness;

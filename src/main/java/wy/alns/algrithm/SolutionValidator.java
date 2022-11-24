@@ -35,7 +35,7 @@ public class SolutionValidator {
 				boolean checkTimeWindows = true;
 
         		for (int j = 1; j < route.getOrderList().size(); j++) {
-					double dist = this.instance.getDistance().between(route.getOrderList().get(j - 1), route.getOrderList().get(j));
+					double dist = this.instance.getDistanceDict().between(route.getOrderList().get(j - 1), route.getOrderList().get(j));
 					time += dist;
 					distanceByVehicle += dist;
 

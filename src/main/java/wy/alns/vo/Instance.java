@@ -35,9 +35,9 @@ public class Instance {
 
 
     /**
-     * distance map of every node to each other.
+     * distanceDict map of every node to each other.
      */
-    private Distance distance;
+    private DistanceDict distanceDict;
 
 
     public Instance(int size, String name, String instanceType) throws IOException {
@@ -48,7 +48,7 @@ public class Instance {
         this.vehicleList = this.loadVehicle(dataLineList);
         this.orderList = this.loadOrder(dataLineList);
 
-        this.distance = new Distance(this.orderList);
+        this.distanceDict = new DistanceDict(this.orderList);
     }
 
 

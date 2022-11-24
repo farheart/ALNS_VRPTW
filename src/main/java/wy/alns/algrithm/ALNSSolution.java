@@ -67,7 +67,7 @@ public class ALNSSolution {
     
 	public void removeCustomer(int routePosition, int cusPosition) {
 		//TODO : duplicated TW
-		Distance distance = instance.getDistance();
+		DistanceDict distanceDict = instance.getDistanceDict();
 
 		Route route = this.routes.get(routePosition);
 
@@ -75,7 +75,7 @@ public class ALNSSolution {
 		Order n = route.getOrderList().get(cusPosition);
 		Order n1 = route.getOrderList().get(cusPosition + 1);
 
-		double dist = distance.between(n0, n1) - distance.between(n0, n) - distance.between(n, n1);
+		double dist = distanceDict.between(n0, n1) - distanceDict.between(n0, n) - distanceDict.between(n, n1);
 		double load = -n.getDemand();
 
 		this.measure.distance += dist;
@@ -91,7 +91,7 @@ public class ALNSSolution {
 
 	public void insertCustomer(int routePosition, int insertCusPosition, Order insertCustomer) {
 		//TODO : duplicated TW
-		Distance distance = instance.getDistance();
+		DistanceDict distanceDict = instance.getDistanceDict();
 
 		Route route = this.routes.get(routePosition);
 
@@ -99,7 +99,7 @@ public class ALNSSolution {
 		Order n = insertCustomer;
 		Order n1 = route.getOrderList().get(insertCusPosition);
 
-		double dist = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
+		double dist = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
 		double load = +n.getDemand();
 
 		// update dist, load,load violation of current route and total
@@ -116,7 +116,7 @@ public class ALNSSolution {
 		double time = 0;
 		double timeWindowViolation = 0;
 		for (int i = 1; i < route.getOrderList().size(); i++) {
-			time += distance.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
+			time += distanceDict.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
 			if (time < route.getOrderList().get(i).getTimeWindow()[0]) {
 				time = route.getOrderList().get(i).getTimeWindow()[0];
 			} else if (time > route.getOrderList().get(i).getTimeWindow()[1]) {
@@ -135,7 +135,7 @@ public class ALNSSolution {
 
 	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Order insertCustomer, Measure evalMeasure) {
 		//TODO : duplicated TW
-		Distance distance = instance.getDistance();
+		DistanceDict distanceDict = instance.getDistanceDict();
 
 		Route route = this.routes.get(routePosition).cloneRoute();
 
@@ -143,7 +143,7 @@ public class ALNSSolution {
 		Order n = insertCustomer;
 		Order n1 = route.getOrderList().get(insertCusPosition);
 
-		double cost = distance.between(n0, n) + distance.between(n, n1) - distance.between(n0, n1);
+		double cost = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
 		double load = +n.getDemand();
 
 		evalMeasure.load += load;
@@ -158,7 +158,7 @@ public class ALNSSolution {
 		double time = 0;
 		double timeWindowViolation = 0;
 		for (int i = 1; i < route.getOrderList().size(); i++) {
-			time += distance.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
+			time += distanceDict.between(route.getOrderList().get(i - 1), route.getOrderList().get(i));
 			if (time < route.getOrderList().get(i).getTimeWindow()[0]) {
 				time = route.getOrderList().get(i).getTimeWindow()[0];
 			} else if (time > route.getOrderList().get(i).getTimeWindow()[1]) {

@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.ALNSSolution;
-import wy.alns.vo.Distance;
+import wy.alns.vo.DistanceDict;
 import wy.alns.vo.Order;
 import wy.alns.vo.Route;
 
@@ -67,8 +67,8 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 		lastRoutePos = -1;
 
 
-		Distance distance = s.instance.getDistance();
-		// double[][] distance = s.instance.getDistanceMatrix();
+		DistanceDict distanceDict = s.instance.getDistanceDict();
+		// double[][] distanceDict = s.instance.getDistanceMatrix();
 		
 		while(s.removalCustomers.size() < removeNr ) {
 			
@@ -81,7 +81,7 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	        		int l = (lastRoute.getId() == s.routes.get(j).getId())? -1 : 1;
 	        		
 	        		double fitness = l * 2 + 
-	        				3 * distance.between(lastRemove, relatedOrder) +
+	        				3 * distanceDict.between(lastRemove, relatedOrder) +
 	        				2 * Math.abs(lastRemove.getTimeWindow()[0] - relatedOrder.getTimeWindow()[0]) +
 	        				2 * Math.abs(lastRemove.getDemand() - relatedOrder.getDemand());
 	        		

@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Distance
+ * DistanceDict
  *
  * @author Yu Wang
  * @date  2022-11-19
  */
-public class Distance {
+public class DistanceDict {
     private final Map<String, Double> distanceMap;
 
 
-    public Distance(List<Order> orderList) {
+    public DistanceDict(List<Order> orderList) {
         this.distanceMap = new HashMap<>();
         this.init(orderList);
     }
