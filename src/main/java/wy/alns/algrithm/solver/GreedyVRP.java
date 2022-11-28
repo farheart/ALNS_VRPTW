@@ -35,111 +35,112 @@ public class GreedyVRP {
 
 
     public Solution getInitialSolution() {
-        // The final Solution
         Solution solution = new Solution();
 
-        // Fetch the depot node.
-        Delivery depot = this.instance.getDeliveryList().remove(0);
-
-        // Fetch the first available vehicle
+        // Create a route using the first available vehicle
         Route curRoute = this.routeList.remove(0);
 
-        // Add the depot to the vehicle.
+        // Add the depot as the 1st stop of the route
+        Delivery depot = this.instance.getDeliveryList().remove(0);
         curRoute.append(depot);
 
         // Loop until all delivery are batched or no available vehicles.
         while ((this.instance.getDeliveryList().size() > 0) && (this.routeList.size() > 0)) {
 
-            // Get the last node of the current route. We will try to find the closest node to it that also satisfies the capacity constraint.
+            // Find the nearest delivery to the last node, which also meets all constraints
             Delivery lastDelivery = curRoute.getLastNodeOfTheRoute();
+            Delivery nearestDelivery = findNearestDelivery(curRoute, lastDelivery);
 
-            // The distance of the closest node, if any, to the last node in the route.
-            double smallestDistance = Double.MAX_VALUE;
+            // Find a node meeting the capacity constraint
+            if (nearestDelivery != null) {
+                this.addToRoute(curRoute, lastDelivery, nearestDelivery);
 
-            // The closest node, if any, to the last node in the route that also satisfies the capacity constraint.
-            Delivery closestDelivery = null;
+                // Remove delivery from the non-served list.
+                this.instance.getDeliveryList().remove(nearestDelivery);
 
-            // Find the nearest neighbor based on distance
-            for (Delivery n: this.instance.getDeliveryList()) {
-                double dist = this.instance.getDistanceDict().between(lastDelivery, n);
-
-                // if find a closer delivery, save it
-                boolean ifCloser = (dist < smallestDistance);
-                boolean ifCapacityOK = (curRoute.getMeasure().amount + n.getAmount() <= curRoute.getVehicle().getCapacity());
-                boolean ifArrTimeOK = (curRoute.getMeasure().time + dist < n.getTimeWindow().getEnd());
-                boolean ifDepotOK = (curRoute.getMeasure().time + dist + n.getServiceTime() +  this.instance.getDistanceDict().between(n, depot) < depot.getTimeWindow().getEnd());
-
-                if (ifCloser && ifCapacityOK && ifArrTimeOK && ifDepotOK) {
-                    smallestDistance = dist;
-                    closestDelivery = n;
-                }
-            }
-            
-            // A node that satisfies the capacity constraint found
-            if (closestDelivery != null) {
-                // Increase the cost of the current route by the distance of previous last node to the new one
-                curRoute.getMeasure().distance += smallestDistance;
-
-                // Increase the time of the current route by the distance of previous last node to the new one and serves time
-                curRoute.getMeasure().time += smallestDistance;
-                
-                // waiting time windows open
-                if (curRoute.getMeasure().time < closestDelivery.getTimeWindow().getStart()) curRoute.getMeasure().time = closestDelivery.getTimeWindow().getStart();
-                
-                curRoute.getMeasure().time += closestDelivery.getServiceTime();
-                
-                // Increase the load of the vehicle by the demand of the new node-customer
-                curRoute.getMeasure().amount += closestDelivery.getAmount();
-
-                // Add the closest node to the route
-                curRoute.append(closestDelivery);
-                
-                // Remove customer from the non-served customers list.
-                this.instance.getDeliveryList().remove(closestDelivery);
-
-            // We didn't find any node that satisfies the condition.
             } else {
-                // Increase cost by the distance to travel from the last node back to depot
-                curRoute.getMeasure().distance += this.instance.getDistanceDict().between(lastDelivery, depot);
-                curRoute.getMeasure().time += this.instance.getDistanceDict().between(lastDelivery, depot);
+                // Close the route and add to solution
+                this.closeRoute(curRoute, lastDelivery, depot);
+                this.addRoute(solution, curRoute);
 
-                // Terminate current route by adding the depot as a final destination
-                curRoute.append(depot);
-                
-                curRoute.getMeasure().calculateTotalCost();
-
-                // Add the finalized route to the solution
-                solution.addRoute(curRoute);
-
-                // Increase the solution's total cost by the cost of the finalized route
-                solution.setTotalCost(solution.getTotalCost() + curRoute.getMeasure().distance);
-                
-                // If we used all vehicles, exit.
-                if ( this.routeList.size()==0 ) {
-                	break;
-                	
-                // if we still have some vehicles, use.
-                } else {
-                	// Recruit a new vehicle.
+                // Create a new route if still have available vehicle
+                if (this.routeList.size() > 0) {
                     curRoute = this.routeList.remove(0);
-
-                    // Add the depot as a starting point to the new route
                     curRoute.append(depot);
                 }
             }
         }
 
-        // Now add the final route to the solution
-        curRoute.getMeasure().distance += this.instance.getDistanceDict().between(curRoute.getLastNodeOfTheRoute(), depot);
-        curRoute.getMeasure().time += this.instance.getDistanceDict().between(curRoute.getLastNodeOfTheRoute(), depot);
-        curRoute.append(depot);
-        curRoute.getMeasure().calculateTotalCost();
-        
-        solution.addRoute(curRoute);
-        solution.setTotalCost(solution.getTotalCost() + curRoute.getMeasure().distance);
-        solution.setTotalCost((double)(Math.round(solution.getTotalCost() * 1000) / 1000.0));
+        // Add the final route to solution
+        this.closeRoute(curRoute, curRoute.getLastNodeOfTheRoute(), depot);
+        this.addRoute(solution, curRoute);
 
         return solution;
+    }
+
+    private void addToRoute(Route curRoute, Delivery lastDelivery, Delivery newDelivery) {
+        double d = this.instance.getDistanceDict().between(lastDelivery, newDelivery);
+
+        // Increase total distance of the route by adding the distance of previous last node to the new one
+        curRoute.getMeasure().distance += d;
+
+        // Increase the time by (distance of previous last node to the new one + waiting time + service time)
+        curRoute.getMeasure().time += d;
+
+        // waiting until TW open
+        if (curRoute.getMeasure().time < newDelivery.getTimeWindow().getStart()) {
+            curRoute.getMeasure().time = newDelivery.getTimeWindow().getStart();
+        }
+
+        curRoute.getMeasure().time += newDelivery.getServiceTime();
+
+        // Increase the load of vehicle by the amount of the new delivery
+        curRoute.getMeasure().amount += newDelivery.getAmount();
+
+        // Add the nearest delivery / node to the route
+        curRoute.append(newDelivery);
+    }
+
+    private static void addRoute(Solution solution, Route curRoute) {
+        // Add route to the solution
+        solution.addRoute(curRoute);
+        solution.setTotalCost(solution.getTotalCost() + curRoute.getMeasure().distance);
+    }
+
+    private void closeRoute(Route curRoute, Delivery lastDelivery, Delivery depot) {
+        // Send back to depot to close the trip
+        curRoute.getMeasure().distance += this.instance.getDistanceDict().between(lastDelivery, depot);
+        curRoute.getMeasure().time += this.instance.getDistanceDict().between(lastDelivery, depot);
+        curRoute.getMeasure().calculateTotalCost();
+        curRoute.append(depot);
+    }
+
+    private Delivery findNearestDelivery(Route curRoute, Delivery lastDelivery) {
+        // 1st stop is the depot
+        Delivery depot = curRoute.getDeliveryList().get(0);
+
+        // The distance of the nearest node to the last node in the route.
+        double minDist = Double.MAX_VALUE;
+
+        // The nearest node, if any, to the last node in the route that also satisfies the capacity constraint.
+        Delivery nearestDelivery = null;
+
+        // Find the nearest neighbor based on distance
+        for (Delivery n: this.instance.getDeliveryList()) {
+            double dist = this.instance.getDistanceDict().between(lastDelivery, n);
+
+            // If find a closer delivery, save it
+            boolean ifCloser = (dist < minDist);
+            boolean ifCapacityOK = (curRoute.getMeasure().amount + n.getAmount() <= curRoute.getVehicle().getCapacity());
+            boolean ifArrTimeOK = (curRoute.getMeasure().time + dist < n.getTimeWindow().getEnd());
+            boolean ifDepotOK = (curRoute.getMeasure().time + dist + n.getServiceTime() +  this.instance.getDistanceDict().between(n, depot) < depot.getTimeWindow().getEnd());
+
+            if (ifCloser && ifCapacityOK && ifArrTimeOK && ifDepotOK) {
+                minDist = dist;
+                nearestDelivery = n;
+            }
+        }
+        return nearestDelivery;
     }
 
 }

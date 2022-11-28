@@ -21,49 +21,51 @@ public class SolutionValidator {
 
     public String Check(Solution solution) {
         String result = "";
-        double totalCost = 0;
 
         int id = 0;
+        double totalDistance = 0;
         for (int i = 0; i < solution.getRoutes().size(); i++) {
         	Route route = solution.getRoutes().get(i);
         	if (route.getDeliveryList().size() >= 3) {
         		id++;
         		
-        		double distanceByVehicle = 0;
+        		double routeDistance = 0;
         		double loadInVehicle = 0;
-        		double time = 0;
-				boolean checkTimeWindows = true;
+        		double clockTime = 0;
+
+				boolean ifTWOK = true;
 
         		for (int j = 1; j < route.getDeliveryList().size(); j++) {
 					double dist = this.instance.getDistanceDict().between(route.getDeliveryList().get(j - 1), route.getDeliveryList().get(j));
-					time += dist;
-					distanceByVehicle += dist;
+					clockTime += dist;
+					routeDistance += dist;
 
 					loadInVehicle += route.getDeliveryList().get(j).getAmount();
-        			if (time < route.getDeliveryList().get(j).getTimeWindow().getStart())
-        				time = route.getDeliveryList().get(j).getTimeWindow().getStart();
-        			else if (time > route.getDeliveryList().get(j).getTimeWindow().getEnd())
-        				checkTimeWindows = false;
-        			
-        			time += route.getDeliveryList().get(j).getServiceTime();
-        		}
-        		totalCost += distanceByVehicle;
+        			if (clockTime < route.getDeliveryList().get(j).getTimeWindow().getStart()) {
+        				clockTime = route.getDeliveryList().get(j).getTimeWindow().getStart();
+					} else if (clockTime > route.getDeliveryList().get(j).getTimeWindow().getEnd()) {
+        				ifTWOK = false;
+					}
 
-				boolean checkCost = (Math.abs(route.getMeasure().distance - distanceByVehicle) <= 0.001);
-				boolean checkLoad = (Math.abs(route.getMeasure().amount - loadInVehicle) <= 0.001);
-				boolean checkTime = (Math.abs(route.getMeasure().time - time) <= 0.001);
+        			clockTime += route.getDeliveryList().get(j).getServiceTime();
+        		}
+        		totalDistance += routeDistance;
+
+				boolean ifDistanceOK = (Math.abs(route.getMeasure().distance - routeDistance) <= 0.001);
+				boolean ifLoadOK = (Math.abs(route.getMeasure().amount - loadInVehicle) <= 0.001);
+				boolean ifTimeOK = (Math.abs(route.getMeasure().time - clockTime) <= 0.001);
 
         		result += "\nroute " + id + ": "
-        				+ "\ncost = " + distanceByVehicle + " \t - " + (checkCost ? "Pass" : "Fail")
-        				+ "\ndemand = " + loadInVehicle + " \t - " + (checkLoad ? "Pass" : "Fail")
-        				+ "\ntime = " + Math.round(time * 100) / 100.0 + " \t - " + (checkTime ? "Pass" : "Fail")
-        				+ "\nTW = \t\t " + (checkTimeWindows ? "Pass" : "Fail")
+        				+ "\ndist = " + routeDistance + " \t - " + (ifDistanceOK ? "Pass" : "Fail")
+        				+ "\nload = " + loadInVehicle + " \t - " + (ifLoadOK ? "Pass" : "Fail")
+        				+ "\ntime = " + clockTime + " \t - " + (ifTimeOK ? "Pass" : "Fail")
+        				+ "\nTW : \t\t\t - " + (ifTWOK ? "Pass" : "Fail")
 						+ "\n";
         	}
         }
         
-        boolean checkTotalCost = (Math.abs(totalCost - solution.getTotalCost()) <= 0.001);
-        result += "\ntotal cost = " + Math.round(totalCost * 100) / 100.0 + " \t - " + (checkTotalCost ? "Pass" : "Fail");
+        boolean checkTotalCost = (Math.abs(totalDistance - solution.getTotalCost()) <= 0.001);
+        result += "\ntotal cost = " + totalDistance + " \t - " + (checkTotalCost ? "Pass" : "Fail");
 
         return result;
     }

@@ -86,7 +86,7 @@ public class ALNS {
             ALNSSolution solDestroy = destroyOperator.destroy(s_c_new, q);
             ALNSSolution solRepair = repairOperator.repair(solDestroy);
 
-            log.info(">> Iteration : " +  i + ", Current TotalCost : " + Math.round(solRepair.measure.totalCost * 100) / 100.0);
+            log.info(">> Iteration : " +  i + ", Current TotalCost : " + solRepair.measure.totalCost);
             
             // Update local best solution
             if (solRepair.measure.totalCost < localBestSol.measure.totalCost) {
@@ -118,7 +118,7 @@ public class ALNS {
         Solution solution = globalBestSol.toSolution();
 
         // time elapsed
-        double s = Math.round((System.currentTimeMillis() - timeStart) * 1000) / 1000000.;
+        double s = Math.round((System.currentTimeMillis() - timeStart) * 1000) / 1E6;
         log.info(">> Run time = " + s + " sec");
 
         // Utilization of operators
@@ -233,8 +233,8 @@ public class ALNS {
         for (T op : ops) {
         	op.setDraws(0);
             op.setPi(0);
-            op.setW(1.);
-            op.setP(1 / (double) ops.length);
+            op.setW(1.0);
+            op.setP(1.0 / (double) ops.length);
         }
     }
 
