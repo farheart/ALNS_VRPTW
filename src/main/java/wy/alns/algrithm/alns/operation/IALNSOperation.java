@@ -1,4 +1,4 @@
-package wy.alns.operation;
+package wy.alns.algrithm.alns.operation;
 
 public interface IALNSOperation {
     int getPi();

@@ -1,18 +1,18 @@
-package wy.alns.algrithm;
+package wy.alns.algrithm.alns;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.operation.IALNSOperation;
-import wy.alns.operation.destroy.IALNSDestroy;
-import wy.alns.operation.destroy.RandomDestroy;
-import wy.alns.operation.destroy.ShawDestroy;
-import wy.alns.operation.destroy.WorstCostDestroy;
-import wy.alns.operation.repair.GreedyRepair;
-import wy.alns.operation.repair.IALNSRepair;
-import wy.alns.operation.repair.RandomRepair;
-import wy.alns.operation.repair.RegretRepair;
+import wy.alns.algrithm.solution.Solution;
+import wy.alns.algrithm.alns.operation.IALNSOperation;
+import wy.alns.algrithm.alns.operation.destroy.IALNSDestroy;
+import wy.alns.algrithm.alns.operation.destroy.RandomDestroy;
+import wy.alns.algrithm.alns.operation.destroy.ShawDestroy;
+import wy.alns.algrithm.alns.operation.destroy.WorstCostDestroy;
+import wy.alns.algrithm.alns.operation.repair.GreedyRepair;
+import wy.alns.algrithm.alns.operation.repair.IALNSRepair;
+import wy.alns.algrithm.alns.operation.repair.RandomRepair;
+import wy.alns.algrithm.alns.operation.repair.RegretRepair;
 import wy.alns.vo.Instance;
 
-import java.io.IOException;
 import java.util.Random;
 
 
@@ -57,7 +57,7 @@ public class ALNS {
     private double T_end;
     
 
-    public ALNS(Solution s_, Instance instance, ALNSConfig c) throws InterruptedException {
+    public ALNS(Solution s_, Instance instance, ALNSConfig c) {
         config = c;
         globalBestSol = new ALNSSolution(s_, instance);
         localBestSol = new ALNSSolution(globalBestSol);
@@ -66,7 +66,7 @@ public class ALNS {
         initOperators(this.repairOperators);
     }
 
-    public Solution improveSolution() throws Exception {
+    public Solution improveSolution() {
         T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * localBestSol.measure.totalCost;
         T = T_s;
         T_end = T_end_t * T_s;
@@ -132,7 +132,7 @@ public class ALNS {
         }
         log.info(">> Statistics of operator utilization : \n" + msg);
 
-        solution.testTime = s;
+        solution.solveTime = s;
         return solution;
     }
 
@@ -153,7 +153,11 @@ public class ALNS {
     }
 
 
-    private void handleNewGlobalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution solRepair) throws IOException {
+    private void handleNewGlobalMinimum(
+            IALNSDestroy destroyOperator,
+            IALNSRepair repairOperator,
+            ALNSSolution solRepair
+    ) {
         //log.info(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, solRepair.getCostFitness(), solRepair.activeVehicles(), s_g.getUnscheduledJobs().size()));
 
         // Accept global best

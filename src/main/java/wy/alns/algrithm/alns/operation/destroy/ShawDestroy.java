@@ -1,7 +1,7 @@
-package wy.alns.operation.destroy;
+package wy.alns.algrithm.alns.operation.destroy;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.ALNSSolution;
+import wy.alns.algrithm.alns.ALNSSolution;
 import wy.alns.vo.Delivery;
 import wy.alns.vo.DistanceDict;
 import wy.alns.vo.Route;
@@ -19,7 +19,7 @@ import java.util.Collections;
 public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 
 	@Override
-	public ALNSSolution destroy(ALNSSolution s, int removeNr) throws Exception {
+	public ALNSSolution destroy(ALNSSolution s, int removeNr) {
 		if (!checkSolution(s)) {
 			return s;
 		}

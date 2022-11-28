@@ -1,4 +1,4 @@
-package wy.alns.algrithm;
+package wy.alns.algrithm.alns;
 
 import lombok.Getter;
 

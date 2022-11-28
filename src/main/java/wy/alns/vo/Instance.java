@@ -44,7 +44,7 @@ public class Instance {
     private DistanceDict distanceDict;
 
 
-    public Instance(int size, String name, String instanceType) throws IOException {
+    public Instance(String name, String instanceType, int size)  {
     	this.name = name;
     	this.type = instanceType;
 
@@ -57,14 +57,21 @@ public class Instance {
     }
 
 
-    private List<String> loadDataLines(int size, String name) throws IOException {
+    private List<String> loadDataLines(int size, String name) {
         String dataFileName = "";
-        if (type.equals("Solomon")) {
+        if (this.type.equals("Solomon")) {
             dataFileName = "./instances" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
-        } else if (type.equals("Homberger")) {
+        } else if (this.type.equals("Homberger")) {
             dataFileName = "./instances" + "/homberger" + "/homberger_" + size + "/" + name + ".txt";
         }
-        return Files.readAllLines(Paths.get(dataFileName));
+
+        List<String> result = null;
+        try {
+            result = Files.readAllLines(Paths.get(dataFileName));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
 
@@ -134,7 +141,7 @@ public class Instance {
     }
 
 
-    public List<Vehicle> loadVehicle(List<String> lineList) throws IOException {
+    public List<Vehicle> loadVehicle(List<String> lineList) {
         log.info(">> Loading vehicles ... ");
 
         ArrayList<Vehicle> result = new ArrayList<>();

@@ -1,9 +1,9 @@
-package wy.alns.operation.repair;
+package wy.alns.algrithm.alns.operation.repair;
 
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.vo.Delivery;
 import wy.alns.vo.Measure;
-import wy.alns.algrithm.ALNSSolution;
+import wy.alns.algrithm.alns.ALNSSolution;
 
 /**
  * GreedyRepair

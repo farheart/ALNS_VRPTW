@@ -1,7 +1,7 @@
 package wy.alns.algrithm.solver;
 
 
-import wy.alns.algrithm.Solution;
+import wy.alns.algrithm.solution.Solution;
 import wy.alns.vo.*;
 
 import java.util.ArrayList;

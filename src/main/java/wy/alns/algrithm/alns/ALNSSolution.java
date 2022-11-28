@@ -1,5 +1,6 @@
-package wy.alns.algrithm;
+package wy.alns.algrithm.alns;
 
+import wy.alns.algrithm.solution.Solution;
 import wy.alns.vo.*;
 
 import java.util.ArrayList;

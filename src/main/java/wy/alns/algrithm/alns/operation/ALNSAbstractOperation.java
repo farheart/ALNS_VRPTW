@@ -1,4 +1,4 @@
-package wy.alns.operation;
+package wy.alns.algrithm.alns.operation;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;

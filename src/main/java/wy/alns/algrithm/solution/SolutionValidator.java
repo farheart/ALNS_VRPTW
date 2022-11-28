@@ -1,4 +1,4 @@
-package wy.alns.algrithm;
+package wy.alns.algrithm.solution;
 
 import wy.alns.vo.Instance;
 import wy.alns.vo.Route;

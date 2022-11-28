@@ -1,4 +1,4 @@
-package wy.alns.algrithm;
+package wy.alns.algrithm.solution;
 
 import lombok.Data;
 import wy.alns.vo.Route;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 public class Solution {
-	public double testTime;
+	public double solveTime;
 
     /**
      * All the routes of the current solution.

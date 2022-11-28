@@ -1,8 +1,8 @@
-package wy.alns.operation.repair;
+package wy.alns.algrithm.alns.operation.repair;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.ALNSSolution;
-import wy.alns.operation.ALNSAbstractOperation;
+import wy.alns.algrithm.alns.ALNSSolution;
+import wy.alns.algrithm.alns.operation.ALNSAbstractOperation;
 
 @Slf4j
 abstract class ALNSAbstractRepair extends ALNSAbstractOperation {
