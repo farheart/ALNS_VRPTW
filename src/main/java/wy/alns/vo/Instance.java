@@ -23,9 +23,14 @@ public class Instance {
     private String type;
 
     /**
-     * All orders, where index = 0 : Depot
+     * All orders
      */
     private List<Delivery> deliveryList;
+
+    /**
+     * Depot where all vehicles depart from
+     */
+    private Delivery depot;
 
     /**
      * The available vehicles
@@ -43,15 +48,16 @@ public class Instance {
     	this.name = name;
     	this.type = instanceType;
 
-        List<String> dataLineList = this.loadData(size, name);
+        List<String> dataLineList = this.loadDataLines(size, name);
         this.vehicleList = this.loadVehicle(dataLineList);
-        this.deliveryList = this.loadOrder(dataLineList);
+        this.deliveryList = this.loadDelivery(dataLineList);
+        this.depot = this.loadDepot(dataLineList);
 
-        this.distanceDict = new DistanceDict(this.deliveryList);
+        this.distanceDict = new DistanceDict(this);
     }
 
 
-    private List<String> loadData(int size, String name) throws IOException {
+    private List<String> loadDataLines(int size, String name) throws IOException {
         String dataFileName = "";
         if (type.equals("Solomon")) {
             dataFileName = "./instances" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
@@ -62,8 +68,8 @@ public class Instance {
     }
 
 
-    public ArrayList<Delivery> loadOrder(List<String> lineList) {
-        log.info(">> Loading customers ... ");
+    public ArrayList<Delivery> loadDelivery(List<String> lineList) {
+        log.info(">> Loading delivery ... ");
 
         ArrayList<Delivery> result = new ArrayList<Delivery>();
 
@@ -71,27 +77,56 @@ public class Instance {
         for (int i=0; i<lineList.size(); ++i) {
             String line = lineList.get(i);
             if (line.startsWith("CUSTOMER")) {
-                tableStartLineNIndex = i + 3;
+                tableStartLineNIndex = i + 4;
             }
 
             if (i >= tableStartLineNIndex) {
                 String cols[] = line.split("\\s+");
                 if (cols.length > 0) {
-                    Delivery delivery = new Delivery();
-                    delivery.setId(Integer.parseInt(cols[1]));
-
-                    double X = (Double.parseDouble(cols[2]));
-                    double Y = (Double.parseDouble(cols[3]));
-                    delivery.setLocation(new Location(X, Y));
-
-                    delivery.setAmount(Double.parseDouble(cols[4]));
-
-                    double s = Double.parseDouble(cols[5]);
-                    double e = Double.parseDouble(cols[6]);
-                    delivery.setTimeWindow(new TimeWindow(s, e));
-
-                    delivery.setServiceTime(Double.parseDouble(cols[7]));
+                    Delivery delivery = createDelivery(cols);
                     result.add(delivery);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static Delivery createDelivery(String[] cols) {
+        Delivery delivery = new Delivery();
+        delivery.setId(Integer.parseInt(cols[1]));
+
+        double X = (Double.parseDouble(cols[2]));
+        double Y = (Double.parseDouble(cols[3]));
+        delivery.setLocation(new Location(X, Y));
+
+        delivery.setAmount(Double.parseDouble(cols[4]));
+
+        double s = Double.parseDouble(cols[5]);
+        double e = Double.parseDouble(cols[6]);
+        delivery.setTimeWindow(new TimeWindow(s, e));
+
+        delivery.setServiceTime(Double.parseDouble(cols[7]));
+        return delivery;
+    }
+
+
+    private Delivery loadDepot(List<String> lineList) {
+        log.info(">> Loading Depot ... ");
+
+        Delivery result = null;
+
+        int tableStartLineNIndex = Integer.MAX_VALUE;
+        for (int i = 0; i < lineList.size(); ++i) {
+            String line = lineList.get(i);
+            if (line.startsWith("CUSTOMER")) {
+                tableStartLineNIndex = i + 3;
+            }
+
+            if (i == tableStartLineNIndex) {
+                String cols[] = line.split("\\s+");
+                if (cols.length > 0) {
+                    result = createDelivery(cols);;
+                    break;
                 }
             }
         }

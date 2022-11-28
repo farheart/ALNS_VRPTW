@@ -41,7 +41,8 @@ public class GreedyVRP {
         Route curRoute = this.routeList.remove(0);
 
         // Add the depot as the 1st stop of the route
-        Delivery depot = this.instance.getDeliveryList().remove(0);
+        Delivery depot = this.instance.getDepot();
+
         curRoute.append(depot);
 
         // Loop until all delivery are batched or no available vehicles.
@@ -129,7 +130,7 @@ public class GreedyVRP {
         for (Delivery n: this.instance.getDeliveryList()) {
             double dist = this.instance.getDistanceDict().between(lastDelivery, n);
 
-            // If find a closer delivery, save it
+            // If find closer delivery, save it
             boolean ifCloser = (dist < minDist);
             boolean ifCapacityOK = (curRoute.getMeasure().amount + n.getAmount() <= curRoute.getVehicle().getCapacity());
             boolean ifArrTimeOK = (curRoute.getMeasure().time + dist < n.getTimeWindow().getEnd());
