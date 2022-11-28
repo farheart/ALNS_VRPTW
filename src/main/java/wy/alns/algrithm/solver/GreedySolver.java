@@ -9,12 +9,12 @@ import java.util.List;
 
 
 /**
- * GreedyVRP : solve using greedy
+ * GreedySolver : solve using greedy
  *
  * @author Yu Wang
  * @date  2022-11-17
  */
-public class GreedyVRP {
+public class GreedySolver {
     private Instance instance;
     
     private List<Route> routeList;
@@ -23,7 +23,7 @@ public class GreedyVRP {
     /**
      * Constructor
      */
-    public GreedyVRP(Instance instance) {
+    public GreedySolver(Instance instance) {
         this.instance = instance;
 
 		this.routeList = new ArrayList<Route>();

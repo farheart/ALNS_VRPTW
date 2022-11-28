@@ -13,8 +13,8 @@ import wy.alns.vo.Instance;
  */
 public class Solver {
     public Solution getInitialSolution(Instance instance) {
-    	GreedyVRP greedyVRP = new GreedyVRP(instance);
-    	return greedyVRP.getInitialSolution();
+    	GreedySolver greedySolver = new GreedySolver(instance);
+    	return greedySolver.getInitialSolution();
     }
 
     public Solution improveSolution(Solution s, ALNSConfig ac, Instance is) throws Exception {

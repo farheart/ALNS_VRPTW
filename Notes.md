@@ -5,7 +5,7 @@
 
 * Location
 ```Java
-// GreedyVRP.java
+// GreedySolver.java
 
 // Delivery closestDelivery = null;
 
