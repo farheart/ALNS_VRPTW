@@ -46,10 +46,10 @@ public class GreedySolver {
         // Loop until all delivery are batched or no available vehicles.
         while (this.instance.getDeliveryList().size() > 0) {
 
-            // Find the nearest delivery to the last node, which also meets all constraints
+            // Find the nearest feasible delivery to the last node in the route
             Delivery nearestDelivery = findNearestDelivery(curRoute);
 
-            // Find a node meeting the capacity constraint
+            // Found
             if (nearestDelivery != null) {
                 this.addToRoute(curRoute, nearestDelivery);
 
@@ -130,24 +130,21 @@ public class GreedySolver {
         // 1st stop is the depot
         Delivery depot = curRoute.getDeliveryList().get(0);
 
-        // The distance of the nearest node to the last node in the route.
-        double minDist = Double.MAX_VALUE;
-
-        // The nearest node, if any, to the last node in the route that also satisfies the capacity constraint.
+        // Find the nearest delivery to the last one in the route
         Delivery nearestDelivery = null;
-
-        // Find the nearest neighbor based on distance
+        double minDist = Double.MAX_VALUE;  // The smallest distance of rest nodes
         for (Delivery n: this.instance.getDeliveryList()) {
-            double dist = this.instance.getDistanceDict().between(lastDelivery, n);
+            double distToLast = this.instance.getDistanceDict().between(lastDelivery, n);
+            double distToDepot = this.instance.getDistanceDict().between(n, depot);
 
-            // If find closer delivery, save it
-            boolean ifCloser = (dist < minDist);
+            boolean ifCloser = (distToLast < minDist);
             boolean ifCapacityOK = (curRoute.getMeasure().amount + n.getAmount() <= curRoute.getVehicle().getCapacity());
-            boolean ifArrTimeOK = (curRoute.getMeasure().time + dist < n.getTimeWindow().getEnd());
-            boolean ifDepotOK = (curRoute.getMeasure().time + dist + n.getServiceTime() +  this.instance.getDistanceDict().between(n, depot) < depot.getTimeWindow().getEnd());
+            boolean ifArrTimeOK = (curRoute.getMeasure().time + distToLast < n.getTimeWindow().getEnd());
+            boolean ifDepotOK = (curRoute.getMeasure().time + distToLast + n.getServiceTime() + distToDepot < depot.getTimeWindow().getEnd());
 
+            // If found a closer, save it
             if (ifCloser && ifCapacityOK && ifArrTimeOK && ifDepotOK) {
-                minDist = dist;
+                minDist = distToLast;
                 nearestDelivery = n;
             }
         }

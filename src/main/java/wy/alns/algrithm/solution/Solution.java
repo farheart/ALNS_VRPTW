@@ -17,9 +17,6 @@ import java.util.List;
 public class Solution {
 	public double solveTime;
 
-    /**
-     * All the routes of the current solution.
-     */
     private List<Route> routes;
 
     /**

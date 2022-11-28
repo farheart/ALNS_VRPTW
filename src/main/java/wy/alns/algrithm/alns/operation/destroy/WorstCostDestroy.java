@@ -18,18 +18,17 @@ import java.util.Collections;
  */
 @Slf4j
 public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
-
 	@Override
-	public ALNSSolution destroy(ALNSSolution s, int removeNr) {
-		if (!checkSolution(s)) {
-			return s;
+	public ALNSSolution destroy(ALNSSolution sol, int removeNr) {
+		if (!checkSolution(sol)) {
+			return sol;
 		}
         
 		// 计算fitness值，对客户进行评估。
 		ArrayList<Fitness> customerFitness = new  ArrayList<Fitness>();
-        for(Route route : s.routes) {
+        for(Route route : sol.routes) {
         	for (Delivery customer : route.getDeliveryList()) {
-        		double fitness = Fitness.calculateFitness(s.instance, customer, route);
+        		double fitness = Fitness.calculateFitness(sol.instance, customer, route);
         		customerFitness.add(new Fitness(customer.getId(), fitness));
         	}
     	}
@@ -38,24 +37,21 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
         ArrayList<Integer> removal = new ArrayList<Integer>();
         for(int i = 0; i < removeNr; ++i) removal.add(customerFitness.get(i).customerNo);
         
-        for(int j = 0; j < s.routes.size(); j++) {
-        	for (int i = 0; i < s.routes.get(j).getDeliveryList().size(); ++i) {
-        		Delivery customer = s.routes.get(j).getDeliveryList().get(i);
+        for(int j = 0; j < sol.routes.size(); j++) {
+        	for (int i = 0; i < sol.routes.get(j).getDeliveryList().size(); ++i) {
+        		Delivery customer = sol.routes.get(j).getDeliveryList().get(i);
         		if(removal.contains(customer.getId())) {
-        			s.removeCustomer(j, i);
+        			sol.removeCustomer(j, i);
         		}	
         	} 
     	}
-    	
-        return s;
+        return sol;
     }
 }
 
 class Fitness implements Comparable<Fitness>{
 	public int customerNo;
 	public double fitness;
-	
-	public Fitness() {}
 	
 	public Fitness(int cNo, double f) {
 		customerNo = cNo;

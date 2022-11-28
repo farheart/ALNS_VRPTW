@@ -19,24 +19,23 @@ public class DistanceDict {
 
 
     public DistanceDict(Instance instance) {
-        this.distanceMap = new HashMap<>();
         this.instance = instance;
+        this.distanceMap = new HashMap<>();
         this.init();
-    }
-
-
-    public static double calDistance(Delivery n1, Delivery n2) {
-        double x1 = n1.getLocation().getX();
-        double y1 = n1.getLocation().getY();
-        double x2 = n2.getLocation().getX();
-        double y2 = n2.getLocation().getY();
-
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
 
     public double between(Delivery n1, Delivery n2) {
         return this.distanceMap.get(getNodePairKey(n1, n2));
+    }
+
+
+    private static double calDistance(Delivery n1, Delivery n2) {
+        double x1 = n1.getLocation().getX();
+        double y1 = n1.getLocation().getY();
+        double x2 = n2.getLocation().getX();
+        double y2 = n2.getLocation().getY();
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
 

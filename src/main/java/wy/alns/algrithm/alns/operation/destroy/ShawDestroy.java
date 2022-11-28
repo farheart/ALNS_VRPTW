@@ -17,11 +17,10 @@ import java.util.Collections;
  */
 @Slf4j
 public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
-
 	@Override
-	public ALNSSolution destroy(ALNSSolution s, int removeNr) {
-		if (!checkSolution(s)) {
-			return s;
+	public ALNSSolution destroy(ALNSSolution sol, int removeNr) {
+		if (!checkSolution(sol)) {
+			return sol;
 		}
 
 		Delivery lastRemove;
@@ -30,18 +29,18 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 		int lastRoutePos;
 		
 		ArrayList<Integer> routeList= new ArrayList<Integer>();
-        for(int j = 0; j < s.routes.size(); j++)
+        for(int j = 0; j < sol.routes.size(); j++)
             routeList.add(j);  
         
         Collections.shuffle(routeList);  
         
 		// 选择被移除客户所在的路径
 		int removenRoutePosition = routeList.remove(0);
-		Route removenRoute = s.routes.get(removenRoutePosition);
+		Route removenRoute = sol.routes.get(removenRoutePosition);
 		
 		while(removenRoute.getDeliveryList().size() <= 2) {
 			removenRoutePosition = routeList.remove(0);
-			removenRoute = s.routes.get(removenRoutePosition);
+			removenRoute = sol.routes.get(removenRoutePosition);
 		}
 		
 		ArrayList<Integer> cusList= new ArrayList<Integer>();
@@ -59,26 +58,23 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 			removenCus = removenRoute.getDeliveryList().get(removenCusPosition);
 		}
 
-		s.removeCustomer(removenRoutePosition, removenCusPosition);
+		sol.removeCustomer(removenRoutePosition, removenCusPosition);
 		
 		lastRemove = removenCus;
 		lastRoute = removenRoute;
 		lastRemovePos = -1;
 		lastRoutePos = -1;
 
-
-		DistanceDict distanceDict = s.instance.getDistanceDict();
-		// double[][] distanceDict = s.instance.getDistanceMatrix();
+		DistanceDict distanceDict = sol.instance.getDistanceDict();
+		// double[][] distanceDict = sol.instance.getDistanceMatrix();
 		
-		while(s.removalCustomers.size() < removeNr ) {
-			
+		while(sol.removalCustomers.size() < removeNr ) {
 			double minRelate = Double.MAX_VALUE;
-			
-			for(int j = 0; j < s.routes.size(); j++) {			
-	        	for (int i = 1; i < s.routes.get(j).getDeliveryList().size() - 1; ++i) {
+			for(int j = 0; j < sol.routes.size(); j++) {
+	        	for (int i = 1; i < sol.routes.get(j).getDeliveryList().size() - 1; ++i) {
 	        		
-	        		Delivery relatedDelivery = s.routes.get(j).getDeliveryList().get(i);
-	        		int l = (lastRoute.getId() == s.routes.get(j).getId())? -1 : 1;
+	        		Delivery relatedDelivery = sol.routes.get(j).getDeliveryList().get(i);
+	        		int l = (lastRoute.getId() == sol.routes.get(j).getId())? -1 : 1;
 	        		
 	        		double fitness = l * 2 + 
 	        				3 * distanceDict.between(lastRemove, relatedDelivery) +
@@ -88,15 +84,14 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	        		if(minRelate > fitness) {
 	        			minRelate = fitness;
 	        			lastRemove = relatedDelivery;
-	        			lastRoute = s.routes.get(j);
+	        			lastRoute = sol.routes.get(j);
 	        			lastRemovePos = i;
 	        			lastRoutePos = j;
 	        		}
 	        	}
 	    	}
-			s.removeCustomer(lastRoutePos, lastRemovePos);
+			sol.removeCustomer(lastRoutePos, lastRemovePos);
 		}
-
-        return s;
+        return sol;
     }
 }

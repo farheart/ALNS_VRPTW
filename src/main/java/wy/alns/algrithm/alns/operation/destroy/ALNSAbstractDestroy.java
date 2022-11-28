@@ -7,7 +7,7 @@ import wy.alns.algrithm.alns.operation.ALNSAbstractOperation;
 @Slf4j
 abstract class ALNSAbstractDestroy extends ALNSAbstractOperation {
     protected static boolean checkSolution(ALNSSolution s) {
-        // If removalCustomers not empty, something in last step
+        // If removalCustomers not empty, something wrong in last step
         if(s.removalCustomers.size() != 0) {
             log.error(">> [ERROR] removalCustomers MUST be empty to start destroy!");
             return false;

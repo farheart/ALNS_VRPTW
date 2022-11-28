@@ -20,6 +20,7 @@ public class ALNSSolver {
     	return greedySolver.getInitialSolution();
     }
 
+
     private Solution improveSolution(Solution s, ALNSConfig ac, Instance is) {
         ALNS alns = new ALNS(s, is, ac);
     	return alns.improveSolution();

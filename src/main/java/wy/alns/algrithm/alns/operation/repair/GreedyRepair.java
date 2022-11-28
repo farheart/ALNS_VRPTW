@@ -15,34 +15,30 @@ import wy.alns.algrithm.alns.ALNSSolution;
 public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
 
 	@Override
-	public ALNSSolution repair(ALNSSolution s) {
-		if (!checkSolution(s)) {
-			return s;
+	public ALNSSolution repair(ALNSSolution sol) {
+		if (!checkSolution(sol)) {
+			return sol;
 		}
     	
-    	int removeNr = s.removalCustomers.size();
-    	
+    	int removeNr = sol.removalCustomers.size();
 		for(int k = 0; k < removeNr; k++) {
-			
-			Delivery insertDelivery = s.removalCustomers.remove(0);
+			Delivery insertDelivery = sol.removalCustomers.remove(0);
 			
 			double bestCost;
 			int bestCusP = -1;
 			int bestRouteP = -1;
 			bestCost = Double.POSITIVE_INFINITY;
         	
-			for(int j = 0; j < s.routes.size(); j++) {			
-        		
-				if(s.routes.get(j).getDeliveryList().size() < 1) {
+			for(int j = 0; j < sol.routes.size(); j++) {
+				if(sol.routes.get(j).getDeliveryList().size() < 1) {
         			continue;
         		}
         		
 				// 寻找最优插入位置
-            	for (int i = 1; i < s.routes.get(j).getDeliveryList().size() - 1; ++i) {
-            		
+            	for (int i = 1; i < sol.routes.get(j).getDeliveryList().size() - 1; ++i) {
             		// 评价插入情况
-    				Measure evalMeasure = new Measure(s.measure);
-    				s.evaluateInsertCustomer(j, i, insertDelivery, evalMeasure);
+    				Measure evalMeasure = new Measure(sol.measure);
+    				sol.evaluateInsertCustomer(j, i, insertDelivery, evalMeasure);
 
             		if(evalMeasure.totalCost > Double.MAX_VALUE) {
             			evalMeasure.totalCost = Double.MAX_VALUE;
@@ -57,8 +53,8 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
             		}
             	}
         	}
-			s.insertCustomer(bestRouteP, bestCusP, insertDelivery);
+			sol.insertCustomer(bestRouteP, bestCusP, insertDelivery);
 		}
-        return s;
+        return sol;
     }
 }

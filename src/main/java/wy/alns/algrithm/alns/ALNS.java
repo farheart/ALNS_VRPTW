@@ -43,24 +43,29 @@ public class ALNS {
     };
 
     private final double T_end_t = 0.01;
+
     // Global Best Solution
-    private ALNSSolution globalBestSol = null;
+    private ALNSSolution globalBestSol;
+
     // Local Best Solution
-    private ALNSSolution localBestSol = null;
-    private int i = 0;
+    private ALNSSolution localBestSol;
+
+    private int iteration = 0;
+
     // time
     private double T;
+
     private double T_s;
-    // time start
+
     private long timeStart;
-    // time end
-    private double T_end;
+
+    private double timeEnd;
     
 
-    public ALNS(Solution s_, Instance instance, ALNSConfig c) {
-        config = c;
-        globalBestSol = new ALNSSolution(s_, instance);
-        localBestSol = new ALNSSolution(globalBestSol);
+    public ALNS(Solution sol, Instance instance, ALNSConfig config) {
+        this.config = config;
+        this.globalBestSol = new ALNSSolution(sol, instance);
+        this.localBestSol = new ALNSSolution(this.globalBestSol);
 
         initOperators(this.destroyOperators);
         initOperators(this.repairOperators);
@@ -69,24 +74,24 @@ public class ALNS {
     public Solution improveSolution() {
         T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * localBestSol.measure.totalCost;
         T = T_s;
-        T_end = T_end_t * T_s;
+        timeEnd = T_end_t * T_s;
 
         timeStart = System.currentTimeMillis();
         
         while (true) {
         	// Generate new solution from local best solution s_c
-            ALNSSolution s_c_new = new ALNSSolution(localBestSol);
-            int q = getQ(s_c_new);
+            ALNSSolution newSol = new ALNSSolution(localBestSol);
+            int q = getQ(newSol);
             
             // Find the best operators
             IALNSDestroy destroyOperator = this.chooseOperatorByChance(this.destroyOperators);
             IALNSRepair repairOperator = this.chooseOperatorByChance(this.repairOperators);
 
             // destroy then repair
-            ALNSSolution solDestroy = destroyOperator.destroy(s_c_new, q);
+            ALNSSolution solDestroy = destroyOperator.destroy(newSol, q);
             ALNSSolution solRepair = repairOperator.repair(solDestroy);
 
-            log.info(">> Iteration : " +  i + ", Current TotalCost : " + solRepair.measure.totalCost);
+            log.info(">> Iteration : " + iteration + ", Current TotalCost : " + solRepair.measure.totalCost);
             
             // Update local best solution
             if (solRepair.measure.totalCost < localBestSol.measure.totalCost) {
@@ -103,44 +108,48 @@ public class ALNS {
                 handleWorseSolution(destroyOperator, repairOperator, solRepair);
             }
 
-            
-            if (i % config.getTau() == 0 && i > 0) {
-                segmentFinsihed();
+            if (iteration % config.getTau() == 0 && iteration > 0) {
+                updateFactors();
             }
             
             T = config.getC() * T;
-            i++;
+            iteration++;
             
-            if (i > config.getOmega() && globalBestSol.isFeasible()) break;
-            if (i > config.getOmega() * 1.5 ) break;
+            if (iteration > config.getOmega() && globalBestSol.isFeasible())
+                break;
+            if (iteration > config.getOmega() * 1.5 )
+                break;
         }
         
         Solution solution = globalBestSol.toSolution();
+        solution.solveTime = (System.currentTimeMillis() - timeStart) / 1000.0;  // time elapsed
 
-        // time elapsed
-        double s = Math.round((System.currentTimeMillis() - timeStart) * 1000) / 1E6;
-        log.info(">> Run time = " + s + " sec");
+        showInfo(solution);
+
+        return solution;
+    }
+
+    private void showInfo(Solution solution) {
+        log.info(">> Run time = " + solution.solveTime + " sec");
 
         // Utilization of operators
         String msg = "";
         for (IALNSDestroy op : destroyOperators){
         	msg += op.getDraws() +" invokes  - [" + op.getClass().getName() +  "]\n";
         }
-        
+
         for (IALNSRepair op : repairOperators){
             msg += op.getDraws() +" invokes  - [" + op.getClass().getName() +  "]\n";
         }
         log.info(">> Statistics of operator utilization : \n" + msg);
-
-        solution.solveTime = s;
-        return solution;
     }
+
 
     private void handleWorseSolution(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution s_t) {
         // Accept worse solution by calculated probability
     	double p_accept = calculateProbabilityToAcceptTempSolutionAsNewCurrent(s_t);
         if (Math.random() < p_accept) {
-            localBestSol = s_t;
+            this.localBestSol = s_t;
         }
         destroyOperator.incPi(config.getSigma_3());
         repairOperator.incPi(config.getSigma_3());
@@ -172,16 +181,16 @@ public class ALNS {
     }
 
 
-    private int getQ(ALNSSolution s_c2) {
-        int q_l = Math.min((int) Math.ceil(0.05 * s_c2.instance.getOrderNum()), 10);
-        int q_u = Math.min((int) Math.ceil(0.20 * s_c2.instance.getOrderNum()), 30);
+    private int getQ(ALNSSolution sol) {
+        int q_l = Math.min((int) Math.ceil(0.05 * sol.instance.getOrderNum()), 10);
+        int q_u = Math.min((int) Math.ceil(0.20 * sol.instance.getOrderNum()), 30);
 
         Random r = new Random();
         return r.nextInt(q_u - q_l + 1) + q_l;
     }
 
 
-    private void segmentFinsihed() {
+    private void updateFactors() {
         // Update factor of Destroy operator
         double w_sum = 0;
         for (IALNSDestroy dstr : destroyOperators) {
@@ -238,7 +247,7 @@ public class ALNS {
         	op.setDraws(0);
             op.setPi(0);
             op.setW(1.0);
-            op.setP(1.0 / (double) ops.length);
+            op.setP(1.0 / ops.length);
         }
     }
 

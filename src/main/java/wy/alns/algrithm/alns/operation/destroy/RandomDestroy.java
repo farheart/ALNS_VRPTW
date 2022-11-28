@@ -17,39 +17,35 @@ import java.util.Random;
  */
 @Slf4j
 public class RandomDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
-
 	@Override
-	public ALNSSolution destroy(ALNSSolution s, int removeNr) {
-		if (!checkSolution(s)) {
-			return s;
+	public ALNSSolution destroy(ALNSSolution sol, int removeNr) {
+		if (!checkSolution(sol)) {
+			return sol;
 		}
 
-		while(s.removalCustomers.size() < removeNr ) {
+		while(sol.removalCustomers.size() < removeNr) {
 			Random r = RandomUtil.getRandom();
 			
     		ArrayList<Integer> routeList= new ArrayList<Integer>();
-            for(int j = 0; j < s.routes.size(); j++) {
+            for(int j = 0; j < sol.routes.size(); j++) {
                 routeList.add(j);
 			}
             Collections.shuffle(routeList);  
             
 			// Select a route to remove customer from
 			int removenRoutePosition = routeList.remove(0);
-			Route removenRoute = s.routes.get(removenRoutePosition);
+			Route removenRoute = sol.routes.get(removenRoutePosition);
 			
 			while(removenRoute.getDeliveryList().size() <= 2) {
 				removenRoutePosition = routeList.remove(0);
-				removenRoute = s.routes.get(removenRoutePosition);
+				removenRoute = sol.routes.get(removenRoutePosition);
 			}
 			
 			// Select customer
 			int removenCustomerPosition = r.nextInt(removenRoute.getDeliveryList().size() - 2) + 1;
-			s.removeCustomer(removenRoutePosition, removenCustomerPosition);
+			sol.removeCustomer(removenRoutePosition, removenCustomerPosition);
 		}
-
-		return s;
+		return sol;
 	}
-
-
 
 }

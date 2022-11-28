@@ -21,21 +21,20 @@ import java.util.Random;
 public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
 
 	@Override
-	public ALNSSolution repair(ALNSSolution s) {
-		if (!checkSolution(s)) {
-			return s;
+	public ALNSSolution repair(ALNSSolution sol) {
+		if (!checkSolution(sol)) {
+			return sol;
 		}
     	
     	// 获取随机数
     	Random r = RandomUtil.getRandom();
-    	int insertCusNr = s.removalCustomers.size();	
+    	int insertNum = sol.removalCustomers.size();
     	
-    	for (int i = 0; i < insertCusNr; i++) {
-    		
-    		Delivery insertDelivery = s.removalCustomers.remove(0);
+    	for (int i = 0; i < insertNum; i++) {
+    		Delivery insertDelivery = sol.removalCustomers.remove(0);
     		
     		// 随机决定查找多少条路径
-    		int randomRouteNr = r.nextInt(s.routes.size() - 1) + 1;
+    		int randomRouteNr = r.nextInt(sol.routes.size() - 1) + 1;
     		
     		// 最优插入方案
     		int bestRoutePosition = -1;
@@ -44,20 +43,19 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     		bestMeasure.totalCost = Double.MAX_VALUE;
     		
     		ArrayList<Integer> routeList= new ArrayList<Integer>();
-            for(int j = 0; j < s.routes.size(); j++)
+            for(int j = 0; j < sol.routes.size(); j++)
                 routeList.add(j);  
             
             Collections.shuffle(routeList);  
             
     		for (int j = 0; j < randomRouteNr; j++) {
-    			
     			// 随机选择一条route
     			int insertRoutePosition = routeList.remove(0);
-    			Route insertRoute = s.routes.get(insertRoutePosition);
+    			Route insertRoute = sol.routes.get(insertRoutePosition);
     			
     			while(insertRoute.getDeliveryList().size() < 1) {
     				insertRoutePosition = routeList.remove(0);
-    				insertRoute = s.routes.get(insertRoutePosition);
+    				insertRoute = sol.routes.get(insertRoutePosition);
     			}
     			
     			// 随机决定查找多少个位置
@@ -71,26 +69,24 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
                 
                 // 随机选择一条位置
     			for (int k = 0; k < insertTimes; k++) {
-    				
-    				int insertCusPosition = customerList.remove(0);
+    				int insertPos = customerList.remove(0);
     				
     				// 评价插入情况
-    				Measure evalMeasure = new Measure(s.measure);
-    				s.evaluateInsertCustomer(insertRoutePosition, insertCusPosition, insertDelivery, evalMeasure);
+    				Measure evalMeasure = new Measure(sol.measure);
+    				sol.evaluateInsertCustomer(insertRoutePosition, insertPos, insertDelivery, evalMeasure);
                     
     				// 更新最优插入位置
     				if (evalMeasure.totalCost < bestMeasure.totalCost) {
     					bestRoutePosition = insertRoutePosition;
-    					bestCusomerPosition = insertCusPosition;
+    					bestCusomerPosition = insertPos;
     					bestMeasure = evalMeasure;
     				}
     			}
     			// 执行插入操作
-    			s.insertCustomer(bestRoutePosition, bestCusomerPosition, insertDelivery);
+    			sol.insertCustomer(bestRoutePosition, bestCusomerPosition, insertDelivery);
     		}
     	}
-    	
-		return s;
+		return sol;
 	}
    
 }

@@ -29,15 +29,16 @@ public class ALNSSolution {
 	public ArrayList<Delivery> removalCustomers;
 
     public ALNSSolution(Instance instance) {
+        this.instance = instance;
+
         this.routes = new ArrayList<>();
         this.measure = new Measure();
         this.numVehicle = 0;
-        this.instance = instance;
-        
+
         this.alpha = penalty;
         this.beta = penalty;
         
-        this.removalCustomers = new ArrayList<Delivery>();
+        this.removalCustomers = new ArrayList<>();
     }
     
     public ALNSSolution(Solution sol, Instance instance) {
