@@ -2,10 +2,7 @@ package wy.alns.algrithm.alns.operation.destroy;
 
 import lombok.extern.slf4j.Slf4j;
 import wy.alns.algrithm.alns.ALNSSolution;
-import wy.alns.vo.Delivery;
-import wy.alns.vo.DistanceDict;
-import wy.alns.vo.Instance;
-import wy.alns.vo.Route;
+import wy.alns.vo.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,10 +24,11 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
 		// 计算fitness值，对客户进行评估。
 		ArrayList<Fitness> customerFitness = new  ArrayList<Fitness>();
         for(Route route : sol.routes) {
-        	for (Delivery customer : route.getDeliveryList()) {
-        		double fitness = Fitness.calculateFitness(sol.instance, customer, route);
-        		customerFitness.add(new Fitness(customer.getId(), fitness));
-        	}
+			for (int i = 1; i < route.getServiceList().size() - 1; ++i) {
+				Delivery customer = (Delivery) route.getServiceList().get(i);
+				double fitness = Fitness.calculateFitness(sol.instance, customer, route);
+				customerFitness.add(new Fitness(customer.getId(), fitness));
+			}
     	}
         Collections.sort(customerFitness);
 
@@ -38,8 +36,8 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
         for(int i = 0; i < removeNr; ++i) removal.add(customerFitness.get(i).customerNo);
         
         for(int j = 0; j < sol.routes.size(); j++) {
-        	for (int i = 0; i < sol.routes.get(j).getDeliveryList().size(); ++i) {
-        		Delivery customer = sol.routes.get(j).getDeliveryList().get(i);
+        	for (int i = 0; i < sol.routes.get(j).getServiceList().size(); ++i) {
+        		Service customer = sol.routes.get(j).getServiceList().get(i);
         		if(removal.contains(customer.getId())) {
         			sol.removeCustomer(j, i);
         		}	
@@ -61,7 +59,7 @@ class Fitness implements Comparable<Fitness>{
 	public static double calculateFitness(Instance instance, Delivery customer, Route route) {
 		DistanceDict distanceDict = instance.getDistanceDict();
 
-		Delivery n0 = route.getDeliveryList().get(0);
+		Service n0 = route.getServiceList().get(0);
 		double v = route.getMeasure().getTimeViolation() + route.getMeasure().getLoadViolation() + customer.getAmount();
 		double distFactor = distanceDict.between(customer, n0) + distanceDict.between(n0, customer);
 		double fitness = v * distFactor;

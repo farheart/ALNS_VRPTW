@@ -25,12 +25,12 @@ public class DistanceDict {
     }
 
 
-    public double between(Delivery n1, Delivery n2) {
+    public double between(Service n1, Service n2) {
         return this.distanceMap.get(getNodePairKey(n1, n2));
     }
 
 
-    private static double calDistance(Delivery n1, Delivery n2) {
+    private static double calDistance(Service n1, Service n2) {
         double x1 = n1.getLocation().getX();
         double y1 = n1.getLocation().getY();
         double x2 = n2.getLocation().getX();
@@ -40,19 +40,19 @@ public class DistanceDict {
 
 
     private void init() {
-        List<Delivery> deliveryList = new ArrayList<>();
-        deliveryList.add(this.instance.getDepot());
-        deliveryList.addAll(this.instance.getDeliveryList());
+        List<Service> serviceList = new ArrayList<>();
+        serviceList.add(this.instance.getDepot());
+        serviceList.addAll(this.instance.getDeliverySet());
 
-        for (Delivery n1: deliveryList) {
-            for (Delivery n2: deliveryList) {
+        for (Service n1: serviceList) {
+            for (Service n2: serviceList) {
                 this.distanceMap.put(getNodePairKey(n1, n2), calDistance(n1, n2));
             }
         }
     }
 
 
-    private static String getNodePairKey(Delivery n1, Delivery n2) {
+    private static String getNodePairKey(Service n1, Service n2) {
         return n1.getId() + "~" + n2.getId();
     }
 }

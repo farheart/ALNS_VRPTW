@@ -1,7 +1,9 @@
 package wy.alns.algrithm.solution;
 
+import wy.alns.vo.Delivery;
 import wy.alns.vo.Instance;
 import wy.alns.vo.Route;
+import wy.alns.vo.Service;
 
 
 /**
@@ -26,7 +28,7 @@ public class SolutionValidator {
         double totalDistance = 0;
         for (int i = 0; i < solution.getRoutes().size(); i++) {
         	Route route = solution.getRoutes().get(i);
-        	if (route.getDeliveryList().size() >= 3) {
+        	if (route.getServiceList().size() >= 3) {
         		id++;
         		
         		double routeDistance = 0;
@@ -35,19 +37,24 @@ public class SolutionValidator {
 
 				boolean ifTWOK = true;
 
-        		for (int j = 1; j < route.getDeliveryList().size(); j++) {
-					double dist = this.instance.getDistanceDict().between(route.getDeliveryList().get(j - 1), route.getDeliveryList().get(j));
+        		for (int j = 1; j < route.getServiceList().size(); j++) {
+					double dist = this.instance.getDistanceDict().between(route.getServiceList().get(j - 1), route.getServiceList().get(j));
 					clockTime += dist;
 					routeDistance += dist;
 
-					loadInVehicle += route.getDeliveryList().get(j).getAmount();
-        			if (clockTime < route.getDeliveryList().get(j).getTimeWindow().getStart()) {
-        				clockTime = route.getDeliveryList().get(j).getTimeWindow().getStart();
-					} else if (clockTime > route.getDeliveryList().get(j).getTimeWindow().getEnd()) {
-        				ifTWOK = false;
-					}
+					Service service = route.getServiceList().get(j);
+					if (service instanceof Delivery) {
+						Delivery delivery = (Delivery) service;
 
-        			clockTime += route.getDeliveryList().get(j).getServiceTime();
+						loadInVehicle += delivery.getAmount();
+
+						if (clockTime < route.getServiceList().get(j).getTimeWindow().getStart()) {
+							clockTime = route.getServiceList().get(j).getTimeWindow().getStart();
+						} else if (clockTime > route.getServiceList().get(j).getTimeWindow().getEnd()) {
+							ifTWOK = false;
+						}
+						clockTime += delivery.getServiceTime();
+					}
         		}
         		totalDistance += routeDistance;
 

@@ -53,16 +53,16 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     			int insertRoutePosition = routeList.remove(0);
     			Route insertRoute = sol.routes.get(insertRoutePosition);
     			
-    			while(insertRoute.getDeliveryList().size() < 1) {
+    			while(insertRoute.getServiceList().size() < 1) {
     				insertRoutePosition = routeList.remove(0);
     				insertRoute = sol.routes.get(insertRoutePosition);
     			}
     			
     			// 随机决定查找多少个位置
-    			int insertTimes = r.nextInt(insertRoute.getDeliveryList().size() - 1) + 1;
+    			int insertTimes = r.nextInt(insertRoute.getServiceList().size() - 1) + 1;
     			
         		ArrayList<Integer> customerList= new ArrayList<Integer>();
-                for(int k = 1; k < insertRoute.getDeliveryList().size(); k++)
+                for(int k = 1; k < insertRoute.getServiceList().size(); k++)
                 	customerList.add(k);  
                 
                 Collections.shuffle(customerList); 

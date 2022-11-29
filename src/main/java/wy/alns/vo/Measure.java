@@ -20,13 +20,13 @@ public class Measure {
 	public double timeViolation; 
 	
 	public Measure(){
-		totalCost = 0;
-		distance = 0;
-		amount = 0;
-		time = 0;
-		
-		loadViolation = 0;
-		timeViolation = 0;
+		this.totalCost = 0;
+		this.distance = 0;
+		this.amount = 0;
+		this.time = 0;
+
+		this.loadViolation = 0;
+		this.timeViolation = 0;
 	}
 	
 	public Measure(Measure measure) {

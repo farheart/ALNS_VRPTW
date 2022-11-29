@@ -36,13 +36,13 @@ public class RandomDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 			int removenRoutePosition = routeList.remove(0);
 			Route removenRoute = sol.routes.get(removenRoutePosition);
 			
-			while(removenRoute.getDeliveryList().size() <= 2) {
+			while(removenRoute.getServiceList().size() <= 2) {
 				removenRoutePosition = routeList.remove(0);
 				removenRoute = sol.routes.get(removenRoutePosition);
 			}
 			
 			// Select customer
-			int removenCustomerPosition = r.nextInt(removenRoute.getDeliveryList().size() - 2) + 1;
+			int removenCustomerPosition = r.nextInt(removenRoute.getServiceList().size() - 2) + 1;
 			sol.removeCustomer(removenRoutePosition, removenCustomerPosition);
 		}
 		return sol;

@@ -30,12 +30,12 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
 			bestCost = Double.POSITIVE_INFINITY;
         	
 			for(int j = 0; j < sol.routes.size(); j++) {
-				if(sol.routes.get(j).getDeliveryList().size() < 1) {
+				if(sol.routes.get(j).getServiceList().size() < 1) {
         			continue;
         		}
         		
 				// 寻找最优插入位置
-            	for (int i = 1; i < sol.routes.get(j).getDeliveryList().size() - 1; ++i) {
+            	for (int i = 1; i < sol.routes.get(j).getServiceList().size() - 1; ++i) {
             		// 评价插入情况
     				Measure evalMeasure = new Measure(sol.measure);
     				sol.evaluateInsertCustomer(j, i, insertDelivery, evalMeasure);

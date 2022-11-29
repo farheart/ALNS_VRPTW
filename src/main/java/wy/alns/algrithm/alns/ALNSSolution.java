@@ -73,9 +73,9 @@ public class ALNSSolution {
 
 		Route route = this.routes.get(routePosition);
 
-		Delivery n0 = route.getDeliveryList().get(cusPosition - 1);
-		Delivery n = route.getDeliveryList().get(cusPosition);
-		Delivery n1 = route.getDeliveryList().get(cusPosition + 1);
+		Service n0 = route.getServiceList().get(cusPosition - 1);
+		Delivery n = (Delivery) route.getServiceList().get(cusPosition);
+		Service n1 = route.getServiceList().get(cusPosition + 1);
 
 		double dist = distanceDict.between(n0, n1) - distanceDict.between(n0, n) - distanceDict.between(n, n1);
 		double amount = -n.getAmount();
@@ -87,7 +87,7 @@ public class ALNSSolution {
 		this.measure.loadViolation -= route.getMeasure().loadViolation;
 		this.measure.timeViolation -= route.getMeasure().timeViolation;
 		
-		removalCustomers.add(route.removeNode(cusPosition));
+		removalCustomers.add((Delivery) route.removeNode(cusPosition));
 	}
 
 
@@ -97,9 +97,9 @@ public class ALNSSolution {
 
 		Route route = this.routes.get(routePosition);
 
-		Delivery n0 = route.getDeliveryList().get(insertCusPosition - 1);
+		Service n0 = route.getServiceList().get(insertCusPosition - 1);
 		Delivery n = insertCustomer;
-		Delivery n1 = route.getDeliveryList().get(insertCusPosition);
+		Service n1 = route.getServiceList().get(insertCusPosition);
 
 		double dist = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
 		double amount = +n.getAmount();
@@ -117,14 +117,15 @@ public class ALNSSolution {
 		// calculate TW violation, time
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getDeliveryList().size(); i++) {
-			time += distanceDict.between(route.getDeliveryList().get(i - 1), route.getDeliveryList().get(i));
-			if (time < route.getDeliveryList().get(i).getTimeWindow().getStart()) {
-				time = route.getDeliveryList().get(i).getTimeWindow().getStart();
-			} else if (time > route.getDeliveryList().get(i).getTimeWindow().getEnd()) {
-				timeWindowViolation += time - route.getDeliveryList().get(i).getTimeWindow().getEnd();
+		for (int i = 1; i < route.getServiceList().size()-1; i++) {
+			time += distanceDict.between(route.getServiceList().get(i - 1), route.getServiceList().get(i));
+			if (time < route.getServiceList().get(i).getTimeWindow().getStart()) {
+				time = route.getServiceList().get(i).getTimeWindow().getStart();
+			} else if (time > route.getServiceList().get(i).getTimeWindow().getEnd()) {
+				timeWindowViolation += time - route.getServiceList().get(i).getTimeWindow().getEnd();
 			}
-			time += route.getDeliveryList().get(i).getServiceTime();
+			Delivery delivery = (Delivery) route.getServiceList().get(i);
+			time += delivery.getServiceTime();
 		}
 
 		route.getMeasure().time = time;
@@ -141,9 +142,9 @@ public class ALNSSolution {
 
 		Route route = this.routes.get(routePosition).cloneRoute();
 
-		Delivery n0 = route.getDeliveryList().get(insertCusPosition - 1);
+		Service n0 = route.getServiceList().get(insertCusPosition - 1);
 		Delivery n = insertCustomer;
-		Delivery n1 = route.getDeliveryList().get(insertCusPosition);
+		Service n1 = route.getServiceList().get(insertCusPosition);
 
 		double cost = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
 		double amount = +n.getAmount();
@@ -159,14 +160,15 @@ public class ALNSSolution {
 		
 		double time = 0;
 		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getDeliveryList().size(); i++) {
-			time += distanceDict.between(route.getDeliveryList().get(i - 1), route.getDeliveryList().get(i));
-			if (time < route.getDeliveryList().get(i).getTimeWindow().getStart()) {
-				time = route.getDeliveryList().get(i).getTimeWindow().getStart();
-			} else if (time > route.getDeliveryList().get(i).getTimeWindow().getEnd()) {
-				timeWindowViolation += time - route.getDeliveryList().get(i).getTimeWindow().getEnd();
+		for (int i = 1; i < route.getServiceList().size()-1; i++) {
+			time += distanceDict.between(route.getServiceList().get(i - 1), route.getServiceList().get(i));
+			if (time < route.getServiceList().get(i).getTimeWindow().getStart()) {
+				time = route.getServiceList().get(i).getTimeWindow().getStart();
+			} else if (time > route.getServiceList().get(i).getTimeWindow().getEnd()) {
+				timeWindowViolation += time - route.getServiceList().get(i).getTimeWindow().getEnd();
 			}
-			time += route.getDeliveryList().get(i).getServiceTime();
+			Delivery delivery = (Delivery) route.getServiceList().get(i);
+			time += delivery.getServiceTime();
 		}
 		
 		evalMeasure.time = time;

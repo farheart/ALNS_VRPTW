@@ -12,12 +12,12 @@ import lombok.Data;
 @Data
 public class Location {
     /**
-     * The X-axis coordinate in a theoretical 2-D space for the specific customer.
+     * The X-axis coordinate
      */
     private double x;
 
     /**
-     * The Y-axis coordinate in a theoretical 2-D space for the specific customer.
+     * The Y-axis coordinate
      */
     private double y;
 

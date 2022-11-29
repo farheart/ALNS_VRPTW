@@ -21,7 +21,7 @@ public class Route {
     /**
      * A sequence of Customers, that will be served from the current Vehicle.
      */
-    private List<Delivery> deliveryList;
+    private List<Service> serviceList;
 
 
     /**
@@ -33,7 +33,7 @@ public class Route {
     public Route(String id, Vehicle v) {
         this.id = id;
         this.vehicle = v;
-        this.deliveryList = new ArrayList<>();
+        this.serviceList = new ArrayList<>();
         this.measure = new Measure();
     }
 
@@ -41,34 +41,33 @@ public class Route {
     public Route cloneRoute() {
         Route result = new Route(this.id, this.vehicle);
         result.measure = new Measure(this.measure);
-        result.deliveryList = new ArrayList<>(this.deliveryList);
+        result.serviceList = new ArrayList<>(this.serviceList);
         return result;
     }
 
     /**
-     * Returns the last node in the route
+     * Returns the last stop of the route
      */
-    public Delivery getLastNodeOfTheRoute() {
-        return this.deliveryList.get(this.deliveryList.size() - 1);
+    public Service getLastStop() {
+        return this.serviceList.get(this.serviceList.size() - 1);
     }
 
     /**
-     * Adds a customer in the end of the route.
-     *
-     * @param delivery The new customer to be inserted.
+     * Adds a customer to the end of the route.
      */
-    public void append(Delivery delivery) {
-        this.deliveryList.add(delivery);
+    public void append(Service service) {
+        this.serviceList.add(service);
     }
+
 
     /**
      * Adds a customer in the route in a specific position in the sequence.
      *
-     * @param delivery The new customer to be inserted
+     * @param service The new customer to be inserted
      * @param index The position in which the customer will be inserted.
      */
-    public void addNode(Delivery delivery, int index) {
-        this.deliveryList.add(index, delivery);
+    public void addNode(Service service, int index) {
+        this.serviceList.add(index, service);
     }
 
     /**
@@ -77,14 +76,14 @@ public class Route {
      * @param index The index from which the customer will be removed
      * @return The removed customer.
      */
-    public Delivery removeNode(int index) {
-        return this.deliveryList.remove(index);
+    public Service removeNode(int index) {
+        return this.serviceList.remove(index);
     }
 
     @Override
     public String toString() {
-        String nodeListStr = "deliveryList : [";
-        for (Delivery customer: this.deliveryList) {
+        String nodeListStr = "serviceList : [";
+        for (Service customer: this.serviceList) {
             nodeListStr += "\n\t\t" + customer;
         }
         nodeListStr += "\n\t]";

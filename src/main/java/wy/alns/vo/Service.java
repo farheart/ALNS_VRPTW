@@ -4,18 +4,19 @@ package wy.alns.vo;
 import lombok.Data;
 
 /**
- * AbstractService : parent class of Pickup and Delivery
+ * Service : parent class of Depot and Delivery
  *
  * @author Yu Wang
  * @date  2022-11-22
  */
 @Data
-public abstract class AbstractService {
+public class Service {
     protected int id;
 
     protected Location location;
 
-    protected double serviceTime;
-
     protected TimeWindow timeWindow;
+
+    public Service() {
+    }
 }

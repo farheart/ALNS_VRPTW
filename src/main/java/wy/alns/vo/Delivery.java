@@ -11,16 +11,18 @@ import lombok.*;
 @Data
 @ToString(callSuper=true)
 @EqualsAndHashCode(callSuper=true)
-public class Delivery extends AbstractService {
+public class Delivery extends Service {
     private double amount;
 
-    public Delivery(Delivery n) {
-    	this.id = n.id;
-    	this.location = n.location;
-    	this.amount = n.amount;
-    	this.serviceTime = n.serviceTime;
-    	this.timeWindow = n.timeWindow;
-    }
+	private double serviceTime;
+
+//    public Delivery(Delivery n) {
+//    	this.id = n.id;
+//    	this.location = n.location;
+//    	this.amount = n.amount;
+//    	this.serviceTime = n.serviceTime;
+//    	this.timeWindow = n.timeWindow;
+//    }
 
     public Delivery() {
 	}

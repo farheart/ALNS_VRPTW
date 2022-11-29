@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -20,17 +21,18 @@ import java.util.List;
 @Slf4j
 public class Instance {
     private String name;
+
     private String type;
 
     /**
      * All orders
      */
-    private List<Delivery> deliveryList;
+    private Collection<Delivery> deliverySet;
 
     /**
      * Depot where all vehicles depart from
      */
-    private Delivery depot;
+    private Depot depot;
 
     /**
      * The available vehicles
@@ -50,7 +52,7 @@ public class Instance {
 
         List<String> dataLineList = this.loadDataLines(size, name);
         this.vehicleList = this.loadVehicle(dataLineList);
-        this.deliveryList = this.loadDelivery(dataLineList);
+        this.deliverySet = this.loadDelivery(dataLineList);
         this.depot = this.loadDepot(dataLineList);
 
         this.distanceDict = new DistanceDict(this);
@@ -98,6 +100,7 @@ public class Instance {
         return result;
     }
 
+
     private static Delivery createDelivery(String[] cols) {
         Delivery delivery = new Delivery();
         delivery.setId(Integer.parseInt(cols[1]));
@@ -117,10 +120,9 @@ public class Instance {
     }
 
 
-    private Delivery loadDepot(List<String> lineList) {
+    private Depot loadDepot(List<String> lineList) {
         log.info(">> Loading Depot ... ");
-
-        Delivery result = null;
+        Depot result = null;
 
         int tableStartLineNIndex = Integer.MAX_VALUE;
         for (int i = 0; i < lineList.size(); ++i) {
@@ -132,11 +134,27 @@ public class Instance {
             if (i == tableStartLineNIndex) {
                 String cols[] = line.split("\\s+");
                 if (cols.length > 0) {
-                    result = createDelivery(cols);;
+                    result = createDepot(cols);;
                     break;
                 }
             }
         }
+        return result;
+    }
+
+
+    private static Depot createDepot(String[] cols) {
+        Depot result = new Depot();
+        result.setId(Integer.parseInt(cols[1]));
+
+        double X = (Double.parseDouble(cols[2]));
+        double Y = (Double.parseDouble(cols[3]));
+        result.setLocation(new Location(X, Y));
+
+        double s = Double.parseDouble(cols[5]);
+        double e = Double.parseDouble(cols[6]);
+        result.setTimeWindow(new TimeWindow(s, e));
+
         return result;
     }
 
@@ -172,7 +190,7 @@ public class Instance {
 
 
     public int getOrderNum() {
-        return this.deliveryList.size();
+        return this.deliverySet.size();
     }
 
 }

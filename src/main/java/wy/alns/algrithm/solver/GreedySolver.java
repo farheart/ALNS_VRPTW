@@ -44,7 +44,7 @@ public class GreedySolver {
         curRoute.append(this.instance.getDepot());
 
         // Loop until all delivery are batched or no available vehicles.
-        while (this.instance.getDeliveryList().size() > 0) {
+        while (this.instance.getDeliverySet().size() > 0) {
 
             // Find the nearest feasible delivery to the last node in the route
             Delivery nearestDelivery = findNearestDelivery(curRoute);
@@ -54,7 +54,7 @@ public class GreedySolver {
                 this.addToRoute(curRoute, nearestDelivery);
 
                 // Remove delivery from the non-served list.
-                this.instance.getDeliveryList().remove(nearestDelivery);
+                this.instance.getDeliverySet().remove(nearestDelivery);
 
             } else {
                 // Close the route and add to solution
@@ -80,7 +80,7 @@ public class GreedySolver {
     }
 
     private void addToRoute(Route curRoute, Delivery newDelivery) {
-        Delivery lastDelivery = curRoute.getLastNodeOfTheRoute();
+        Service lastDelivery = curRoute.getLastStop();
 
         double d = this.instance.getDistanceDict().between(lastDelivery, newDelivery);
 
@@ -113,8 +113,8 @@ public class GreedySolver {
 
 
     private void closeRoute(Route curRoute) {
-        Delivery lastDelivery = curRoute.getLastNodeOfTheRoute();
-        Delivery depot = this.instance.getDepot();
+        Service lastDelivery = curRoute.getLastStop();
+        Service depot = this.instance.getDepot();
 
         // Send back to depot to close the trip
         curRoute.getMeasure().distance += this.instance.getDistanceDict().between(lastDelivery, depot);
@@ -125,15 +125,15 @@ public class GreedySolver {
 
 
     private Delivery findNearestDelivery(Route curRoute) {
-        Delivery lastDelivery = curRoute.getLastNodeOfTheRoute();
+        Service lastDelivery = curRoute.getLastStop();
 
         // 1st stop is the depot
-        Delivery depot = curRoute.getDeliveryList().get(0);
+        Service depot = curRoute.getServiceList().get(0);
 
         // Find the nearest delivery to the last one in the route
         Delivery nearestDelivery = null;
         double minDist = Double.MAX_VALUE;  // The smallest distance of rest nodes
-        for (Delivery n: this.instance.getDeliveryList()) {
+        for (Delivery n: this.instance.getDeliverySet()) {
             double distToLast = this.instance.getDistanceDict().between(lastDelivery, n);
             double distToDepot = this.instance.getDistanceDict().between(n, depot);
 

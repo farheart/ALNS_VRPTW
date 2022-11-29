@@ -38,26 +38,25 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 		int removenRoutePosition = routeList.remove(0);
 		Route removenRoute = sol.routes.get(removenRoutePosition);
 		
-		while(removenRoute.getDeliveryList().size() <= 2) {
+		while(removenRoute.getServiceList().size() <= 2) {
 			removenRoutePosition = routeList.remove(0);
 			removenRoute = sol.routes.get(removenRoutePosition);
 		}
 		
 		ArrayList<Integer> cusList= new ArrayList<Integer>();
-        for(int j = 1; j < removenRoute.getDeliveryList().size() - 1; j++)
+        for(int j = 1; j < removenRoute.getServiceList().size() - 1; j++)
         	cusList.add(j);  
         
         Collections.shuffle(cusList);  
         
 		// 选择被移除客户所在的路径
 		int removenCusPosition = cusList.remove(0);
-		Delivery removenCus = removenRoute.getDeliveryList().get(removenCusPosition);
+		Delivery removenCus = (Delivery) removenRoute.getServiceList().get(removenCusPosition);
 		
-		while(removenRoute.getDeliveryList().size() <= 2) {
+		while(removenRoute.getServiceList().size() <= 2) {
 			removenCusPosition = cusList.remove(0);
-			removenCus = removenRoute.getDeliveryList().get(removenCusPosition);
+			removenCus = (Delivery) removenRoute.getServiceList().get(removenCusPosition);
 		}
-
 		sol.removeCustomer(removenRoutePosition, removenCusPosition);
 		
 		lastRemove = removenCus;
@@ -71,9 +70,9 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 		while(sol.removalCustomers.size() < removeNr ) {
 			double minRelate = Double.MAX_VALUE;
 			for(int j = 0; j < sol.routes.size(); j++) {
-	        	for (int i = 1; i < sol.routes.get(j).getDeliveryList().size() - 1; ++i) {
+	        	for (int i = 1; i < sol.routes.get(j).getServiceList().size() - 1; ++i) {
 	        		
-	        		Delivery relatedDelivery = sol.routes.get(j).getDeliveryList().get(i);
+	        		Delivery relatedDelivery = (Delivery) sol.routes.get(j).getServiceList().get(i);
 	        		int l = (lastRoute.getId() == sol.routes.get(j).getId())? -1 : 1;
 	        		
 	        		double fitness = l * 2 + 
