@@ -48,7 +48,7 @@ public class Measure {
 	}
 	
 	public void calculateTotalCost() {
-		totalCost = distance + loadViolation  + timeViolation;
+		totalCost = distance + loadViolation + timeViolation;
 	}
 
 }

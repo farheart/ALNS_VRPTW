@@ -37,8 +37,8 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     		int randomRouteNr = r.nextInt(sol.routes.size() - 1) + 1;
     		
     		// 最优插入方案
-    		int bestRoutePosition = -1;
-    		int bestCusomerPosition = -1;
+    		int bestRouteIndex = -1;
+    		int bestInsertPos = -1;
     		Measure bestMeasure = new Measure();
     		bestMeasure.totalCost = Double.MAX_VALUE;
     		
@@ -50,12 +50,12 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
             
     		for (int j = 0; j < randomRouteNr; j++) {
     			// 随机选择一条route
-    			int insertRoutePosition = routeList.remove(0);
-    			Route insertRoute = sol.routes.get(insertRoutePosition);
+    			int routeIndex = routeList.remove(0);
+    			Route insertRoute = sol.routes.get(routeIndex);
     			
     			while(insertRoute.getServiceList().size() < 1) {
-    				insertRoutePosition = routeList.remove(0);
-    				insertRoute = sol.routes.get(insertRoutePosition);
+    				routeIndex = routeList.remove(0);
+    				insertRoute = sol.routes.get(routeIndex);
     			}
     			
     			// 随机决定查找多少个位置
@@ -72,18 +72,17 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     				int insertPos = customerList.remove(0);
     				
     				// 评价插入情况
-    				Measure evalMeasure = new Measure(sol.measure);
-    				sol.evaluateInsertCustomer(insertRoutePosition, insertPos, insertDelivery, evalMeasure);
-                    
+    				Measure evalMeasure = sol.evaluateInsertCustomer(routeIndex, insertPos, insertDelivery);
+
     				// 更新最优插入位置
     				if (evalMeasure.totalCost < bestMeasure.totalCost) {
-    					bestRoutePosition = insertRoutePosition;
-    					bestCusomerPosition = insertPos;
+    					bestRouteIndex = routeIndex;
+    					bestInsertPos = insertPos;
     					bestMeasure = evalMeasure;
     				}
     			}
     			// 执行插入操作
-    			sol.insertCustomer(bestRoutePosition, bestCusomerPosition, insertDelivery);
+    			sol.insertStop(bestRouteIndex, bestInsertPos, insertDelivery);
     		}
     	}
 		return sol;

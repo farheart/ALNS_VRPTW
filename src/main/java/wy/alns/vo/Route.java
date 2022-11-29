@@ -19,13 +19,13 @@ public class Route {
 
 
     /**
-     * A sequence of Customers, that will be served from the current Vehicle.
+     * A sequence of service that need to be performed by the vehicle.
      */
     private List<Service> serviceList;
 
 
     /**
-     * The cost of the current Route. It is calculated as the sum of the distances of every next node from the previous one.
+     * Measure of Route, e.g., total distances
      */   
 	private Measure measure;
 

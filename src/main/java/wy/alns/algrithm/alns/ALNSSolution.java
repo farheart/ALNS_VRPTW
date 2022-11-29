@@ -28,7 +28,7 @@ public class ALNSSolution {
 	
 	public ArrayList<Delivery> removalCustomers;
 
-    public ALNSSolution(Instance instance) {
+    private ALNSSolution(Instance instance) {
         this.instance = instance;
 
         this.routes = new ArrayList<>();
@@ -91,91 +91,85 @@ public class ALNSSolution {
 	}
 
 
-	public void insertCustomer(int routePosition, int insertCusPosition, Delivery insertCustomer) {
-		//TODO : duplicated TW
-		DistanceDict distanceDict = instance.getDistanceDict();
+	public void insertStop(int routeIndex, int insertPos, Delivery stop) {
+		Route route = this.routes.get(routeIndex);
+		Measure tmp = doInsert(stop, insertPos, route);
 
-		Route route = this.routes.get(routePosition);
+		route.getMeasure().distance += tmp.getDistance();
+		route.getMeasure().amount += tmp.getAmount();
+		route.getMeasure().time = tmp.getTime();
+		route.getMeasure().timeViolation = tmp.getTimeViolation();
 
-		Service n0 = route.getServiceList().get(insertCusPosition - 1);
-		Delivery n = insertCustomer;
-		Service n1 = route.getServiceList().get(insertCusPosition);
-
-		double dist = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
-		double amount = +n.getAmount();
-
-		// update dist, load,load violation of current route and total
-		this.measure.distance += dist;
-		route.getMeasure().distance += dist;
-		route.getMeasure().amount += amount;
-
-		if (route.getMeasure().amount > route.getVehicle().getCapacity()) {
-			this.measure.loadViolation += route.getMeasure().amount - route.getVehicle().getCapacity();
-		}
-		route.addNode(insertCustomer, insertCusPosition);;
-		
-		// calculate TW violation, time
-		double time = 0;
-		double timeWindowViolation = 0;
-		for (int i = 1; i < route.getServiceList().size()-1; i++) {
-			time += distanceDict.between(route.getServiceList().get(i - 1), route.getServiceList().get(i));
-			if (time < route.getServiceList().get(i).getTimeWindow().getStart()) {
-				time = route.getServiceList().get(i).getTimeWindow().getStart();
-			} else if (time > route.getServiceList().get(i).getTimeWindow().getEnd()) {
-				timeWindowViolation += time - route.getServiceList().get(i).getTimeWindow().getEnd();
-			}
-			Delivery delivery = (Delivery) route.getServiceList().get(i);
-			time += delivery.getServiceTime();
-		}
-
-		route.getMeasure().time = time;
-		route.getMeasure().timeViolation = timeWindowViolation;
-
-		this.measure.timeViolation += timeWindowViolation;
+		this.measure.distance += tmp.getDistance();
+		this.measure.loadViolation += tmp.getLoadViolation();
+		this.measure.timeViolation += tmp.getTimeViolation();
 		this.measure.calculateTotalCost(this.alpha, this.beta);
 	}
 
 
-	public void evaluateInsertCustomer(int routePosition, int insertCusPosition, Delivery insertCustomer, Measure evalMeasure) {
+	public Measure evaluateInsertCustomer(int routeIndex, int insertPos, Delivery stop) {
+		Route route = this.routes.get(routeIndex).cloneRoute();
+		Measure tmp = doInsert(stop, insertPos, route);
+
+		Measure evalMeasure = new Measure(this.measure);
+		evalMeasure.distance += tmp.getDistance();
+		evalMeasure.amount += tmp.getAmount();
+		evalMeasure.time = tmp.getTime();
+		evalMeasure.loadViolation += tmp.getLoadViolation();
+		evalMeasure.timeViolation = tmp.getTimeViolation();
+		evalMeasure.calculateTotalCost(this.alpha, this.beta);
+
+		return evalMeasure;
+	}
+
+
+	private Measure doInsert(Delivery stop, int insertPos, Route route) {
 		//TODO : duplicated TW
+		Measure tmp = new Measure();
+
+		Service n0 = route.getServiceList().get(insertPos - 1);
+		Delivery n = stop;
+		Service n1 = route.getServiceList().get(insertPos);
+
+		// calculate dist, load, load violation
 		DistanceDict distanceDict = instance.getDistanceDict();
-
-		Route route = this.routes.get(routePosition).cloneRoute();
-
-		Service n0 = route.getServiceList().get(insertCusPosition - 1);
-		Delivery n = insertCustomer;
-		Service n1 = route.getServiceList().get(insertCusPosition);
-
-		double cost = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
+		double dist = distanceDict.between(n0, n) + distanceDict.between(n, n1) - distanceDict.between(n0, n1);
 		double amount = +n.getAmount();
 
-		evalMeasure.amount += amount;
-		evalMeasure.distance += cost;
+		tmp.setDistance(dist);
+		tmp.setAmount(amount);
 
-		if (evalMeasure.amount > route.getVehicle().getCapacity()) {
-			evalMeasure.loadViolation += this.measure.amount - route.getVehicle().getCapacity();
+		double load = route.getMeasure().getAmount() + tmp.getAmount();
+		if (load > route.getVehicle().getCapacity()) {
+			tmp.setLoadViolation(load - route.getVehicle().getCapacity());
 		}
-		
-		route.addNode(insertCustomer, insertCusPosition);;
-		
+		route.addNode(stop, insertPos);
+
+		// calculate TW violation, time
 		double time = 0;
 		double timeWindowViolation = 0;
 		for (int i = 1; i < route.getServiceList().size()-1; i++) {
-			time += distanceDict.between(route.getServiceList().get(i - 1), route.getServiceList().get(i));
-			if (time < route.getServiceList().get(i).getTimeWindow().getStart()) {
-				time = route.getServiceList().get(i).getTimeWindow().getStart();
-			} else if (time > route.getServiceList().get(i).getTimeWindow().getEnd()) {
-				timeWindowViolation += time - route.getServiceList().get(i).getTimeWindow().getEnd();
+			Service s = route.getServiceList().get(i);
+			time += distanceDict.between(route.getServiceList().get(i - 1), s);
+			if (time < s.getTimeWindow().getStart()) {
+				time = s.getTimeWindow().getStart();
+			} else if (time > s.getTimeWindow().getEnd()) {
+				timeWindowViolation += time - s.getTimeWindow().getEnd();
 			}
-			Delivery delivery = (Delivery) route.getServiceList().get(i);
-			time += delivery.getServiceTime();
+
+			if (s instanceof Delivery) {
+				Delivery delivery = (Delivery) s;
+				time += delivery.getServiceTime();
+			}
 		}
-		
-		evalMeasure.time = time;
-		evalMeasure.timeViolation = timeWindowViolation;
-		
-		evalMeasure.calculateTotalCost(this.alpha, this.beta);
+		tmp.setTime(time);
+		tmp.setTimeViolation(timeWindowViolation);
+
+		return tmp;
 	}
+
+
+
 
 
 	public boolean isFeasible() {

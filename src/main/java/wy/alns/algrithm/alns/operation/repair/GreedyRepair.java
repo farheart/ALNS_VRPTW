@@ -25,20 +25,19 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
 			Delivery insertDelivery = sol.removalCustomers.remove(0);
 			
 			double bestCost;
-			int bestCusP = -1;
-			int bestRouteP = -1;
+			int bestInsertPos = -1;
+			int bestRouteIndex = -1;
 			bestCost = Double.POSITIVE_INFINITY;
         	
-			for(int j = 0; j < sol.routes.size(); j++) {
-				if(sol.routes.get(j).getServiceList().size() < 1) {
+			for(int routeIndex = 0; routeIndex < sol.routes.size(); routeIndex++) {
+				if(sol.routes.get(routeIndex).getServiceList().size() < 1) {
         			continue;
         		}
         		
 				// 寻找最优插入位置
-            	for (int i = 1; i < sol.routes.get(j).getServiceList().size() - 1; ++i) {
+            	for (int i = 1; i < sol.routes.get(routeIndex).getServiceList().size() - 1; ++i) {
             		// 评价插入情况
-    				Measure evalMeasure = new Measure(sol.measure);
-    				sol.evaluateInsertCustomer(j, i, insertDelivery, evalMeasure);
+    				Measure evalMeasure = sol.evaluateInsertCustomer(routeIndex, i, insertDelivery);
 
             		if(evalMeasure.totalCost > Double.MAX_VALUE) {
             			evalMeasure.totalCost = Double.MAX_VALUE;
@@ -47,13 +46,13 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
             		// if a better insertion is found, set the position to insert in the move and update the minimum cost found
             		if (evalMeasure.totalCost < bestCost) {
             			//log.info(varCost.checkFeasible());
-            			bestCusP = i;
-            			bestRouteP = j;
+            			bestInsertPos = i;
+            			bestRouteIndex = routeIndex;
             			bestCost = evalMeasure.totalCost;
             		}
             	}
         	}
-			sol.insertCustomer(bestRouteP, bestCusP, insertDelivery);
+			sol.insertStop(bestRouteIndex, bestInsertPos, insertDelivery);
 		}
         return sol;
     }

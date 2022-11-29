@@ -33,22 +33,20 @@ public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
 			Delivery insertDelivery = sol.removalCustomers.remove(0);
 			
 			double first,second;
-			int bestCusP = -1;
-			int bestRouteP = -1;
+			int bestInsertPos = -1;
+			int bestRouteIndex = -1;
 			first = second = Double.POSITIVE_INFINITY;
         	
-			for(int j = 0; j < sol.routes.size(); j++) {
+			for(int routeIndex = 0; routeIndex < sol.routes.size(); routeIndex++) {
         		
-				if(sol.routes.get(j).getServiceList().size() < 1) {
+				if(sol.routes.get(routeIndex).getServiceList().size() < 1) {
         			continue;
         		}
         		
 				// 寻找最优插入位置
-            	for (int i = 1; i < sol.routes.get(j).getServiceList().size() - 1; ++i) {
-            		
+            	for (int i = 1; i < sol.routes.get(routeIndex).getServiceList().size() - 1; ++i) {
             		// 评价插入情况
-    				Measure evalMeasure = new Measure(sol.measure);
-    				sol.evaluateInsertCustomer(j, i, insertDelivery, evalMeasure);
+    				Measure evalMeasure =  sol.evaluateInsertCustomer(routeIndex, i, insertDelivery);
 
             		if(evalMeasure.totalCost > Double.MAX_VALUE) {
             			evalMeasure.totalCost = Double.MAX_VALUE;
@@ -57,37 +55,37 @@ public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
             		// if a better insertion is found, set the position to insert in the move and update the minimum cost found
             		if (evalMeasure.totalCost < first) {
             			//log.info(varCost.checkFeasible());
-            			bestCusP = i;
-            			bestRouteP = j;
+            			bestInsertPos = i;
+            			bestRouteIndex = routeIndex;
             			second = first;
             			first = evalMeasure.totalCost;
-            		}else if(evalMeasure.totalCost < second && evalMeasure.totalCost != first) {
+            		} else if(evalMeasure.totalCost < second && evalMeasure.totalCost != first) {
             			second = evalMeasure.totalCost;
             		}
             	}
         	}
-        	bestPoses.add(new BestPos(insertDelivery, bestCusP, bestRouteP, second - first));
+        	bestPoses.add(new BestPos(insertDelivery, bestInsertPos, bestRouteIndex, second - first));
 		}
 		Collections.sort(bestPoses);
 		
 		for(BestPos bp : bestPoses) {
-			sol.insertCustomer(bp.bestCustomerPos, bp.bestRoutePos, bp.insertDelivery);
+			sol.insertStop(bp.bestRouteIndex, bp.bestInsertPos, bp.insertDelivery);
 		}
         return sol;
     }
 }
 
 class BestPos implements Comparable<BestPos>{
-	public int bestRoutePos;
-	public int bestCustomerPos;
+	public int bestRouteIndex;
+	public int bestInsertPos;
 	public Delivery insertDelivery;
 	public double deltaCost;
 
 	
-	public BestPos(Delivery insertDelivery, int customer, int route, double f) {
+	public BestPos(Delivery insertDelivery, int bestInsertPos, int bestRouteIndex, double f) {
 		this.insertDelivery = insertDelivery;
-		this.bestRoutePos = customer;
-		this.bestCustomerPos = route;
+		this.bestRouteIndex = bestRouteIndex;
+		this.bestInsertPos = bestInsertPos;
 		this.deltaCost = f;
 	}
 	
