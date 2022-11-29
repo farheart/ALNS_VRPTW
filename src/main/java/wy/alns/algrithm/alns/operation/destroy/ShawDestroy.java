@@ -19,7 +19,7 @@ import java.util.Collections;
 public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	@Override
 	public ALNSSolution destroy(ALNSSolution sol, int removeNr) {
-		if (!checkSolution(sol)) {
+		if (!isDestroyReady(sol)) {
 			return sol;
 		}
 
@@ -67,7 +67,7 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 		DistanceDict distanceDict = sol.instance.getDistanceDict();
 		// double[][] distanceDict = sol.instance.getDistanceMatrix();
 		
-		while(sol.removalCustomers.size() < removeNr ) {
+		while(sol.removeSet.size() < removeNr ) {
 			double minRelate = Double.MAX_VALUE;
 			for(int j = 0; j < sol.routes.size(); j++) {
 	        	for (int i = 1; i < sol.routes.get(j).getServiceList().size() - 1; ++i) {

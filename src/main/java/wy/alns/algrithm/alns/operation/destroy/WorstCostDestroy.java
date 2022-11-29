@@ -17,7 +17,7 @@ import java.util.Collections;
 public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	@Override
 	public ALNSSolution destroy(ALNSSolution sol, int removeNr) {
-		if (!checkSolution(sol)) {
+		if (!isDestroyReady(sol)) {
 			return sol;
 		}
         

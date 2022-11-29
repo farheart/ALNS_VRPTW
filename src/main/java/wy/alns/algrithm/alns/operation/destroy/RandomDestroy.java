@@ -5,9 +5,10 @@ import wy.alns.algrithm.alns.ALNSSolution;
 import wy.alns.util.RandomUtil;
 import wy.alns.vo.Route;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * RandomDestroy
@@ -18,33 +19,30 @@ import java.util.Random;
 @Slf4j
 public class RandomDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	@Override
-	public ALNSSolution destroy(ALNSSolution sol, int removeNr) {
-		if (!checkSolution(sol)) {
+	public ALNSSolution destroy(ALNSSolution sol, int removeNum) {
+		if (!isDestroyReady(sol)) {
 			return sol;
 		}
 
-		while(sol.removalCustomers.size() < removeNr) {
-			Random r = RandomUtil.getRandom();
-			
-    		ArrayList<Integer> routeList= new ArrayList<Integer>();
-            for(int j = 0; j < sol.routes.size(); j++) {
-                routeList.add(j);
-			}
-            Collections.shuffle(routeList);  
-            
-			// Select a route to remove customer from
-			int removeRouteIndex = routeList.remove(0);
-			Route removeRoute = sol.routes.get(removeRouteIndex);
-			
-			while(removeRoute.getServiceList().size() <= 2) {
-				removeRouteIndex = routeList.remove(0);
-				removeRoute = sol.routes.get(removeRouteIndex);
-			}
-			
-			// Select customer
+		Random r = RandomUtil.getRandom();
+		while(sol.removeSet.size() < removeNum) {
+			// filter valid route index
+			List<Integer> inxList = IntStream
+					.range(0, sol.routes.size())   // [0, sol.routes.size-1]
+					.boxed()
+					.filter(i -> sol.routes.get(i).getServiceList().size() > 2)
+					.collect(Collectors.toList());
+
+			// Select a route to remove stop from
+			int ii = r.nextInt(inxList.size());
+			int rIndex = inxList.get(ii);
+			Route removeRoute = sol.routes.get(rIndex);
+
+			// Select a stop
 			int removePos = r.nextInt(removeRoute.getServiceList().size() - 2) + 1;
 			sol.removeStop(removeRoute, removePos);
 		}
+
 		return sol;
 	}
 

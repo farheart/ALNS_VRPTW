@@ -28,10 +28,10 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     	
     	// 获取随机数
     	Random r = RandomUtil.getRandom();
-    	int insertNum = sol.removalCustomers.size();
+    	int insertNum = sol.removeSet.size();
     	
     	for (int i = 0; i < insertNum; i++) {
-    		Delivery insertDelivery = sol.removalCustomers.remove(0);
+    		Delivery insertDelivery = sol.removeSet.remove(0);
     		
     		// 随机决定查找多少条路径
     		int randomRouteNr = r.nextInt(sol.routes.size() - 1) + 1;

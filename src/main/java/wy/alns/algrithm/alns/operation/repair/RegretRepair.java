@@ -27,11 +27,11 @@ public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
     	
     	ArrayList<BestPos> bestPoses = new ArrayList<BestPos>();
     	
-    	int removeNr = sol.removalCustomers.size();
+    	int removeNr = sol.removeSet.size();
     	
 		for(int k = 0; k < removeNr; k++) {
 			
-			Delivery insertDelivery = sol.removalCustomers.remove(0);
+			Delivery insertDelivery = sol.removeSet.remove(0);
 			
 			double first,second;
 			int bestInsertPos = -1;

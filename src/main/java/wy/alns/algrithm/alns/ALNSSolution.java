@@ -26,7 +26,7 @@ public class ALNSSolution {
 	
 	public static final double penalty = 1000;
 	
-	public ArrayList<Delivery> removalCustomers;
+	public ArrayList<Delivery> removeSet;
 
     private ALNSSolution(Instance instance) {
         this.instance = instance;
@@ -38,7 +38,7 @@ public class ALNSSolution {
         this.alpha = penalty;
         this.beta = penalty;
         
-        this.removalCustomers = new ArrayList<>();
+        this.removeSet = new ArrayList<>();
     }
     
     public ALNSSolution(Solution sol, Instance instance) {
@@ -64,7 +64,7 @@ public class ALNSSolution {
             this.routes.add(route.cloneRoute());
         }
         
-        this.removalCustomers = new ArrayList<Delivery>();
+        this.removeSet = new ArrayList<Delivery>();
     }
 
 
@@ -86,12 +86,11 @@ public class ALNSSolution {
 		this.measure.loadViolation -= route.getMeasure().loadViolation;
 		this.measure.timeViolation -= route.getMeasure().timeViolation;
 		
-		removalCustomers.add((Delivery) route.removeNode(removePos));
+		removeSet.add((Delivery) route.removeNode(removePos));
 	}
 
 
 	public void insertStop(Route route, int insertPos, Delivery stop) {
-		// Route route = this.routes.get(routeIndex);
 		Measure tmp = doInsert(stop, insertPos, route);
 
 		route.getMeasure().distance += tmp.getDistance();
