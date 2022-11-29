@@ -16,29 +16,31 @@ import java.util.Collections;
 @Slf4j
 public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	@Override
-	public ALNSSolution destroy(ALNSSolution sol, int removeNr) {
+	public ALNSSolution destroy(ALNSSolution sol, int removeNum) {
 		if (!isDestroyReady(sol)) {
 			return sol;
 		}
         
-		// 计算fitness值，对客户进行评估。
-		ArrayList<Fitness> customerFitness = new  ArrayList<Fitness>();
+		// Calculate fitness of stops
+		ArrayList<Fitness> fitnessList = new ArrayList<Fitness>();
         for(Route route : sol.routes) {
 			for (int i = 1; i < route.getServiceList().size() - 1; ++i) {
-				Delivery customer = (Delivery) route.getServiceList().get(i);
-				double fitness = Fitness.calculateFitness(sol.instance, customer, route);
-				customerFitness.add(new Fitness(customer.getId(), fitness));
+				Delivery stop = (Delivery) route.getServiceList().get(i);
+				Fitness fitness = Fitness.calculateFitness(sol.instance, stop, route);
+				fitnessList.add(fitness);
 			}
     	}
-        Collections.sort(customerFitness);
+        Collections.sort(fitnessList);
 
-        ArrayList<Integer> removal = new ArrayList<Integer>();
-        for(int i = 0; i < removeNr; ++i) removal.add(customerFitness.get(i).customerNo);
+        ArrayList<Integer> idList = new ArrayList<Integer>();
+        for(int i = 0; i < removeNum; ++i) {
+			idList.add(fitnessList.get(i).stopId);
+		}
         
         for(int j = 0; j < sol.routes.size(); j++) {
         	for (int i = 0; i < sol.routes.get(j).getServiceList().size(); ++i) {
-        		Service customer = sol.routes.get(j).getServiceList().get(i);
-        		if(removal.contains(customer.getId())) {
+        		Service stop = sol.routes.get(j).getServiceList().get(i);
+        		if(idList.contains(stop.getId())) {
         			sol.removeStop(sol.routes.get(j), i);
         		}	
         	} 
@@ -48,29 +50,28 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
 }
 
 class Fitness implements Comparable<Fitness>{
-	public int customerNo;
+	public int stopId;
 	public double fitness;
 	
-	public Fitness(int cNo, double f) {
-		customerNo = cNo;
+	private Fitness(int stopID, double f) {
+		stopId = stopID;
 		fitness = f;
 	}
 	
-	public static double calculateFitness(Instance instance, Delivery customer, Route route) {
+	public static Fitness calculateFitness(Instance instance, Delivery stop, Route route) {
 		DistanceDict distanceDict = instance.getDistanceDict();
 
-		Service n0 = route.getServiceList().get(0);
-		double v = route.getMeasure().getTimeViolation() + route.getMeasure().getLoadViolation() + customer.getAmount();
-		double distFactor = distanceDict.between(customer, n0) + distanceDict.between(n0, customer);
+		Service depot = route.getServiceList().get(0);
+		double v = route.getMeasure().getTimeViolation() + route.getMeasure().getLoadViolation() + stop.getAmount();
+		double distFactor = distanceDict.between(stop, depot) + distanceDict.between(depot, stop);
 		double fitness = v * distFactor;
 
-		return fitness;
+		return new Fitness(stop.getId(), fitness);
 	}
 	
 	@Override
-	public int compareTo(Fitness o) {
-		Fitness s = (Fitness) o;
-		if (s.fitness > this.fitness  ) {
+	public int compareTo(Fitness s) {
+		if (s.fitness > this.fitness) {
 			return 1;
 		} else if (this.fitness == s.fitness) {
 			return 0;

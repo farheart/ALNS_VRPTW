@@ -4,6 +4,7 @@ import wy.alns.algrithm.solution.Solution;
 import wy.alns.vo.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -31,7 +32,7 @@ public class ALNSSolution {
     private ALNSSolution(Instance instance) {
         this.instance = instance;
 
-        this.routes = new ArrayList<>();
+        this.routes = new LinkedList<>();
         this.measure = new Measure();
         this.numVehicle = 0;
 
