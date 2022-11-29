@@ -66,33 +66,32 @@ public class ALNSSolution {
         
         this.removalCustomers = new ArrayList<Delivery>();
     }
-    
-	public void removeCustomer(int routePosition, int cusPosition) {
+
+
+	public void removeStop(Route route, int removePos) {
 		//TODO : duplicated TW
 		DistanceDict distanceDict = instance.getDistanceDict();
 
-		Route route = this.routes.get(routePosition);
-
-		Service n0 = route.getServiceList().get(cusPosition - 1);
-		Delivery n = (Delivery) route.getServiceList().get(cusPosition);
-		Service n1 = route.getServiceList().get(cusPosition + 1);
+		Service n0 = route.getServiceList().get(removePos - 1);
+		Delivery n = (Delivery) route.getServiceList().get(removePos);
+		Service n1 = route.getServiceList().get(removePos + 1);
 
 		double dist = distanceDict.between(n0, n1) - distanceDict.between(n0, n) - distanceDict.between(n, n1);
 		double amount = -n.getAmount();
 
-		this.measure.distance += dist;
 		route.getMeasure().distance += dist;
 		route.getMeasure().amount += amount;
 
+		this.measure.distance += dist;
 		this.measure.loadViolation -= route.getMeasure().loadViolation;
 		this.measure.timeViolation -= route.getMeasure().timeViolation;
 		
-		removalCustomers.add((Delivery) route.removeNode(cusPosition));
+		removalCustomers.add((Delivery) route.removeNode(removePos));
 	}
 
 
-	public void insertStop(int routeIndex, int insertPos, Delivery stop) {
-		Route route = this.routes.get(routeIndex);
+	public void insertStop(Route route, int insertPos, Delivery stop) {
+		// Route route = this.routes.get(routeIndex);
 		Measure tmp = doInsert(stop, insertPos, route);
 
 		route.getMeasure().distance += tmp.getDistance();
@@ -107,9 +106,9 @@ public class ALNSSolution {
 	}
 
 
-	public Measure evaluateInsertCustomer(int routeIndex, int insertPos, Delivery stop) {
-		Route route = this.routes.get(routeIndex).cloneRoute();
-		Measure tmp = doInsert(stop, insertPos, route);
+	public Measure evalInsertStop(Route route, int insertPos, Delivery stop) {
+		Route tmpRoute = route.cloneRoute();
+		Measure tmp = doInsert(stop, insertPos, tmpRoute);
 
 		Measure evalMeasure = new Measure(this.measure);
 		evalMeasure.distance += tmp.getDistance();
@@ -169,9 +168,6 @@ public class ALNSSolution {
 	}
 
 
-
-
-
 	public boolean isFeasible() {
 		return (measure.timeViolation < 0.01 && measure.loadViolation < 0.01);
 	}
@@ -191,7 +187,8 @@ public class ALNSSolution {
 		
 		return sol;
 	}
-        
+
+
     @Override
     public String toString() {
         String result = "Solution{" +
@@ -204,15 +201,6 @@ public class ALNSSolution {
 
         return result + "]}";
     }
-    
-	public int compareTo(ALNSSolution arg0) {
-		if (this.measure.totalCost >  arg0.measure.totalCost) {
-			return 1;
-		} else if (this.measure == arg0.measure) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
+
 
 }

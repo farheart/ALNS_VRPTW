@@ -37,7 +37,7 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     		int randomRouteNr = r.nextInt(sol.routes.size() - 1) + 1;
     		
     		// 最优插入方案
-    		int bestRouteIndex = -1;
+    		Route bestRoute = null;
     		int bestInsertPos = -1;
     		Measure bestMeasure = new Measure();
     		bestMeasure.totalCost = Double.MAX_VALUE;
@@ -72,17 +72,17 @@ public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
     				int insertPos = customerList.remove(0);
     				
     				// 评价插入情况
-    				Measure evalMeasure = sol.evaluateInsertCustomer(routeIndex, insertPos, insertDelivery);
+    				Measure evalMeasure = sol.evalInsertStop(insertRoute, insertPos, insertDelivery);
 
     				// 更新最优插入位置
     				if (evalMeasure.totalCost < bestMeasure.totalCost) {
-    					bestRouteIndex = routeIndex;
+    					bestRoute = insertRoute;
     					bestInsertPos = insertPos;
     					bestMeasure = evalMeasure;
     				}
     			}
     			// 执行插入操作
-    			sol.insertStop(bestRouteIndex, bestInsertPos, insertDelivery);
+    			sol.insertStop(bestRoute, bestInsertPos, insertDelivery);
     		}
     	}
 		return sol;

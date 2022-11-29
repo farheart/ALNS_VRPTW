@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import wy.alns.vo.Delivery;
 import wy.alns.vo.Measure;
 import wy.alns.algrithm.alns.ALNSSolution;
+import wy.alns.vo.Route;
 
 /**
  * GreedyRepair
@@ -24,20 +25,21 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
 		for(int k = 0; k < removeNr; k++) {
 			Delivery insertDelivery = sol.removalCustomers.remove(0);
 			
-			double bestCost;
+			double bestCost = 0;
 			int bestInsertPos = -1;
-			int bestRouteIndex = -1;
+			Route bestRoute = null;
 			bestCost = Double.POSITIVE_INFINITY;
         	
 			for(int routeIndex = 0; routeIndex < sol.routes.size(); routeIndex++) {
-				if(sol.routes.get(routeIndex).getServiceList().size() < 1) {
+				Route route = sol.routes.get(routeIndex);
+				if(route.getServiceList().size() < 1) {
         			continue;
         		}
         		
 				// 寻找最优插入位置
-            	for (int i = 1; i < sol.routes.get(routeIndex).getServiceList().size() - 1; ++i) {
+            	for (int i = 1; i < route.getServiceList().size() - 1; ++i) {
             		// 评价插入情况
-    				Measure evalMeasure = sol.evaluateInsertCustomer(routeIndex, i, insertDelivery);
+    				Measure evalMeasure = sol.evalInsertStop(route, i, insertDelivery);
 
             		if(evalMeasure.totalCost > Double.MAX_VALUE) {
             			evalMeasure.totalCost = Double.MAX_VALUE;
@@ -47,12 +49,12 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
             		if (evalMeasure.totalCost < bestCost) {
             			//log.info(varCost.checkFeasible());
             			bestInsertPos = i;
-            			bestRouteIndex = routeIndex;
+            			bestRoute = route;
             			bestCost = evalMeasure.totalCost;
             		}
             	}
         	}
-			sol.insertStop(bestRouteIndex, bestInsertPos, insertDelivery);
+			sol.insertStop(bestRoute, bestInsertPos, insertDelivery);
 		}
         return sol;
     }

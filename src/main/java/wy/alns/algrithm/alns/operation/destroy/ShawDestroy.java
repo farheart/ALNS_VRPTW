@@ -35,32 +35,32 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
         Collections.shuffle(routeList);  
         
 		// 选择被移除客户所在的路径
-		int removenRoutePosition = routeList.remove(0);
-		Route removenRoute = sol.routes.get(removenRoutePosition);
+		int removeRouteIndex = routeList.remove(0);
+		Route removeRoute = sol.routes.get(removeRouteIndex);
 		
-		while(removenRoute.getServiceList().size() <= 2) {
-			removenRoutePosition = routeList.remove(0);
-			removenRoute = sol.routes.get(removenRoutePosition);
+		while(removeRoute.getServiceList().size() <= 2) {
+			removeRouteIndex = routeList.remove(0);
+			removeRoute = sol.routes.get(removeRouteIndex);
 		}
 		
 		ArrayList<Integer> cusList= new ArrayList<Integer>();
-        for(int j = 1; j < removenRoute.getServiceList().size() - 1; j++)
+        for(int j = 1; j < removeRoute.getServiceList().size() - 1; j++)
         	cusList.add(j);  
         
         Collections.shuffle(cusList);  
         
 		// 选择被移除客户所在的路径
-		int removenCusPosition = cusList.remove(0);
-		Delivery removenCus = (Delivery) removenRoute.getServiceList().get(removenCusPosition);
+		int removePos = cusList.remove(0);
+		Delivery removeStop = (Delivery) removeRoute.getServiceList().get(removePos);
 		
-		while(removenRoute.getServiceList().size() <= 2) {
-			removenCusPosition = cusList.remove(0);
-			removenCus = (Delivery) removenRoute.getServiceList().get(removenCusPosition);
+		while(removeRoute.getServiceList().size() <= 2) {
+			removePos = cusList.remove(0);
+			removeStop = (Delivery) removeRoute.getServiceList().get(removePos);
 		}
-		sol.removeCustomer(removenRoutePosition, removenCusPosition);
+		sol.removeStop(removeRoute, removePos);
 		
-		lastRemove = removenCus;
-		lastRoute = removenRoute;
+		lastRemove = removeStop;
+		lastRoute = removeRoute;
 		lastRemovePos = -1;
 		lastRoutePos = -1;
 
@@ -89,7 +89,7 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	        		}
 	        	}
 	    	}
-			sol.removeCustomer(lastRoutePos, lastRemovePos);
+			sol.removeStop(lastRoute, lastRemovePos);
 		}
         return sol;
     }

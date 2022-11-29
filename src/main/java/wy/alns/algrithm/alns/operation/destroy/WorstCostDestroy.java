@@ -39,7 +39,7 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
         	for (int i = 0; i < sol.routes.get(j).getServiceList().size(); ++i) {
         		Service customer = sol.routes.get(j).getServiceList().get(i);
         		if(removal.contains(customer.getId())) {
-        			sol.removeCustomer(j, i);
+        			sol.removeStop(sol.routes.get(j), i);
         		}	
         	} 
     	}
