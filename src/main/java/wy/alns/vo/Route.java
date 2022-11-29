@@ -2,7 +2,7 @@ package wy.alns.vo;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,7 +33,7 @@ public class Route {
     public Route(String id, Vehicle v) {
         this.id = id;
         this.vehicle = v;
-        this.serviceList = new ArrayList<>();
+        this.serviceList = new LinkedList<>();
         this.measure = new Measure();
     }
 
@@ -41,7 +41,7 @@ public class Route {
     public Route cloneRoute() {
         Route result = new Route(this.id, this.vehicle);
         result.measure = new Measure(this.measure);
-        result.serviceList = new ArrayList<>(this.serviceList);
+        result.serviceList = new LinkedList<>(this.serviceList);
         return result;
     }
 

@@ -29,10 +29,10 @@ public class ALNSSolver {
 
     public Solution solve(Instance instance, ALNSConfig config) {
         Solution initSol = this.getInitialSolution(instance);
-        log.info(">> Init Solution : " + initSol.toString());
+        // log.info(">> Init Solution : " + initSol.toString());
 
         Solution sol = this.improveSolution(initSol, config, instance);
-        log.info(">> Solution : " + sol.toString());
+        // log.info(">> Solution : " + sol.toString());
 
         SolutionValidator solutionValidator = new SolutionValidator(instance);
         log.info(">> Validation : \n" + solutionValidator.Check(sol));

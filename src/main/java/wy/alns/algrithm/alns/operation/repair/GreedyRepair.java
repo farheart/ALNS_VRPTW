@@ -21,8 +21,8 @@ public class GreedyRepair extends ALNSAbstractRepair implements IALNSRepair {
 			return sol;
 		}
     	
-    	int removeNr = sol.removeSet.size();
-		for(int k = 0; k < removeNr; k++) {
+    	int removeNum = sol.removeSet.size();
+		for(int k = 0; k < removeNum; k++) {
 			Delivery insertDelivery = sol.removeSet.remove(0);
 			
 			double bestCost = 0;

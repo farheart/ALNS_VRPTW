@@ -27,45 +27,50 @@ public class ALNSSolution {
 	
 	public static final double penalty = 1000;
 	
-	public ArrayList<Delivery> removeSet;
+	public List<Delivery> removeSet;
 
     private ALNSSolution(Instance instance) {
         this.instance = instance;
 
-        this.routes = new LinkedList<>();
         this.measure = new Measure();
         this.numVehicle = 0;
+
+        this.routes = new LinkedList<>();
 
         this.alpha = penalty;
         this.beta = penalty;
         
-        this.removeSet = new ArrayList<>();
+        this.removeSet = new LinkedList<>();
     }
     
     public ALNSSolution(Solution sol, Instance instance) {
 		this(instance);
-        this.numVehicle = sol.getNumVehicle();
+
         measure.distance = sol.getTotalCost();
         measure.calculateTotalCost();
+        this.numVehicle = sol.getNumVehicle();
+
         for (Route route: sol.getRoutes()) {
             this.routes.add(route.cloneRoute());
         }
     }
     
     public ALNSSolution(ALNSSolution sol) {
+        this.instance = sol.instance;
+
     	this.measure = new Measure(sol.measure);
         this.numVehicle = sol.numVehicle;
-        this.instance = sol.instance;
-        
-        this.alpha = sol.alpha;
-        this.beta = sol.beta;
+
 
         this.routes = new ArrayList<>();
         for (Route route: sol.routes) {
             this.routes.add(route.cloneRoute());
         }
-        
-        this.removeSet = new ArrayList<Delivery>();
+
+        this.alpha = sol.alpha;
+        this.beta = sol.beta;
+
+		this.removeSet = new LinkedList<>();
     }
 
 

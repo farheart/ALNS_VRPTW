@@ -6,6 +6,7 @@ import wy.alns.vo.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * WorstCostDestroy
@@ -32,15 +33,15 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
     	}
         Collections.sort(fitnessList);
 
-        ArrayList<Integer> idList = new ArrayList<Integer>();
+        HashSet<Integer> idSet = new HashSet<Integer>();
         for(int i = 0; i < removeNum; ++i) {
-			idList.add(fitnessList.get(i).stopId);
+			idSet.add(fitnessList.get(i).stopId);
 		}
         
         for(int j = 0; j < sol.routes.size(); j++) {
         	for (int i = 0; i < sol.routes.get(j).getServiceList().size(); ++i) {
         		Service stop = sol.routes.get(j).getServiceList().get(i);
-        		if(idList.contains(stop.getId())) {
+        		if(idSet.contains(stop.getId())) {
         			sol.removeStop(sol.routes.get(j), i);
         		}	
         	} 
