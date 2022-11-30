@@ -1,7 +1,6 @@
 package wy.alns.algrithm.alns;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.solution.Solution;
 import wy.alns.algrithm.alns.operation.IALNSOperation;
 import wy.alns.algrithm.alns.operation.destroy.IALNSDestroy;
 import wy.alns.algrithm.alns.operation.destroy.RandomDestroy;
@@ -11,9 +10,8 @@ import wy.alns.algrithm.alns.operation.repair.GreedyRepair;
 import wy.alns.algrithm.alns.operation.repair.IALNSRepair;
 import wy.alns.algrithm.alns.operation.repair.RandomRepair;
 import wy.alns.algrithm.alns.operation.repair.RegretRepair;
+import wy.alns.algrithm.solution.Solution;
 import wy.alns.vo.Instance;
-
-import java.util.Random;
 
 
 /**
@@ -52,6 +50,8 @@ public class ALNS {
 
     private int iteration = 0;
 
+    public static int invalidIterCount = 0;
+
     // time
     private double T;
 
@@ -81,14 +81,13 @@ public class ALNS {
         while (true) {
         	// Generate new solution from local best solution s_c
             ALNSResult newSol = new ALNSResult(localBestSol);
-            int q = getQ(newSol);
             
             // Find the best operators
             IALNSDestroy destroyOperator = this.chooseOperatorByChance(this.destroyOperators);
             IALNSRepair repairOperator = this.chooseOperatorByChance(this.repairOperators);
 
             // destroy then repair
-            ALNSResult solDestroy = destroyOperator.destroy(newSol, q);
+            ALNSResult solDestroy = destroyOperator.destroy(newSol);
             ALNSResult solRepair = repairOperator.repair(solDestroy);
 
             log.info(">> Iteration : " + iteration + ", Current TotalCost : " + solRepair.measure.totalCost);
@@ -178,15 +177,6 @@ public class ALNS {
 
     private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(ALNSResult s_t) {
         return Math.exp(-(s_t.measure.totalCost - localBestSol.measure.totalCost) / T);
-    }
-
-
-    private int getQ(ALNSResult sol) {
-        int q_l = Math.min((int) Math.ceil(0.05 * sol.instance.getOrderNum()), 10);
-        int q_u = Math.min((int) Math.ceil(0.20 * sol.instance.getOrderNum()), 30);
-
-        Random r = new Random();
-        return r.nextInt(q_u - q_l + 1) + q_l;
     }
 
 

@@ -17,36 +17,36 @@ import java.util.HashSet;
 @Slf4j
 public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	@Override
-	public ALNSResult destroy(ALNSResult sol, int removeNum) {
-		if (!isDestroyReady(sol)) {
-			return sol;
+	public ALNSResult destroy(ALNSResult result) {
+		if (!isDestroyReady(result)) {
+			return result;
 		}
         
 		// Calculate fitness of stops
 		ArrayList<Fitness> fitnessList = new ArrayList<Fitness>();
-        for(Route route : sol.routes) {
+        for(Route route : result.routes) {
 			for (int i = 1; i < route.getServiceList().size() - 1; ++i) {
 				Delivery stop = (Delivery) route.getServiceList().get(i);
-				Fitness fitness = Fitness.calculateFitness(sol.instance, stop, route);
+				Fitness fitness = Fitness.calculateFitness(result.instance, stop, route);
 				fitnessList.add(fitness);
 			}
     	}
         Collections.sort(fitnessList);
 
         HashSet<Integer> idSet = new HashSet<Integer>();
-        for(int i = 0; i < removeNum; ++i) {
+        for(int i = 0; i < this.findNumToRemove(result); ++i) {
 			idSet.add(fitnessList.get(i).stopId);
 		}
         
-        for(int j = 0; j < sol.routes.size(); j++) {
-        	for (int i = 0; i < sol.routes.get(j).getServiceList().size(); ++i) {
-        		Service stop = sol.routes.get(j).getServiceList().get(i);
+        for(int j = 0; j < result.routes.size(); j++) {
+        	for (int i = 0; i < result.routes.get(j).getServiceList().size(); ++i) {
+        		Service stop = result.routes.get(j).getServiceList().get(i);
         		if(idSet.contains(stop.getId())) {
-        			sol.removeStop(sol.routes.get(j), i);
+        			result.removeStop(result.routes.get(j), i);
         		}	
         	} 
     	}
-        return sol;
+        return result;
     }
 }
 

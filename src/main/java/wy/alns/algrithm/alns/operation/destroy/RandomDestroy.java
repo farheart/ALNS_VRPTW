@@ -18,23 +18,23 @@ import java.util.stream.IntStream;
 @Slf4j
 public class RandomDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	@Override
-	public ALNSResult destroy(ALNSResult sol, int removeNum) {
-		if (!isDestroyReady(sol)) {
-			return sol;
+	public ALNSResult destroy(ALNSResult result) {
+		if (!isDestroyReady(result)) {
+			return result;
 		}
 
-		while(sol.removeSet.size() < removeNum) {
+		while(result.removeSet.size() < this.findNumToRemove(result)) {
 			// Select a route to remove stop from
-			Route removeRoute = findRandomRoute(sol);
+			Route removeRoute = findRandomRoute(result);
 
 			// Select a stop
 			int removePos = RandomUtil.getRandom().nextInt(removeRoute.getServiceList().size() - 2) + 1;
 
 			// do remove
-			sol.removeStop(removeRoute, removePos);
+			result.removeStop(removeRoute, removePos);
 		}
 
-		return sol;
+		return result;
 	}
 
 

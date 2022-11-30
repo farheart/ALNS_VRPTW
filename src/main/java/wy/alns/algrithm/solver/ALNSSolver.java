@@ -37,6 +37,8 @@ public class ALNSSolver {
         SolutionValidator solutionValidator = new SolutionValidator(instance);
         log.info(">> Validation : \n" + solutionValidator.Check(sol));
 
+        log.info(">> Invalid Iters : {}", ALNS.invalidIterCount);
+
         return sol;
     }
 }
