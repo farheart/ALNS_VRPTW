@@ -90,7 +90,7 @@ public class ALNS {
             ALNSResult solDestroy = destroyOperator.destroy(newSol);
             ALNSResult solRepair = repairOperator.repair(solDestroy);
 
-            log.info(">> Iteration : " + iteration + ", Current TotalCost : " + solRepair.measure.totalCost);
+            log.info(">> " + iteration + " - TotalCost : " + solRepair.measure.totalCost);
             
             // Update local best solution
             if (solRepair.measure.totalCost < localBestSol.measure.totalCost) {

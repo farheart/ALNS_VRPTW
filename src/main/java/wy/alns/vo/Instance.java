@@ -29,6 +29,8 @@ public class Instance {
      */
     private Collection<Delivery> deliverySet;
 
+    private int deliveryNum;
+
     /**
      * Depot where all vehicles depart from
      */
@@ -53,6 +55,7 @@ public class Instance {
         List<String> dataLineList = this.loadDataLines(size, name);
         this.vehicleList = this.loadVehicle(dataLineList);
         this.deliverySet = this.loadDelivery(dataLineList);
+        this.deliveryNum = this.deliverySet.size();
         this.depot = this.loadDepot(dataLineList);
 
         this.distanceDict = new DistanceDict(this);
@@ -186,11 +189,6 @@ public class Instance {
             }
         }
         return result;
-    }
-
-
-    public int getOrderNum() {
-        return this.deliverySet.size();
     }
 
 }

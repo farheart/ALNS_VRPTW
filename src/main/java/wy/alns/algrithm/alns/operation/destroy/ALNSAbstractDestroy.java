@@ -18,9 +18,10 @@ abstract class ALNSAbstractDestroy extends ALNSAbstractOperation {
 
 
     protected int findNumToRemove(ALNSResult result) {
-        int q_l = Math.min((int) Math.ceil(0.05 * result.instance.getOrderNum()), 10);
-        int q_u = Math.min((int) Math.ceil(0.20 * result.instance.getOrderNum()), 30);
-        return RandomUtil.getRandom().nextInt(q_u - q_l + 1) + q_l;
+        int q_l = Math.min((int) Math.ceil(0.05 * result.instance.getDeliveryNum()), 10);
+        int q_u = Math.min((int) Math.ceil(0.20 * result.instance.getDeliveryNum()), 30);
+        int num = RandomUtil.getRandom().nextInt(q_u - q_l + 1) + q_l;
+        return num;
     }
 
 }

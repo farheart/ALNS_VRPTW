@@ -34,7 +34,8 @@ public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestro
         Collections.sort(fitnessList);
 
         HashSet<Integer> idSet = new HashSet<Integer>();
-        for(int i = 0; i < this.findNumToRemove(result); ++i) {
+		int numToRemove = this.findNumToRemove(result);
+        for(int i = 0; i < numToRemove; ++i) {
 			idSet.add(fitnessList.get(i).stopId);
 		}
         

@@ -23,7 +23,8 @@ public class RandomDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 			return result;
 		}
 
-		while(result.removeSet.size() < this.findNumToRemove(result)) {
+		int numToRemove = this.findNumToRemove(result);
+		while(result.removeSet.size() < numToRemove) {
 			// Select a route to remove stop from
 			Route removeRoute = findRandomRoute(result);
 

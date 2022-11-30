@@ -35,7 +35,9 @@ public class ShawDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 		Route lastRoute = removeRoute;
 		int lastRemovePos = -1;
 
-		while(result.removeSet.size() < this.findNumToRemove(result)) {
+
+		int numToRemove = this.findNumToRemove(result);
+		while(result.removeSet.size() < numToRemove) {
 			double minRelate = Double.MAX_VALUE;
 			for(int j = 0; j < result.routes.size(); j++) {
 	        	for (int i = 1; i < result.routes.get(j).getServiceList().size() - 1; ++i) {

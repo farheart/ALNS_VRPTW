@@ -23,8 +23,8 @@ public class Test {
 
     private static void test_1() {
         String instanceName = "C101";
-        String instanceType = "Solomon";  // Type: Homberger / Solomon
         int size = 25;  // Number of orders£¬Solomon: 25,50,100, Homberger: 200, 400
+        String instanceType = "Solomon";  // Type: Homberger / Solomon
 
         Instance instance = new Instance(instanceName, instanceType, size);
         Solution sol = new ALNSSolver().solve(instance, ALNSConfig.DEFAULT);
