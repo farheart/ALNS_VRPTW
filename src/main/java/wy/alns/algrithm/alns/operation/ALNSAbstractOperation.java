@@ -23,14 +23,14 @@ public abstract class ALNSAbstractOperation implements IALNSOperation {
     private double w;
 
 
-    // 被使用的次数
+    // number of times being selected
     @Override
     public void drawn() {
         draws++;
     }
 
 
-    // 优化最优满意解，则增加pi值
+    // increase Pi accordingly
     @Override
     public void incPi(int pi) {
         this.pi += pi;

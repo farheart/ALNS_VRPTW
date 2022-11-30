@@ -20,40 +20,39 @@ import java.util.Collections;
 public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
 
 	@Override
-	public ALNSResult repair(ALNSResult sol) {
-		if (!isRepairReady(sol)) {
-			return sol;
+	public ALNSResult repair(ALNSResult result) {
+		if (!isRepairReady(result)) {
+			return result;
 		}
     	
-    	ArrayList<BestPos> bestPoses = new ArrayList<BestPos>();
+    	ArrayList<BestPos> posList = new ArrayList<BestPos>();
     	
-    	int removeNr = sol.removeSet.size();
+    	int insertNum = result.removeSet.size();
     	
-		for(int k = 0; k < removeNr; k++) {
+		for(int k = 0; k < insertNum; k++) {
+			Delivery insertDelivery = result.removeSet.remove(0);
 			
-			Delivery insertDelivery = sol.removeSet.remove(0);
-			
-			double first,second;
+			double first, second;
 			int bestInsertPos = -1;
 			Route bestRoute = null;
 			first = second = Double.POSITIVE_INFINITY;
         	
-			for(int routeIndex = 0; routeIndex < sol.routes.size(); routeIndex++) {
-				Route route = sol.routes.get(routeIndex);
+			for(int routeIndex = 0; routeIndex < result.routes.size(); routeIndex++) {
+				Route route = result.routes.get(routeIndex);
 				if(route.getServiceList().size() < 1) {
         			continue;
         		}
         		
-				// 寻找最优插入位置
+				// Find best insert position
             	for (int i = 1; i < route.getServiceList().size() - 1; ++i) {
-            		// 评价插入情况
-    				Measure evalMeasure =  sol.evalInsertStop(route, i, insertDelivery);
+            		// evaluate
+    				Measure evalMeasure =  result.evalInsertStop(route, i, insertDelivery);
 
-            		if(evalMeasure.totalCost > Double.MAX_VALUE) {
-            			evalMeasure.totalCost = Double.MAX_VALUE;
-            		}
+//            		if(evalMeasure.totalCost > Double.MAX_VALUE) {
+//            			evalMeasure.totalCost = Double.MAX_VALUE;
+//            		}
             		
-            		// if a better insertion is found, set the position to insert in the move and update the minimum cost found
+            		// if a better insertion is found, save it
             		if (evalMeasure.totalCost < first) {
             			//log.info(varCost.checkFeasible());
             			bestInsertPos = i;
@@ -65,14 +64,14 @@ public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
             		}
             	}
         	}
-        	bestPoses.add(new BestPos(insertDelivery, bestInsertPos, bestRoute, second - first));
+        	posList.add(new BestPos(insertDelivery, bestInsertPos, bestRoute, second - first));
 		}
-		Collections.sort(bestPoses);
+		Collections.sort(posList);
 		
-		for(BestPos bp : bestPoses) {
-			sol.insertStop(bp.bestRoute, bp.bestInsertPos, bp.insertDelivery);
+		for(BestPos bp : posList) {
+			result.insertStop(bp.bestRoute, bp.bestInsertPos, bp.insertDelivery);
 		}
-        return sol;
+        return result;
     }
 }
 
