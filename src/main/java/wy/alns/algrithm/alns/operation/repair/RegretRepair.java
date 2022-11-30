@@ -1,7 +1,7 @@
 package wy.alns.algrithm.alns.operation.repair;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.alns.ALNSSolution;
+import wy.alns.algrithm.alns.ALNSResult;
 import wy.alns.vo.Delivery;
 import wy.alns.vo.Measure;
 import wy.alns.vo.Route;
@@ -20,8 +20,8 @@ import java.util.Collections;
 public class RegretRepair extends ALNSAbstractRepair implements IALNSRepair {
 
 	@Override
-	public ALNSSolution repair(ALNSSolution sol) {
-		if (!checkSolution(sol)) {
+	public ALNSResult repair(ALNSResult sol) {
+		if (!isRepairReady(sol)) {
 			return sol;
 		}
     	

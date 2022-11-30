@@ -1,7 +1,7 @@
 package wy.alns.algrithm.alns.operation.destroy;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.alns.ALNSSolution;
+import wy.alns.algrithm.alns.ALNSResult;
 import wy.alns.vo.*;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.HashSet;
 @Slf4j
 public class WorstCostDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 	@Override
-	public ALNSSolution destroy(ALNSSolution sol, int removeNum) {
+	public ALNSResult destroy(ALNSResult sol, int removeNum) {
 		if (!isDestroyReady(sol)) {
 			return sol;
 		}

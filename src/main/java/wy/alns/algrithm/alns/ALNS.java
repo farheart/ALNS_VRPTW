@@ -45,10 +45,10 @@ public class ALNS {
     private final double T_end_t = 0.01;
 
     // Global Best Solution
-    private ALNSSolution globalBestSol;
+    private ALNSResult globalBestSol;
 
     // Local Best Solution
-    private ALNSSolution localBestSol;
+    private ALNSResult localBestSol;
 
     private int iteration = 0;
 
@@ -64,8 +64,8 @@ public class ALNS {
 
     public ALNS(Solution sol, Instance instance, ALNSConfig config) {
         this.config = config;
-        this.globalBestSol = new ALNSSolution(sol, instance);
-        this.localBestSol = new ALNSSolution(this.globalBestSol);
+        this.globalBestSol = new ALNSResult(sol, instance);
+        this.localBestSol = new ALNSResult(this.globalBestSol);
 
         initOperators(this.destroyOperators);
         initOperators(this.repairOperators);
@@ -80,7 +80,7 @@ public class ALNS {
         
         while (true) {
         	// Generate new solution from local best solution s_c
-            ALNSSolution newSol = new ALNSSolution(localBestSol);
+            ALNSResult newSol = new ALNSResult(localBestSol);
             int q = getQ(newSol);
             
             // Find the best operators
@@ -88,8 +88,8 @@ public class ALNS {
             IALNSRepair repairOperator = this.chooseOperatorByChance(this.repairOperators);
 
             // destroy then repair
-            ALNSSolution solDestroy = destroyOperator.destroy(newSol, q);
-            ALNSSolution solRepair = repairOperator.repair(solDestroy);
+            ALNSResult solDestroy = destroyOperator.destroy(newSol, q);
+            ALNSResult solRepair = repairOperator.repair(solDestroy);
 
             log.info(">> Iteration : " + iteration + ", Current TotalCost : " + solRepair.measure.totalCost);
             
@@ -145,7 +145,7 @@ public class ALNS {
     }
 
 
-    private void handleWorseSolution(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSSolution s_t) {
+    private void handleWorseSolution(IALNSDestroy destroyOperator, IALNSRepair repairOperator, ALNSResult s_t) {
         // Accept worse solution by calculated probability
     	double p_accept = calculateProbabilityToAcceptTempSolutionAsNewCurrent(s_t);
         if (Math.random() < p_accept) {
@@ -165,7 +165,7 @@ public class ALNS {
     private void handleNewGlobalMinimum(
             IALNSDestroy destroyOperator,
             IALNSRepair repairOperator,
-            ALNSSolution solRepair
+            ALNSResult solRepair
     ) {
         //log.info(String.format("[%d]: Found new global minimum: %.2f, Required Vehicles: %d, I_uns: %d", i, solRepair.getCostFitness(), solRepair.activeVehicles(), s_g.getUnscheduledJobs().size()));
 
@@ -176,12 +176,12 @@ public class ALNS {
     }
 
 
-    private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(ALNSSolution s_t) {
+    private double calculateProbabilityToAcceptTempSolutionAsNewCurrent(ALNSResult s_t) {
         return Math.exp(-(s_t.measure.totalCost - localBestSol.measure.totalCost) / T);
     }
 
 
-    private int getQ(ALNSSolution sol) {
+    private int getQ(ALNSResult sol) {
         int q_l = Math.min((int) Math.ceil(0.05 * sol.instance.getOrderNum()), 10);
         int q_u = Math.min((int) Math.ceil(0.20 * sol.instance.getOrderNum()), 30);
 

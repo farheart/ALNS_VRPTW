@@ -1,15 +1,16 @@
 package wy.alns.algrithm.alns.operation.repair;
 
 import lombok.extern.slf4j.Slf4j;
-import wy.alns.algrithm.alns.ALNSSolution;
+import wy.alns.algrithm.alns.ALNSResult;
 import wy.alns.util.RandomUtil;
 import wy.alns.vo.Delivery;
 import wy.alns.vo.Measure;
 import wy.alns.vo.Route;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * RandomRepair
@@ -21,71 +22,64 @@ import java.util.Random;
 public class RandomRepair extends ALNSAbstractRepair implements IALNSRepair {
 
 	@Override
-	public ALNSSolution repair(ALNSSolution sol) {
-		if (!checkSolution(sol)) {
-			return sol;
+	public ALNSResult repair(ALNSResult result) {
+		if (!isRepairReady(result)) {
+			return result;
 		}
-    	
-    	// 获取随机数
-    	Random r = RandomUtil.getRandom();
-    	int insertNum = sol.removeSet.size();
-    	
+
+		List<Route> routeList = result.routes;
+
+    	int insertNum = result.removeSet.size();
     	for (int i = 0; i < insertNum; i++) {
-    		Delivery insertDelivery = sol.removeSet.remove(0);
-    		
-    		// 随机决定查找多少条路径
-    		int randomRouteNr = r.nextInt(sol.routes.size() - 1) + 1;
-    		
-    		// 最优插入方案
+    		Delivery insertDelivery = result.removeSet.remove(0);
+
+			// Search for the best insertion position
     		Route bestRoute = null;
     		int bestInsertPos = -1;
     		Measure bestMeasure = new Measure();
     		bestMeasure.totalCost = Double.MAX_VALUE;
-    		
-    		ArrayList<Integer> routeList= new ArrayList<Integer>();
-            for(int j = 0; j < sol.routes.size(); j++)
-                routeList.add(j);  
-            
-            Collections.shuffle(routeList);  
-            
-    		for (int j = 0; j < randomRouteNr; j++) {
-    			// 随机选择一条route
-    			int routeIndex = routeList.remove(0);
-    			Route insertRoute = sol.routes.get(routeIndex);
-    			
-    			while(insertRoute.getServiceList().size() < 1) {
-    				routeIndex = routeList.remove(0);
-    				insertRoute = sol.routes.get(routeIndex);
-    			}
-    			
-    			// 随机决定查找多少个位置
-    			int insertTimes = r.nextInt(insertRoute.getServiceList().size() - 1) + 1;
-    			
-        		ArrayList<Integer> customerList= new ArrayList<Integer>();
-                for(int k = 1; k < insertRoute.getServiceList().size(); k++)
-                	customerList.add(k);  
-                
-                Collections.shuffle(customerList); 
-                
-                // 随机选择一条位置
-    			for (int k = 0; k < insertTimes; k++) {
-    				int insertPos = customerList.remove(0);
-    				
-    				// 评价插入情况
-    				Measure evalMeasure = sol.evalInsertStop(insertRoute, insertPos, insertDelivery);
 
-    				// 更新最优插入位置
+			List<Integer> routeIndexList = IntStream
+					.range(0, routeList.size())   // [0, sol.routes.size-1]
+					.filter(n -> routeList.get(n).getServiceList().size() > 0)
+					.boxed()
+					.collect(Collectors.toList());
+            Collections.shuffle(routeIndexList);
+
+			// Number of routes to check for insertion
+			int numRouteToCheck = RandomUtil.getRandom().nextInt(routeList.size() - 1) + 1;
+    		for (int j = 0; j < numRouteToCheck; j++) {
+    			// select a route randomly
+    			int routeIndex = routeIndexList.remove(0);
+    			Route insertRoute = routeList.get(routeIndex);
+
+				List<Integer> stopIndexList = IntStream
+						.range(1, insertRoute.getServiceList().size())   // [1, insertRoute.getServiceList().size-1]
+						.boxed()
+						.collect(Collectors.toList());
+				Collections.shuffle(stopIndexList);
+
+    			// number of positions to check for insertion
+    			int numPosToCheck = RandomUtil.getRandom().nextInt(insertRoute.getServiceList().size() - 1) + 1;
+    			for (int k = 0; k < numPosToCheck; k++) {
+					// select a position randomly
+    				int insertPos = stopIndexList.remove(0);
+    				
+    				// evaluate
+    				Measure evalMeasure = result.evalInsertStop(insertRoute, insertPos, insertDelivery);
+
+    				// update if better
     				if (evalMeasure.totalCost < bestMeasure.totalCost) {
     					bestRoute = insertRoute;
     					bestInsertPos = insertPos;
     					bestMeasure = evalMeasure;
     				}
     			}
-    			// 执行插入操作
-    			sol.insertStop(bestRoute, bestInsertPos, insertDelivery);
     		}
+			// do insert
+			result.insertStop(bestRoute, bestInsertPos, insertDelivery);
     	}
-		return sol;
+		return result;
 	}
    
 }

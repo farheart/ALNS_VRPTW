@@ -9,27 +9,28 @@ import java.util.List;
 
 
 /**
- * ALNSSolution
+ * ALNSResult
  *
  * @author Yu Wang
  * @date  2022-11-19
  */
-public class ALNSSolution {
+public class ALNSResult {
+    public Instance instance;
+
     public List<Route> routes;
-    public Measure measure;
+
+	public List<Delivery> removeSet;
+
+	public Measure measure;
 
 	public int numVehicle;
 
-    public Instance instance;
-
 	public double alpha;
 	public double beta;
-	
 	public static final double penalty = 1000;
-	
-	public List<Delivery> removeSet;
 
-    private ALNSSolution(Instance instance) {
+
+    private ALNSResult(Instance instance) {
         this.instance = instance;
 
         this.measure = new Measure();
@@ -43,7 +44,7 @@ public class ALNSSolution {
         this.removeSet = new LinkedList<>();
     }
     
-    public ALNSSolution(Solution sol, Instance instance) {
+    public ALNSResult(Solution sol, Instance instance) {
 		this(instance);
 
         measure.distance = sol.getTotalCost();
@@ -55,7 +56,7 @@ public class ALNSSolution {
         }
     }
     
-    public ALNSSolution(ALNSSolution sol) {
+    public ALNSResult(ALNSResult sol) {
         this.instance = sol.instance;
 
     	this.measure = new Measure(sol.measure);
