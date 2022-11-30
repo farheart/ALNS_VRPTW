@@ -8,6 +8,7 @@ import wy.alns.util.RandomUtil;
 @Slf4j
 abstract class ALNSAbstractDestroy extends ALNSAbstractOperation {
     protected boolean isDestroyReady(ALNSResult result) {
+        log.debug(">> [{}] invoked ...", this.getClass().getSimpleName());
         if (result.removeSet.size() != 0) {
             log.error(">> [ERROR] - [{}] removeSet MUST be empty to start destroy!", this.getClass().getSimpleName());
             return false;

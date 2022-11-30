@@ -33,7 +33,6 @@ public class RandomDestroy extends ALNSAbstractDestroy implements IALNSDestroy {
 			// do remove
 			result.removeStop(removeRoute, removePos);
 		}
-
 		return result;
 	}
 

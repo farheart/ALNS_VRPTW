@@ -8,6 +8,7 @@ import wy.alns.algrithm.alns.operation.ALNSAbstractOperation;
 @Slf4j
 abstract class ALNSAbstractRepair extends ALNSAbstractOperation {
     protected boolean isRepairReady(ALNSResult result) {
+        log.debug(">> [{}] invoked ...", this.getClass().getSimpleName());
         if (result.removeSet.size() == 0) {
             ALNS.invalidIterCount++;
             log.error(">> [ERROR] - [{}] removeSet should NOT be empty!", this.getClass().getSimpleName());

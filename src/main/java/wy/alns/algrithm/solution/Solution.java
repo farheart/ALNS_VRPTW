@@ -17,6 +17,8 @@ import java.util.List;
 public class Solution {
 	public double solveTime;
 
+    private String solveInfo;
+
     private List<Route> routes;
 
     /**

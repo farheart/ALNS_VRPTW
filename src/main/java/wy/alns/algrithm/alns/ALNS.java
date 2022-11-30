@@ -122,14 +122,13 @@ public class ALNS {
         
         Solution solution = globalBestSol.toSolution();
         solution.solveTime = (System.currentTimeMillis() - timeStart) / 1000.0;  // time elapsed
-
-        showInfo(solution);
+        solution.setSolveInfo(this.collectInfo(solution));
 
         return solution;
     }
 
-    private void showInfo(Solution solution) {
-        log.info(">> Run time = " + solution.solveTime + " sec");
+    private String collectInfo(Solution solution) {
+        String result = (">> Run time = " + solution.solveTime + " sec\n\n");
 
         // Utilization of operators
         String msg = "";
@@ -140,7 +139,8 @@ public class ALNS {
         for (IALNSRepair op : repairOperators){
             msg += op.getDraws() +" invokes  - [" + op.getClass().getName() +  "]\n";
         }
-        log.info(">> Statistics of operator utilization : \n" + msg);
+        result += (">> Statistics of operator utilization : \n" + msg);
+        return result;
     }
 
 
