@@ -65,9 +65,9 @@ public class Instance {
     private List<String> loadDataLines(int size, String name) {
         String dataFileName = "";
         if (this.type.equals("Solomon")) {
-            dataFileName = "./instances" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
+            dataFileName = "./data" + "/solomon" + "/solomon_" + size + "/" + name + ".txt";
         } else if (this.type.equals("Homberger")) {
-            dataFileName = "./instances" + "/homberger" + "/homberger_" + size + "/" + name + ".txt";
+            dataFileName = "./data" + "/homberger" + "/homberger_" + size + "/" + name + ".txt";
         }
 
         List<String> result = null;
