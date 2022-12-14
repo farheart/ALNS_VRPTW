@@ -13,24 +13,24 @@ import lombok.Getter;
 public enum ALNSConfig {
     DEFAULT(10000, 500, 0.1, 20, 5, 1, 0.99937, 0.05, 0.5);
 
-    private final int omega; // iteration numbers
-    private final int tau; //更新算子选择概率的间隔迭代次数
-    private final double r_p; //计算概率
-    private final int sigma_1; //发现全局最优，add
-    private final int sigma_2;//发现局部最优，add
-    private final int sigma_3;//发现较差，add
+    private final int maxIterNum;  // max iteration numbers -- omega
+    private final int itersBetweenUpdate;  // iterations between updating the probability of op selection -- tau
+    private final double r_p; // probability used in calculate weight factor -- r_p
+    private final int delta_GlobalBest;  // delta to add to Pi for Global Best -- sigma_1
+    private final int delta_LocalBest;  // delta to add to Pi for Local Best -- sigma_2
+    private final int delta_Worse;  // delta to add to Pi for Worse -- sigma_3
     private final double c;
     private final double delta;
     private final double big_omega;
 
 
-    ALNSConfig(int omega, int tau, double r_p, int sigma_1, int sigma_2, int sigma_3, double c, double delta, double big_omega) {
-        this.omega = omega;
-        this.tau = tau;
+    ALNSConfig(int maxIterNum, int itersBetweenUpdate, double r_p, int delta_GlobalBest, int delta_LocalBest, int delta_Worse, double c, double delta, double big_omega) {
+        this.maxIterNum = maxIterNum;
+        this.itersBetweenUpdate = itersBetweenUpdate;
         this.r_p = r_p;
-        this.sigma_1 = sigma_1;
-        this.sigma_2 = sigma_2;
-        this.sigma_3 = sigma_3;
+        this.delta_GlobalBest = delta_GlobalBest;
+        this.delta_LocalBest = delta_LocalBest;
+        this.delta_Worse = delta_Worse;
         this.c = c;
         this.delta = delta;
         this.big_omega = big_omega;

@@ -52,14 +52,13 @@ public class ALNS {
 
     public static int invalidIterCount = 0;
 
-    // time
     private double T;
 
     private double T_s;
 
     private long timeStart;
 
-    private double timeEnd;
+    private double T_end;
     
 
     public ALNS(Solution sol, Instance instance, ALNSConfig config) {
@@ -74,7 +73,7 @@ public class ALNS {
     public Solution improveSolution() {
         T_s = -(config.getDelta() / Math.log(config.getBig_omega())) * localBestSol.measure.totalCost;
         T = T_s;
-        timeEnd = T_end_t * T_s;
+        // T_end = T_end_t * T_s;
 
         timeStart = System.currentTimeMillis();
         
@@ -107,16 +106,16 @@ public class ALNS {
                 handleWorseSolution(destroyOperator, repairOperator, solRepair);
             }
 
-            if (iteration % config.getTau() == 0 && iteration > 0) {
+            if (iteration % config.getItersBetweenUpdate() == 0 && iteration > 0) {
                 updateFactors();
             }
             
             T = config.getC() * T;
             iteration++;
             
-            if (iteration > config.getOmega() && globalBestSol.isFeasible())
+            if (iteration > config.getMaxIterNum() && globalBestSol.isFeasible())
                 break;
-            if (iteration > config.getOmega() * 1.5 )
+            if (iteration > config.getMaxIterNum() * 1.5 )
                 break;
         }
         
@@ -150,14 +149,14 @@ public class ALNS {
         if (Math.random() < p_accept) {
             this.localBestSol = s_t;
         }
-        destroyOperator.incPi(config.getSigma_3());
-        repairOperator.incPi(config.getSigma_3());
+        destroyOperator.incPi(config.getDelta_Worse());
+        repairOperator.incPi(config.getDelta_Worse());
     }
 
 
     private void handleNewLocalMinimum(IALNSDestroy destroyOperator, IALNSRepair repairOperator) {
-        destroyOperator.incPi(config.getSigma_2());
-        repairOperator.incPi(config.getSigma_2());
+        destroyOperator.incPi(config.getDelta_LocalBest());
+        repairOperator.incPi(config.getDelta_LocalBest());
     }
 
 
@@ -170,8 +169,8 @@ public class ALNS {
 
         // Accept global best
         this.globalBestSol = solRepair;
-        destroyOperator.incPi(config.getSigma_1());
-        repairOperator.incPi(config.getSigma_1());
+        destroyOperator.incPi(config.getDelta_GlobalBest());
+        repairOperator.incPi(config.getDelta_GlobalBest());
     }
 
 
